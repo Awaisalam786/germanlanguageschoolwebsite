@@ -1,0 +1,97 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-bg-primary: #0F172A;
+  --color-bg-secondary: #1E293B;
+  --color-accent-primary: #F59E0B;
+  --color-accent-secondary: #DC2626;
+  --color-text-heading: #FFFFFF;
+  --color-text-body: #CBD5E1;
+  --color-success: #10B981;
+  --color-border: #334155;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-body);
+    @apply font-sans antialiased selection:bg-amber-500 selection:text-slate-950 min-h-screen;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: var(--color-text-heading);
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-accent-primary);
+}
+
+/* Dynamic CSS Variable Utility Classes */
+.theme-bg-primary {
+  background-color: var(--color-bg-primary);
+}
+
+.theme-bg-secondary {
+  background-color: var(--color-bg-secondary);
+}
+
+.theme-accent-primary {
+  color: var(--color-accent-primary);
+}
+
+.theme-border {
+  border-color: var(--color-border);
+}
+
+/* Glassmorphism utility classes */
+.glass-panel {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-card {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(245, 158, 11, 0.15);
+}
+
+.gold-gradient-text {
+  background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.german-flag-strip {
+  background: linear-gradient(90deg, #111827 0%, #111827 33.3%, #DC2626 33.3%, #DC2626 66.6%, #D97706 66.6%, #D97706 100%);
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(217, 119, 6, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(217, 119, 6, 0.6);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 3s infinite ease-in-out;
+}

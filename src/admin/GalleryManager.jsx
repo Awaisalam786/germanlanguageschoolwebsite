@@ -1,0 +1,107 @@
+import React, { useState } from 'react';
+import { Image as ImageIcon, Upload, Trash2, Eye } from 'lucide-react';
+import { applyAutoWatermark } from '../utils/watermark';
+
+const mockImages = [
+  { id: 'g1', url: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80', caption: 'B1 Class Graduation' },
+  { id: 'g2', url: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=800&q=80', caption: 'Study Material' }
+];
+
+export default function GalleryManager() {
+  const [images, setImages] = useState(mockImages);
+  const [uploading, setUploading] = useState(false);
+  const [preview, setPreview] = useState(null);
+
+  const handleUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setUploading(true);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      // Apply watermark automatically
+      const originalSrc = event.target.result;
+      const watermarkedUrl = applyAutoWatermark(originalSrc, "0342 1189593");
+      
+      setTimeout(() => {
+        setImages([{ id: `g-${Date.now()}`, url: watermarkedUrl || originalSrc, caption: 'New Upload' }, ...images]);
+        setUploading(false);
+      }, 500); // simulate upload delay
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDelete = (id) => {
+    if (confirm('Delete this gallery image?')) {
+      setImages(images.filter(img => img.id !== id));
+    }
+  };
+
+  return (
+    <div className="space-y-8">
+      
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-2xl font-extrabold text-white flex items-center gap-2">
+            <ImageIcon className="w-6 h-6 text-amber-400" />
+            <span>Gallery Management</span>
+          </h2>
+          <p className="text-xs text-slate-400">Upload class photos and event images. Watermark is auto-applied.</p>
+        </div>
+
+        <div className="relative">
+          <input
+            type="file"
+            accept="image/*"
+            onChange={handleUpload}
+            disabled={uploading}
+            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+          />
+          <button
+            disabled={uploading}
+            className="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 disabled:bg-slate-700 disabled:text-slate-500 text-slate-950 font-bold rounded-xl text-xs shadow-gold-glow flex items-center gap-2 transition"
+          >
+            <Upload className="w-4 h-4" />
+            <span>{uploading ? 'Processing...' : 'Upload Image'}</span>
+          </button>
+        </div>
+      </div>
+
+      {/* Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {images.map(img => (
+          <div key={img.id} className="group relative rounded-xl overflow-hidden bg-slate-900 border border-slate-800 aspect-video">
+            <img src={img.url} alt={img.caption} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition" />
+            
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
+              <input 
+                type="text"
+                value={img.caption}
+                onChange={(e) => setImages(images.map(i => i.id === img.id ? {...i, caption: e.target.value} : i))}
+                className="bg-slate-950/80 border border-slate-700 text-white text-[10px] px-2 py-1 rounded w-full focus:outline-none focus:border-amber-500"
+                placeholder="Caption..."
+              />
+              <div className="flex items-center gap-2 mt-2">
+                <button onClick={() => setPreview(img.url)} className="p-1.5 rounded bg-slate-800 text-amber-400 hover:bg-slate-700 flex-1 flex justify-center">
+                  <Eye className="w-3.5 h-3.5" />
+                </button>
+                <button onClick={() => handleDelete(img.id)} className="p-1.5 rounded bg-slate-800 text-red-400 hover:bg-slate-700 flex-1 flex justify-center">
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Preview Modal */}
+      {preview && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/90 backdrop-blur-sm" onClick={() => setPreview(null)}>
+          <img src={preview} alt="Preview" className="max-w-full max-h-full rounded-lg shadow-2xl" />
+        </div>
+      )}
+
+    </div>
+  );
+}
