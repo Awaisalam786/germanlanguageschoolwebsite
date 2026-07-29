@@ -1,20 +1,34 @@
-import React, { useState } from 'react';
-import { Newspaper, Plus, Edit, Trash2, Calendar, Clock, X } from 'lucide-react';
-import { initialBlogPosts } from '../mockData/seedData';
+import React, { useState, useEffect } from 'react';
+import { Newspaper, Plus, Edit, Trash2, Calendar, Clock, X, Loader2 } from 'lucide-react';
+import { supabase } from '../lib/supabaseClient';
 
 export default function BlogCMS() {
-  const [posts, setPosts] = useState(initialBlogPosts);
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingPost, setEditingPost] = useState(null);
   const [formData, setFormData] = useState({
     title: '',
     category: 'Exam Tips',
     author: 'Dr. Michael Weber',
-    readTime: '6 min read',
+    read_time: '6 min read',
     summary: '',
     content: '',
     image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80'
   });
+
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const fetchPosts = async () => {
+    setLoading(true);
+    const { data, error } = await supabase.from('blog_posts').select('*').order('created_at', { ascending: false });
+    if (!error && data) {
+      setPosts(data);
+    }
+    setLoading(false);
+  };
 
   const handleOpenAdd = () => {
     setEditingPost(null);
@@ -22,7 +36,7 @@ export default function BlogCMS() {
       title: '',
       category: 'Exam Tips',
       author: 'Dr. Michael Weber',
-      readTime: '6 min read',
+      read_time: '6 min read',
       summary: '',
       content: '',
       image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80'
@@ -32,30 +46,48 @@ export default function BlogCMS() {
 
   const handleOpenEdit = (post) => {
     setEditingPost(post);
-    setFormData({ ...post });
+    setFormData({ 
+      title: post.title,
+      category: post.category,
+      author: post.author,
+      read_time: post.read_time,
+      summary: post.summary,
+      content: post.content,
+      image: post.image
+    });
     setShowModal(true);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm('Delete this article?')) {
-      setPosts(posts.filter(p => p.id !== id));
+      const { error } = await supabase.from('blog_posts').delete().eq('id', id);
+      if (!error) {
+        setPosts(posts.filter(p => p.id !== id));
+      } else {
+        alert('Failed to delete post');
+      }
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (editingPost) {
-      setPosts(posts.map(p => p.id === editingPost.id ? { ...p, ...formData } : p));
+      const { data, error } = await supabase.from('blog_posts').update(formData).eq('id', editingPost.id).select().single();
+      if (!error && data) {
+        setPosts(posts.map(p => p.id === editingPost.id ? data : p));
+        setShowModal(false);
+      } else {
+        alert('Failed to update post');
+      }
     } else {
-      const newP = {
-        id: `post-${Date.now()}`,
-        slug: formData.title.toLowerCase().replace(/\s+/g, '-'),
-        date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-        ...formData
-      };
-      setPosts([newP, ...posts]);
+      const { data, error } = await supabase.from('blog_posts').insert([formData]).select().single();
+      if (!error && data) {
+        setPosts([data, ...posts]);
+        setShowModal(false);
+      } else {
+        alert('Failed to add post');
+      }
     }
-    setShowModal(false);
   };
 
   return (
@@ -78,31 +110,37 @@ export default function BlogCMS() {
         </button>
       </div>
 
-      <div className="space-y-4">
-        {posts.map((post) => (
-          <div key={post.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <img src={post.image} alt={post.title} className="w-20 h-20 rounded-xl object-cover border border-slate-800 shrink-0" />
-              <div className="space-y-1">
-                <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-bold text-[10px]">
-                  {post.category}
-                </span>
-                <h3 className="text-sm font-bold text-white leading-snug">{post.title}</h3>
-                <div className="text-[11px] text-slate-400">By {post.author} • {post.date}</div>
+      {loading ? (
+        <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 text-amber-500 animate-spin" /></div>
+      ) : (
+        <div className="space-y-4">
+          {posts.length === 0 ? (
+            <div className="text-center text-slate-400 py-12">No blog posts found.</div>
+          ) : posts.map((post) => (
+            <div key={post.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <img src={post.image} alt={post.title} className="w-20 h-20 rounded-xl object-cover border border-slate-800 shrink-0" />
+                <div className="space-y-1">
+                  <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-bold text-[10px]">
+                    {post.category}
+                  </span>
+                  <h3 className="text-sm font-bold text-white leading-snug">{post.title}</h3>
+                  <div className="text-[11px] text-slate-400">By {post.author} • {new Date(post.created_at).toLocaleDateString()}</div>
+                </div>
+              </div>
+
+              <div className="flex space-x-2">
+                <button onClick={() => handleOpenEdit(post)} className="p-2 rounded bg-slate-800 text-amber-400 hover:bg-slate-700">
+                  <Edit className="w-4 h-4" />
+                </button>
+                <button onClick={() => handleDelete(post.id)} className="p-2 rounded bg-slate-800 text-red-400 hover:bg-slate-700">
+                  <Trash2 className="w-4 h-4" />
+                </button>
               </div>
             </div>
-
-            <div className="flex space-x-2">
-              <button onClick={() => handleOpenEdit(post)} className="p-2 rounded bg-slate-800 text-amber-400 hover:bg-slate-700">
-                <Edit className="w-4 h-4" />
-              </button>
-              <button onClick={() => handleDelete(post.id)} className="p-2 rounded bg-slate-800 text-red-400 hover:bg-slate-700">
-                <Trash2 className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {showModal && (
         <div className="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-sm flex items-center justify-center p-4">
@@ -174,7 +212,7 @@ export default function BlogCMS() {
               </div>
 
               <button type="submit" className="w-full py-3 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs shadow">
-                Publish Article to Public Site
+                {editingPost ? 'Update Article' : 'Publish Article to Public Site'}
               </button>
             </form>
           </div>

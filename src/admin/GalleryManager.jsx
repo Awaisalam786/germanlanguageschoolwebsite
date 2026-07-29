@@ -1,16 +1,28 @@
-import React, { useState } from 'react';
-import { Image as ImageIcon, Upload, Trash2, Eye } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Image as ImageIcon, Upload, Trash2, Eye, Loader2 } from 'lucide-react';
 import { applyAutoWatermark } from '../utils/watermark';
-
-const mockImages = [
-  { id: 'g1', url: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=800&q=80', caption: 'B1 Class Graduation' },
-  { id: 'g2', url: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?auto=format&fit=crop&w=800&q=80', caption: 'Study Material' }
-];
+import { supabase } from '../lib/supabaseClient';
+import { useGlobalContent } from '../context/GlobalContentContext';
 
 export default function GalleryManager() {
-  const [images, setImages] = useState(mockImages);
+  const { settings } = useGlobalContent();
+  const [images, setImages] = useState([]);
   const [uploading, setUploading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [preview, setPreview] = useState(null);
+
+  useEffect(() => {
+    fetchImages();
+  }, []);
+
+  const fetchImages = async () => {
+    setLoading(true);
+    const { data, error } = await supabase.from('gallery').select('*').order('created_at', { ascending: false });
+    if (!error && data) {
+      setImages(data);
+    }
+    setLoading(false);
+  };
 
   const handleUpload = (e) => {
     const file = e.target.files[0];
@@ -18,24 +30,53 @@ export default function GalleryManager() {
 
     setUploading(true);
     const reader = new FileReader();
-    reader.onload = (event) => {
-      // Apply watermark automatically
+    reader.onload = async (event) => {
+      // Apply watermark automatically using Global Settings
       const originalSrc = event.target.result;
-      const watermarkedUrl = applyAutoWatermark(originalSrc, "0342 1189593");
+      const watermarkedUrl = applyAutoWatermark(originalSrc, settings?.watermark_text || "03421189593");
       
-      setTimeout(() => {
-        setImages([{ id: `g-${Date.now()}`, url: watermarkedUrl || originalSrc, caption: 'New Upload' }, ...images]);
-        setUploading(false);
-      }, 500); // simulate upload delay
+      const payload = {
+        url: watermarkedUrl || originalSrc,
+        caption: 'New Upload'
+      };
+
+      const { data, error } = await supabase.from('gallery').insert([payload]).select().single();
+      
+      if (!error && data) {
+        setImages([data, ...images]);
+      } else {
+        alert('Failed to upload image');
+      }
+      setUploading(false);
     };
     reader.readAsDataURL(file);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm('Delete this gallery image?')) {
-      setImages(images.filter(img => img.id !== id));
+      const { error } = await supabase.from('gallery').delete().eq('id', id);
+      if (!error) {
+        setImages(images.filter(img => img.id !== id));
+      } else {
+        alert('Failed to delete image');
+      }
     }
   };
+
+  const handleUpdateCaption = async (id, newCaption) => {
+    const { error } = await supabase.from('gallery').update({ caption: newCaption }).eq('id', id);
+    if (!error) {
+      setImages(images.map(img => img.id === id ? { ...img, caption: newCaption } : img));
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 text-amber-500 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -75,12 +116,13 @@ export default function GalleryManager() {
             <img src={img.url} alt={img.caption} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition" />
             
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex flex-col justify-end p-3">
-              <input 
+              <input
                 type="text"
-                value={img.caption}
-                onChange={(e) => setImages(images.map(i => i.id === img.id ? {...i, caption: e.target.value} : i))}
-                className="bg-slate-950/80 border border-slate-700 text-white text-[10px] px-2 py-1 rounded w-full focus:outline-none focus:border-amber-500"
-                placeholder="Caption..."
+                value={img.caption || ''}
+                onChange={(e) => setImages(images.map(i => i.id === img.id ? { ...i, caption: e.target.value } : i))}
+                onBlur={(e) => handleUpdateCaption(img.id, e.target.value)}
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                placeholder="Image Caption"
               />
               <div className="flex items-center gap-2 mt-2">
                 <button onClick={() => setPreview(img.url)} className="p-1.5 rounded bg-slate-800 text-amber-400 hover:bg-slate-700 flex-1 flex justify-center">

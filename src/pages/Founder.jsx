@@ -72,7 +72,7 @@ export default function Founder({ setActiveTab }) {
                 className="px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs shadow flex items-center gap-2 transition"
               >
                 <MessageCircle className="w-4 h-4 fill-current" />
-                <span>Consult Founder on WhatsApp (0342 1189593)</span>
+                <span>Consult Founder on WhatsApp (03421189593)</span>
               </button>
 
               <button

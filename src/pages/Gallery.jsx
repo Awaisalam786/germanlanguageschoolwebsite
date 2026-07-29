@@ -1,17 +1,38 @@
-import React, { useState } from 'react';
-import { Image as GalleryIcon, Maximize2, X, Lock } from 'lucide-react';
-import { initialGallery } from '../mockData/seedData';
+import React, { useState, useEffect } from 'react';
+import { Image as GalleryIcon, Maximize2, X, Lock, Loader2 } from 'lucide-react';
 import ProtectedImage from '../components/ProtectedImage';
+import { supabase } from '../lib/supabaseClient';
+import { useGlobalContent } from '../context/GlobalContentContext';
 
 export default function Gallery() {
+  const { settings } = useGlobalContent();
+  const [gallery, setGallery] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [lightboxImage, setLightboxImage] = useState(null);
 
   const categories = ['All', 'Live Classes', 'Certificates', 'Webinars'];
 
+  useEffect(() => {
+    const fetchGallery = async () => {
+      const { data } = await supabase.from('gallery').select('*').order('created_at', { ascending: false });
+      if (data) {
+        const mapped = data.map(item => ({
+          id: item.id,
+          category: 'Live Classes', // default category since we didn't add it to DB
+          imageUrl: item.url,
+          title: item.caption
+        }));
+        setGallery(mapped);
+      }
+      setLoading(false);
+    };
+    fetchGallery();
+  }, []);
+
   const filteredGallery = selectedCategory === 'All'
-    ? initialGallery
-    : initialGallery.filter(item => item.category === selectedCategory);
+    ? gallery
+    : gallery.filter(item => item.category === selectedCategory);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
@@ -46,7 +67,12 @@ export default function Gallery() {
 
       {/* Photo Cards Grid with Protected Watermarked Images */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {filteredGallery.map((item) => (
+        {loading ? (
+          <div className="col-span-full text-center text-slate-400 py-12 flex flex-col items-center">
+            <Loader2 className="w-8 h-8 text-amber-500 animate-spin mb-4" />
+            Loading gallery...
+          </div>
+        ) : filteredGallery.map((item) => (
           <div
             key={item.id}
             onClick={() => setLightboxImage(item)}
@@ -56,7 +82,7 @@ export default function Gallery() {
               <ProtectedImage
                 src={item.imageUrl}
                 alt={item.title}
-                watermarkText="0342 1189593"
+                watermarkText={settings?.whatsapp_number || "03421189593"}
                 className="w-full h-full"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-80 group-hover:opacity-60 transition pointer-events-none"></div>
@@ -90,17 +116,17 @@ export default function Gallery() {
               </button>
             </div>
 
-            <div className="h-[420px] rounded-2xl overflow-hidden border border-slate-800 relative bg-slate-950">
+            <div className="h-[420px] rounded-2xl overflow-hidden border border-slate-800 relative bg-slate-950 flex items-center justify-center">
               <ProtectedImage
                 src={lightboxImage.imageUrl}
                 alt={lightboxImage.title}
-                watermarkText="0342 1189593"
-                className="w-full h-full"
+                watermarkText={settings?.whatsapp_number || "03421189593"}
+                className="w-auto h-auto max-w-full max-h-[85vh] mx-auto rounded-lg shadow-2xl border border-slate-700"
               />
             </div>
 
             <p className="text-xs text-slate-300 text-center italic">
-              {lightboxImage.caption} • <span className="text-amber-400 font-semibold">Protected Image (0342 1189593)</span>
+              {lightboxImage.caption} • <span className="text-amber-400 font-semibold">Protected Image ({settings?.whatsapp_number || "03421189593"})</span>
             </p>
 
           </div>

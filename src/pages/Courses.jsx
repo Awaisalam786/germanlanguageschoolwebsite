@@ -1,20 +1,40 @@
-import React, { useState } from 'react';
-import { initialCourses } from '../mockData/seedData';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabaseClient';
 import { translations } from '../i18n/translations';
 import CourseCard from '../components/CourseCard';
 import CourseBundles from '../components/CourseBundles';
+import ScrollReveal from '../components/ScrollReveal';
 
 export default function Courses({ currentLang, setActiveTab, onOpenTrialModal }) {
   const t = translations[currentLang];
   const [selectedLevel, setSelectedLevel] = useState('All');
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      const { data } = await supabase.from('courses').select('*').order('created_at', { ascending: true });
+      if (data) {
+        const levelOrder = { 'A1': 1, 'A2': 2, 'B1': 3, 'B2': 4 };
+        const sortedData = data.sort((a, b) => (levelOrder[a.level] || 99) - (levelOrder[b.level] || 99));
+        setCourses(sortedData);
+      }
+      setLoading(false);
+    };
+    fetchCourses();
+  }, []);
 
   const filteredCourses = selectedLevel === 'All' 
-    ? initialCourses 
-    : initialCourses.filter(c => c.level === selectedLevel);
+    ? courses 
+    : courses.filter(c => c.level === selectedLevel);
 
-  const handleWhatsAppEnroll = (courseTitle) => {
-    const msg = encodeURIComponent(`Hi, I want to enroll in ${courseTitle}. Please share payment details.`);
-    window.open(`https://wa.me/923421189593?text=${msg}`, '_blank');
+  const handleWhatsAppEnroll = (courseTitle, couponCode = null) => {
+    let msg = `Hi, I want to enroll in ${courseTitle}.`;
+    if (couponCode) {
+      msg += ` I am applying the coupon code: ${couponCode}.`;
+    }
+    msg += ` Please share payment details.`;
+    window.open(`https://wa.me/923421189593?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   return (
@@ -50,12 +70,21 @@ export default function Courses({ currentLang, setActiveTab, onOpenTrialModal })
 
       {/* Responsive Grid: SINGLE ROW of 4 Columns on Desktop (lg:grid-cols-4), 2 Cols Tablet, 1 Col Mobile */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {filteredCourses.map((course) => (
-          <CourseCard
-            key={course.id}
-            course={course}
-            onEnroll={handleWhatsAppEnroll}
-          />
+        {loading ? (
+          <div className="col-span-full text-center text-slate-400 py-12">Loading courses...</div>
+        ) : filteredCourses.map((course) => (
+          <ScrollReveal key={course.id} className="h-full">
+            <CourseCard
+              course={{
+                ...course,
+                feesPKR: course.price,
+                feesEUR: course.price,
+                description: course.description || `Comprehensive German ${course.level} course.`,
+                featuredBadge: course.badge || ''
+              }}
+              onEnroll={handleWhatsAppEnroll}
+            />
+          </ScrollReveal>
         ))}
       </div>
 

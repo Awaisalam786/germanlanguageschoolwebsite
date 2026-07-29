@@ -1,13 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MessageSquare, Plus, Edit, Trash2, Star, Video, Image as ImageIcon, X } from 'lucide-react';
-
-const mockTestimonials = [
-  { id: 't1', name: 'Ali Hassan', course: 'B1 Intensive', rating: 5, text: 'Cleared my exam with 92 marks! Highly recommended.', type: 'text' },
-  { id: 't2', name: 'Sara Khan', course: 'A2 Foundation', rating: 5, text: 'Best online German classes in Pakistan.', type: 'text' }
-];
+import { supabase } from '../lib/supabaseClient';
 
 export default function TestimonialManager() {
-  const [testimonials, setTestimonials] = useState(mockTestimonials);
+  const [testimonials, setTestimonials] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   
@@ -19,6 +16,19 @@ export default function TestimonialManager() {
     type: 'text'
   });
 
+  useEffect(() => {
+    fetchTestimonials();
+  }, []);
+
+  const fetchTestimonials = async () => {
+    setLoading(true);
+    const { data, error } = await supabase.from('testimonials').select('*').order('created_at', { ascending: false });
+    if (!error && data) {
+      setTestimonials(data);
+    }
+    setLoading(false);
+  };
+
   const handleOpenAdd = () => {
     setEditingId(null);
     setFormData({ name: '', course: 'A1 Beginner', rating: 5, text: '', type: 'text' });
@@ -27,22 +37,52 @@ export default function TestimonialManager() {
 
   const handleOpenEdit = (t) => {
     setEditingId(t.id);
-    setFormData({ ...t });
+    setFormData({ 
+      name: t.name,
+      course: t.course,
+      rating: t.rating,
+      text: t.text,
+      type: t.type
+    });
     setShowModal(true);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm('Delete this testimonial?')) {
-      setTestimonials(testimonials.filter(t => t.id !== id));
+      const { error } = await supabase.from('testimonials').delete().eq('id', id);
+      if (!error) {
+        setTestimonials(testimonials.filter(t => t.id !== id));
+      } else {
+        alert('Error deleting testimonial: ' + error.message);
+      }
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (editingId) {
-      setTestimonials(testimonials.map(t => t.id === editingId ? { ...t, ...formData } : t));
+      const { data, error } = await supabase
+        .from('testimonials')
+        .update(formData)
+        .eq('id', editingId)
+        .select();
+      
+      if (!error && data) {
+        setTestimonials(testimonials.map(t => t.id === editingId ? data[0] : t));
+      } else {
+        alert('Error updating testimonial: ' + error?.message);
+      }
     } else {
-      setTestimonials([{ id: `t-${Date.now()}`, ...formData }, ...testimonials]);
+      const { data, error } = await supabase
+        .from('testimonials')
+        .insert([formData])
+        .select();
+        
+      if (!error && data) {
+        setTestimonials([data[0], ...testimonials]);
+      } else {
+        alert('Error adding testimonial: ' + error?.message);
+      }
     }
     setShowModal(false);
   };
@@ -57,7 +97,7 @@ export default function TestimonialManager() {
             <MessageSquare className="w-6 h-6 text-amber-400" />
             <span>Testimonials Manager</span>
           </h2>
-          <p className="text-xs text-slate-400">Manage student success stories, text reviews, and video testimonials.</p>
+          <p className="text-xs text-slate-400">Manage student success stories, text reviews, and video testimonials (Synced with Supabase).</p>
         </div>
 
         <button
@@ -69,40 +109,43 @@ export default function TestimonialManager() {
         </button>
       </div>
 
-      {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {testimonials.map(t => (
-          <div key={t.id} className="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between">
-            <div className="space-y-3">
-              <div className="flex items-start justify-between">
-                <div>
-                  <h3 className="text-white font-bold">{t.name}</h3>
-                  <span className="text-[10px] text-amber-400 font-bold tracking-wider uppercase">{t.course}</span>
+      {loading ? (
+        <div className="text-center py-10 text-amber-400 font-bold">Loading testimonials from Supabase...</div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {testimonials.map(t => (
+            <div key={t.id} className="bg-slate-900 border border-slate-800 p-5 rounded-2xl flex flex-col justify-between">
+              <div className="space-y-3">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h3 className="text-white font-bold">{t.name}</h3>
+                    <span className="text-[10px] text-amber-400 font-bold tracking-wider uppercase">{t.course}</span>
+                  </div>
+                  <div className="flex items-center gap-0.5 text-amber-400">
+                    {[...Array(t.rating)].map((_, i) => <Star key={i} className="w-3.5 h-3.5 fill-current" />)}
+                  </div>
                 </div>
-                <div className="flex items-center gap-0.5 text-amber-400">
-                  {[...Array(t.rating)].map((_, i) => <Star key={i} className="w-3.5 h-3.5 fill-current" />)}
-                </div>
+                <p className="text-xs text-slate-400 italic">"{t.text}"</p>
               </div>
-              <p className="text-xs text-slate-400 italic">"{t.text}"</p>
-            </div>
 
-            <div className="mt-5 pt-4 border-t border-slate-800/80 flex items-center justify-between">
-              <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
-                {t.type === 'video' ? <Video className="w-3.5 h-3.5" /> : <ImageIcon className="w-3.5 h-3.5" />}
-                <span>{t.type} format</span>
-              </div>
-              <div className="flex space-x-2">
-                <button onClick={() => handleOpenEdit(t)} className="p-1.5 rounded bg-slate-800 text-amber-400 hover:bg-slate-700 transition">
-                  <Edit className="w-3.5 h-3.5" />
-                </button>
-                <button onClick={() => handleDelete(t.id)} className="p-1.5 rounded bg-slate-800 text-red-400 hover:bg-slate-700 transition">
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
+              <div className="mt-5 pt-4 border-t border-slate-800/80 flex items-center justify-between">
+                <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-slate-500">
+                  {t.type === 'video' ? <Video className="w-3.5 h-3.5" /> : <ImageIcon className="w-3.5 h-3.5" />}
+                  <span>{t.type} format</span>
+                </div>
+                <div className="flex space-x-2">
+                  <button onClick={() => handleOpenEdit(t)} className="p-1.5 rounded bg-slate-800 text-amber-400 hover:bg-slate-700 transition">
+                    <Edit className="w-3.5 h-3.5" />
+                  </button>
+                  <button onClick={() => handleDelete(t.id)} className="p-1.5 rounded bg-slate-800 text-red-400 hover:bg-slate-700 transition">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Modal */}
       {showModal && (

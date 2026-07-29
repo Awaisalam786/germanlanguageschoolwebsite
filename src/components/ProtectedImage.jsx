@@ -5,7 +5,7 @@ export default function ProtectedImage({
   src, 
   alt = 'Protected Image', 
   className = '', 
-  watermarkText = '0342 1189593',
+  watermarkText = '03421189593',
   isPrivateOriginal = false,
   objectFit = 'contain'
 }) {

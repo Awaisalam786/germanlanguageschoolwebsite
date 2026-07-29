@@ -1,8 +1,19 @@
-import React from 'react';
-import { ShieldCheck, Mail, BookOpen, Award, Star, Calendar } from 'lucide-react';
-import { initialTeachers } from '../mockData/seedData';
+import React, { useState, useEffect } from 'react';
+import { ShieldCheck, Mail, BookOpen, Award, Star, Calendar, Loader2 } from 'lucide-react';
+import { supabase } from '../lib/supabaseClient';
 
 export default function Teachers({ currentLang, onOpenTrialModal }) {
+  const [teachers, setTeachers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchTeachers = async () => {
+      const { data } = await supabase.from('teachers').select('*').order('created_at', { ascending: false });
+      if (data) setTeachers(data);
+      setLoading(false);
+    };
+    fetchTeachers();
+  }, []);
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
       
@@ -17,7 +28,12 @@ export default function Teachers({ currentLang, onOpenTrialModal }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {initialTeachers.map((teacher) => (
+        {loading ? (
+          <div className="col-span-full text-center text-slate-400 py-12 flex flex-col items-center">
+            <Loader2 className="w-8 h-8 text-amber-500 animate-spin mb-4" />
+            Loading teachers...
+          </div>
+        ) : teachers.map((teacher) => (
           <div 
             key={teacher.id}
             className="bg-slate-900 border border-slate-800 rounded-2xl p-6 hover:border-amber-500/40 transition duration-300 flex flex-col md:flex-row gap-6 items-start"
@@ -52,7 +68,9 @@ export default function Teachers({ currentLang, onOpenTrialModal }) {
 
               <div className="pt-3 border-t border-slate-800 flex items-center justify-between">
                 <span className="text-[11px] text-slate-400">
-                  Teaches: <span className="text-white font-semibold">{teacher.coursesAssigned.join(', ')}</span>
+                  Teaches: <span className="text-white font-semibold">
+                    {teacher.courses_assigned ? teacher.courses_assigned.join(', ') : 'All Levels'}
+                  </span>
                 </span>
                 <button
                   onClick={onOpenTrialModal}

@@ -12,8 +12,8 @@ import {
   MessageCircle,
   ShieldCheck
 } from 'lucide-react';
+import { supabase } from '../lib/supabaseClient';
 import { translations } from '../i18n/translations';
-import { initialCourses } from '../mockData/seedData';
 import CertificateShowcase from '../components/CertificateShowcase';
 import GoogleReviewsWidget from '../components/GoogleReviewsWidget';
 import VideoTestimonialsReels from '../components/VideoTestimonialsReels';
@@ -24,6 +24,21 @@ import DemoClassBanner from '../components/DemoClassBanner';
 
 export default function Home({ currentLang, setActiveTab, onOpenTrialModal }) {
   const t = translations[currentLang];
+  const [courses, setCourses] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const fetchCourses = async () => {
+      const { data } = await supabase.from('courses').select('*').order('created_at', { ascending: true });
+      if (data) {
+        const levelOrder = { 'A1': 1, 'A2': 2, 'B1': 3, 'B2': 4 };
+        const sortedData = data.sort((a, b) => (levelOrder[a.level] || 99) - (levelOrder[b.level] || 99));
+        setCourses(sortedData);
+      }
+      setLoading(false);
+    };
+    fetchCourses();
+  }, []);
 
   const handleWhatsAppEnroll = (courseName = "German Language Course") => {
     const msg = encodeURIComponent(`Hi, I want to enroll in ${courseName}. Please share payment details.`);
@@ -67,7 +82,7 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal }) {
                   className="group relative px-7 py-3.5 rounded-full bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold text-sm shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/40 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2.5 whitespace-nowrap"
                 >
                   <MessageCircle className="w-5 h-5 fill-current shrink-0 animate-pulse group-hover:scale-110 transition-transform duration-300" />
-                  <span className="whitespace-nowrap">Enroll on WhatsApp (0342 1189593)</span>
+                  <span className="whitespace-nowrap">Enroll on WhatsApp (03421189593)</span>
                 </button>
 
                 <button
@@ -137,23 +152,12 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal }) {
         </div>
       </section>
 
+
+
       {/* EXAM BODY CREDIBILITY LOGOS ROW */}
       <ExamLogosRow />
 
-      {/* 2. REAL STUDENT CERTIFICATE SHOWCASE */}
-      <CertificateShowcase />
-
-      {/* 3. LIVE GOOGLE REVIEWS WIDGET */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <GoogleReviewsWidget />
-      </section>
-
-      {/* 4. SHORT-FORM VIDEO REELS */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <VideoTestimonialsReels />
-      </section>
-
-      {/* 5. COURSES LEVEL OVERVIEW (ALL 4 CEFR LEVELS: A1 TO B2 IN A SINGLE ROW OF 4 COLS) */}
+      {/* 2. COURSES LEVEL OVERVIEW (ALL 4 CEFR LEVELS: A1 TO B2 IN A SINGLE ROW OF 4 COLS) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
@@ -169,12 +173,20 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal }) {
           </button>
         </div>
 
-        {/* Responsive Grid: SINGLE ROW of 4 Columns on Desktop (lg:grid-cols-4) */}
+        {/* Responsive Course Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {initialCourses.map((course) => (
+          {loading ? (
+            <div className="col-span-full text-center text-slate-400">Loading live batches...</div>
+          ) : courses.map((course) => (
             <CourseCard
               key={course.id}
-              course={course}
+              course={{
+                ...course,
+                feesPKR: course.price,
+                feesEUR: course.price,
+                description: course.description || `Comprehensive German ${course.level} course.`,
+                featuredBadge: course.badge || ''
+              }}
               onEnroll={handleWhatsAppEnroll}
             />
           ))}
@@ -183,6 +195,19 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal }) {
         {/* DEDICATED COURSE BUNDLES SECTION */}
         <CourseBundles />
 
+      </section>
+
+      {/* 3. REAL STUDENT CERTIFICATE SHOWCASE */}
+      <CertificateShowcase />
+
+      {/* 4. LIVE GOOGLE REVIEWS WIDGET */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <GoogleReviewsWidget />
+      </section>
+
+      {/* 5. SHORT-FORM VIDEO REELS */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <VideoTestimonialsReels />
       </section>
 
       {/* 6. REUSABLE PREMIUM DARK DEMO CLASS BANNER */}

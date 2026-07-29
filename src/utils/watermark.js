@@ -1,7 +1,7 @@
 // AUTOMATED WATERMARK UTILITY ENGINE FOR GERMAN LANGUAGE SCHOOL
-// Automatically tiles diagonal watermark "0342 1189593" (1-5 repeats) at 15-20% opacity
+// Automatically tiles diagonal watermark "03421189593" (1-5 repeats) at 15-20% opacity
 
-export function applyAutoWatermark(imageSrc, text = "0342 1189593", opacity = 0.18) {
+export function applyAutoWatermark(imageSrc, text = "03421189593", opacity = 0.18) {
   return new Promise((resolve) => {
     const img = new Image();
     img.crossOrigin = "anonymous";

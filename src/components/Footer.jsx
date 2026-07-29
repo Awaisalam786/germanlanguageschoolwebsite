@@ -111,10 +111,9 @@ export default function Footer({ currentLang, setActiveTab }) {
 
         {/* Bottom Disclaimer & Copyright */}
         <div className="pt-8 border-t border-slate-800/80 flex flex-col md:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-          <p>© {new Date().getFullYear()} German Language School. All rights reserved. 100% Online Institute.</p>
+          <p className="text-center md:text-left">© {new Date().getFullYear()} German Language School. All rights reserved. 100% Online Institute.</p>
           <div className="flex items-center space-x-4">
-
-            <button onClick={() => setActiveTab('payments')} className="hover:text-slate-300">JazzCash / EasyPaisa Guide</button>
+            <button onClick={() => window.open('https://wa.me/923421189593?text=Hi,%20I%20would%20like%20to%20enroll.%20Please%20share%20the%20payment%20details.', '_blank')} className="hover:text-slate-300">WhatsApp Payment Guide</button>
           </div>
         </div>
 

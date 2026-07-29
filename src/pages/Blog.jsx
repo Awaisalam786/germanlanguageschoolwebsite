@@ -1,14 +1,25 @@
-import React, { useState } from 'react';
-import { Search, Calendar, Clock, User, ArrowRight, Tag } from 'lucide-react';
-import { initialBlogPosts } from '../mockData/seedData';
+import React, { useState, useEffect } from 'react';
+import { Search, Calendar, Clock, User, ArrowRight, Tag, Loader2 } from 'lucide-react';
+import { supabase } from '../lib/supabaseClient';
 
 export default function Blog({ onSelectPost }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const categories = ['All', 'Exam Tips', 'Visa & Career', 'Healthcare'];
 
-  const filteredPosts = initialBlogPosts.filter(post => {
+  useEffect(() => {
+    const fetchPosts = async () => {
+      const { data } = await supabase.from('blog_posts').select('*').order('created_at', { ascending: false });
+      if (data) setPosts(data);
+      setLoading(false);
+    };
+    fetchPosts();
+  }, []);
+
+  const filteredPosts = posts.filter(post => {
     const matchesCategory = selectedCategory === 'All' || post.category === selectedCategory;
     const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                           post.summary.toLowerCase().includes(searchTerm.toLowerCase());
@@ -63,7 +74,16 @@ export default function Blog({ onSelectPost }) {
 
       {/* Blog Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {filteredPosts.map((post) => (
+        {loading ? (
+          <div className="col-span-full text-center text-slate-400 py-12 flex flex-col items-center">
+            <Loader2 className="w-8 h-8 text-amber-500 animate-spin mb-4" />
+            Loading blog posts...
+          </div>
+        ) : filteredPosts.length === 0 ? (
+          <div className="col-span-full text-center text-slate-400 py-12">
+            No blog posts found matching your criteria.
+          </div>
+        ) : filteredPosts.map((post) => (
           <div 
             key={post.id}
             onClick={() => onSelectPost(post)}
@@ -85,12 +105,12 @@ export default function Blog({ onSelectPost }) {
                 <div className="flex items-center gap-3 text-[11px] text-slate-400">
                   <span className="flex items-center gap-1">
                     <Calendar className="w-3.5 h-3.5 text-amber-400" />
-                    <span>{post.date}</span>
+                    <span>{new Date(post.created_at).toLocaleDateString()}</span>
                   </span>
                   <span>•</span>
                   <span className="flex items-center gap-1">
                     <Clock className="w-3.5 h-3.5 text-amber-400" />
-                    <span>{post.readTime}</span>
+                    <span>{post.read_time}</span>
                   </span>
                 </div>
 

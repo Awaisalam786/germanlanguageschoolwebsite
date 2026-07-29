@@ -73,7 +73,7 @@ export const googleReviewsData = {
       rating: 5,
       date: '1 month ago',
       avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80',
-      text: 'Enrolled via WhatsApp (0342 1189593) and cleared my Goethe A1 exam with 97 marks! Highly professional native German and Pakistani instructors.'
+      text: 'Enrolled via WhatsApp (03421189593) and cleared my Goethe A1 exam with 97 marks! Highly professional native German and Pakistani instructors.'
     },
     {
       id: 'gr-3',
@@ -431,7 +431,7 @@ export const initialInquiries = [
     id: 'inq-301',
     name: 'Hamza Ahmed',
     email: 'hamza.a@example.com',
-    phone: '0342 1189593',
+    phone: '03421189593',
     courseInterest: 'B1 Intermediate',
     message: 'AOA! I want to enroll in B1 online course for German student visa. Please share payment details on WhatsApp.',
     date: '2026-07-27 18:30 PKT',
@@ -547,6 +547,6 @@ export const initialFaqs = [
   {
     category: 'Enrollment & Fees',
     q: 'How do I complete my enrollment and receive payment details?',
-    a: 'Simply click "Enroll Now" (0342 1189593) on any course card or form, and our admissions team will instantly assist you on WhatsApp.'
+    a: 'Simply click "Enroll Now" (03421189593) on any course card or form, and our admissions team will instantly assist you on WhatsApp.'
   }
 ];

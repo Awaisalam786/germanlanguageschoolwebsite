@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { UserCheck, Plus, Edit, Trash2, Mail, Award, X } from 'lucide-react';
-import { initialTeachers } from '../mockData/seedData';
+import React, { useState, useEffect } from 'react';
+import { UserCheck, Plus, Edit, Trash2, Mail, Award, X, Loader2 } from 'lucide-react';
+import { supabase } from '../lib/supabaseClient';
 
 export default function TeacherManagement() {
-  const [teachers, setTeachers] = useState(initialTeachers);
+  const [teachers, setTeachers] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingTeacher, setEditingTeacher] = useState(null);
   const [formData, setFormData] = useState({
@@ -15,6 +16,21 @@ export default function TeacherManagement() {
     email: '',
     image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=500&q=80'
   });
+
+  useEffect(() => {
+    fetchTeachers();
+  }, []);
+
+  const fetchTeachers = async () => {
+    setLoading(true);
+    const { data, error } = await supabase.from('teachers').select('*').order('created_at', { ascending: false });
+    if (error) {
+      console.error('Error fetching teachers:', error);
+    } else {
+      setTeachers(data || []);
+    }
+    setLoading(false);
+  };
 
   const handleOpenAdd = () => {
     setEditingTeacher(null);
@@ -36,27 +52,64 @@ export default function TeacherManagement() {
     setShowModal(true);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm('Delete teacher profile?')) {
-      setTeachers(teachers.filter(t => t.id !== id));
+      const { error } = await supabase.from('teachers').delete().eq('id', id);
+      if (!error) {
+        setTeachers(teachers.filter(t => t.id !== id));
+      } else {
+        alert('Failed to delete teacher');
+      }
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // In our schema, we didn't add email, bio, or coursesAssigned. 
+    // We will extract only the fields that exist in our schema to prevent errors.
+    const payload = {
+      name: formData.name,
+      role: formData.role,
+      qualification: formData.qualification,
+      experience: formData.experience,
+      specialty: formData.specialty,
+      image: formData.image
+    };
+
     if (editingTeacher) {
-      setTeachers(teachers.map(t => t.id === editingTeacher.id ? { ...t, ...formData } : t));
+      const { data, error } = await supabase
+        .from('teachers')
+        .update(payload)
+        .eq('id', editingTeacher.id)
+        .select()
+        .single();
+        
+      if (!error && data) {
+        setTeachers(teachers.map(t => t.id === editingTeacher.id ? data : t));
+        setShowModal(false);
+      }
     } else {
-      const newT = {
-        id: `t-${Date.now()}`,
-        bio: 'Certified DaF language instructor committed to student success.',
-        coursesAssigned: ['B1', 'B2'],
-        ...formData
-      };
-      setTeachers([...teachers, newT]);
+      const { data, error } = await supabase
+        .from('teachers')
+        .insert([payload])
+        .select()
+        .single();
+        
+      if (!error && data) {
+        setTeachers([data, ...teachers]);
+        setShowModal(false);
+      }
     }
-    setShowModal(false);
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 text-amber-500 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">

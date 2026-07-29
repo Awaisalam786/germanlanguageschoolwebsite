@@ -22,7 +22,12 @@ import {
   X,
   Star,
   Image as ImageIcon,
-  MapPin
+  MapPin,
+  Edit3,
+  BookOpen,
+  ShoppingCart,
+  Ticket,
+  Megaphone
 } from 'lucide-react';
 import { translations } from '../i18n/translations';
 
@@ -40,13 +45,17 @@ export default function AdminLayout({
 
   const menuItems = [
     { id: 'dashboard', label: t.admin.dashboard, icon: LayoutDashboard },
+    { id: 'announcements', label: 'Announcements', icon: Megaphone, badge: 'New' },
     { id: 'documents', label: t.admin.documents, icon: FileText, badge: 'OCR' },
     { id: 'students', label: t.admin.students, icon: Users },
     { id: 'coursesManager', label: t.admin.coursesManager, icon: GraduationCap },
     { id: 'teachersManager', label: t.admin.teachersManager, icon: UserCheck },
     { id: 'recordings', label: t.admin.recordings, icon: Video, badge: 'HD' },
     { id: 'certificateManager', label: t.admin.certificateManager, icon: Award, badge: 'Carousel' },
+    { id: 'booksManager', label: 'Books Manager', icon: BookOpen },
+    { id: 'bookOrders', label: 'Book Orders', icon: ShoppingCart },
     { id: 'paymentStatus', label: t.admin.paymentStatus, icon: CreditCard },
+    { id: 'couponManager', label: 'Coupon Manager', icon: Ticket },
     { id: 'themeCustomizer', label: 'Theme Customizer', icon: Palette, badge: 'CSS' },
     { id: 'blogCMS', label: t.admin.blogCMS, icon: Newspaper },
     { id: 'inquiries', label: t.admin.inquiries, icon: MessageSquare, badge: '3' },
@@ -55,6 +64,7 @@ export default function AdminLayout({
     { id: 'analytics', label: t.admin.analytics, icon: BarChart3 },
     { id: 'notifications', label: t.admin.notifications, icon: Bell },
     { id: 'googleReviews', label: 'Google Reviews', icon: MapPin },
+    { id: 'globalContent', label: 'Global Settings', icon: Edit3 },
     { id: 'settings', label: t.admin.settings, icon: SettingsIcon },
   ];
 

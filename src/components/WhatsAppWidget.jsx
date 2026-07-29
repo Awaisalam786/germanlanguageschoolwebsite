@@ -1,13 +1,23 @@
 import React, { useState } from 'react';
 import { MessageCircle, X, Send } from 'lucide-react';
+import { useGlobalContent } from '../context/GlobalContentContext';
 
 export default function WhatsAppWidget() {
+  const { settings } = useGlobalContent();
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("AOA German Language School! I want to inquire about online course fees and enrollment.");
 
+  const formatWaLink = (num) => {
+    // Remove leading zero and prepend 92 for wa.me link
+    const clean = num?.replace(/[^0-9]/g, '') || '';
+    if (clean.startsWith('0')) return `92${clean.substring(1)}`;
+    return clean;
+  };
+
   const handleSendWhatsApp = () => {
     const encoded = encodeURIComponent(message);
-    window.open(`https://wa.me/923421189593?text=${encoded}`, '_blank');
+    const linkNum = formatWaLink(settings?.whatsapp_number);
+    window.open(`https://wa.me/${linkNum}?text=${encoded}`, '_blank');
   };
 
   return (
@@ -48,7 +58,7 @@ export default function WhatsAppWidget() {
               className="w-full py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-lg text-xs flex items-center justify-center gap-2 transition shadow-lg"
             >
               <Send className="w-3.5 h-3.5" />
-              <span>Chat on WhatsApp (0342 1189593)</span>
+              <span>Chat on WhatsApp ({settings?.whatsapp_number})</span>
             </button>
           </div>
         </div>
@@ -57,7 +67,7 @@ export default function WhatsAppWidget() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-14 h-14 rounded-full bg-gradient-to-tr from-emerald-600 to-emerald-400 text-white flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-transform duration-300 relative group"
-        title="Chat on WhatsApp (0342 1189593)"
+        title={`Chat on WhatsApp (${settings?.whatsapp_number})`}
       >
         <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>

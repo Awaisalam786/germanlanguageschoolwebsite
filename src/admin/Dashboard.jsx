@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Users, 
   GraduationCap, 
@@ -12,9 +12,36 @@ import {
   ArrowUpRight,
   ShieldAlert
 } from 'lucide-react';
-import { mockAnalyticsData, initialInquiries, initialStudents } from '../mockData/seedData';
+import { mockAnalyticsData } from '../mockData/seedData';
+import { supabase } from '../lib/supabaseClient';
 
 export default function Dashboard({ setCurrentTab }) {
+  const [stats, setStats] = useState({
+    students: 0,
+    courses: 0,
+    inquiries: 0
+  });
+  const [recentInquiries, setRecentInquiries] = useState([]);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      const [{ count: studentCount }, { count: courseCount }, { count: inquiryCount }, { data: inquiries }] = await Promise.all([
+        supabase.from('students').select('*', { count: 'exact', head: true }),
+        supabase.from('courses').select('*', { count: 'exact', head: true }),
+        supabase.from('inquiries').select('*', { count: 'exact', head: true }),
+        supabase.from('inquiries').select('*').order('created_at', { ascending: false }).limit(5)
+      ]);
+      
+      setStats({
+        students: studentCount || 0,
+        courses: courseCount || 0,
+        inquiries: inquiryCount || 0
+      });
+      setRecentInquiries(inquiries || []);
+    };
+    fetchStats();
+  }, []);
+
   return (
     <div className="space-y-8">
       
@@ -55,10 +82,10 @@ export default function Dashboard({ setCurrentTab }) {
             <span>Total Enrolled Students</span>
             <Users className="w-4 h-4 text-amber-400" />
           </div>
-          <div className="text-3xl font-extrabold text-white">12,548</div>
+          <div className="text-3xl font-extrabold text-white">{stats.students}</div>
           <div className="flex items-center text-xs text-emerald-400 gap-1 font-semibold">
             <TrendingUp className="w-3.5 h-3.5" />
-            <span>+14.2% from last month</span>
+            <span>Live Data</span>
           </div>
         </div>
 
@@ -67,8 +94,8 @@ export default function Dashboard({ setCurrentTab }) {
             <span>Active Course Batches</span>
             <GraduationCap className="w-4 h-4 text-red-500" />
           </div>
-          <div className="text-3xl font-extrabold text-white">18 Batches</div>
-          <div className="text-xs text-slate-400">A1 to B2 & Goethe/telc prep</div>
+          <div className="text-3xl font-extrabold text-white">{stats.courses} Batches</div>
+          <div className="text-xs text-slate-400">Live Data</div>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-2">
@@ -124,11 +151,15 @@ export default function Dashboard({ setCurrentTab }) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800">
-                {initialInquiries.map((inq) => (
+                {recentInquiries.length === 0 ? (
+                  <tr>
+                    <td colSpan="4" className="p-3 text-center text-slate-500">No recent inquiries found</td>
+                  </tr>
+                ) : recentInquiries.map((inq) => (
                   <tr key={inq.id} className="hover:bg-slate-950/50">
                     <td className="p-3 font-semibold text-white">{inq.name}</td>
-                    <td className="p-3 text-amber-400 font-medium">{inq.courseInterest}</td>
-                    <td className="p-3 text-slate-400">{inq.date}</td>
+                    <td className="p-3 text-amber-400 font-medium">{inq.course_interest || inq.courseInterest}</td>
+                    <td className="p-3 text-slate-400">{new Date(inq.created_at).toLocaleDateString()}</td>
                     <td className="p-3">
                       <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
                         inq.status === 'New Lead' ? 'bg-amber-500/20 text-amber-400 border border-amber-500/30' :

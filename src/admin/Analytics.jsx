@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   BarChart3, 
   TrendingUp, 
@@ -13,10 +13,20 @@ import {
   Sparkles
 } from 'lucide-react';
 import { mockAnalyticsData } from '../mockData/seedData';
+import { supabase } from '../lib/supabaseClient';
 
 export default function Analytics() {
   const [timeRange, setTimeRange] = useState('This Month');
   const [exporting, setExporting] = useState(false);
+  const [liveUsersCount, setLiveUsersCount] = useState(0);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const { count } = await supabase.from('students').select('*', { count: 'exact', head: true });
+      setLiveUsersCount(count || 0);
+    };
+    fetchUsers();
+  }, []);
 
   const handleExportPDF = () => {
     setExporting(true);
@@ -82,9 +92,9 @@ export default function Analytics() {
         </div>
 
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-2">
-          <div className="text-xs text-slate-400 font-semibold">Avg. Session Duration</div>
-          <div className="text-3xl font-extrabold text-amber-400">{mockAnalyticsData.avgSessionDuration}</div>
-          <div className="text-xs text-slate-400">High engagement rate</div>
+          <div className="text-xs text-slate-400 font-semibold">Total Verified Students</div>
+          <div className="text-3xl font-extrabold text-amber-400">{liveUsersCount}</div>
+          <div className="text-xs text-slate-400">Live Database Sync</div>
         </div>
 
         <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-2">

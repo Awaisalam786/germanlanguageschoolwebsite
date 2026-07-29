@@ -1,23 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   CheckCircle2, 
   MessageCircle,
-  Sparkles
+  Sparkles,
+  Send,
+  Clock,
+  ChevronDown,
+  Star
 } from 'lucide-react';
 import { translations } from '../i18n/translations';
-import { initialCourses } from '../mockData/seedData';
+import { supabase } from '../lib/supabaseClient';
+import { useGlobalContent } from '../context/GlobalContentContext';
 
-export default function Enroll({ currentLang, setActiveTab }) {
+export default function Enroll({ currentLang, setActiveTab, selectedCourse }) {
+  const { settings } = useGlobalContent();
   const t = translations[currentLang];
+  const [courses, setCourses] = useState([]);
+  
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     phone: '',
     cnic: '',
-    courseLevel: 'German A1 — Beginner Online Foundation',
+    courseLevel: selectedCourse || 'German A1 — Beginner Online Foundation',
     preferredBatch: 'Evening (18:00 - 20:30 PKT)'
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      const { data } = await supabase.from('courses').select('*').order('created_at', { ascending: true });
+      if (data) setCourses(data);
+    };
+    fetchCourses();
+  }, []);
 
   const handleOpenWhatsApp = (levelName = formData.courseLevel) => {
     const msg = encodeURIComponent(`Hi, I want to enroll in ${levelName}. My name is ${formData.fullName || 'Student'}. Please share payment details.`);
@@ -49,11 +65,10 @@ export default function Enroll({ currentLang, setActiveTab }) {
           <div className="space-y-2">
             <h3 className="text-2xl font-bold text-white">Registration Info Recorded!</h3>
             <p className="text-xs text-slate-300 max-w-md mx-auto leading-relaxed">
-              Click the button below to open WhatsApp (0342 1189593) and receive your payment details and seat confirmation.
+              {settings?.payment_instructions || 'Click the button below to open WhatsApp and receive your payment details and seat confirmation.'}
             </p>
           </div>
 
-          {/* Registration Details Summary */}
           <div className="bg-slate-950 border border-slate-800 rounded-2xl p-6 max-w-md mx-auto text-left text-xs space-y-2.5">
             <div className="flex justify-between text-slate-400">
               <span>Student Name:</span>
@@ -70,11 +85,11 @@ export default function Enroll({ currentLang, setActiveTab }) {
           </div>
 
           <button
-            onClick={() => handleOpenWhatsApp()}
-            className="w-full max-w-md py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-extrabold text-sm rounded-2xl shadow-xl flex items-center justify-center gap-2 transition hover:scale-105"
+            onClick={handleSendWhatsApp}
+            className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl shadow-lg flex items-center justify-center gap-2 transition active:scale-95"
           >
-            <MessageCircle className="w-5 h-5 fill-current" />
-            <span>Complete Enrollment on WhatsApp (0342 1189593)</span>
+            <Send className="w-5 h-5" />
+            <span>Complete Enrollment on WhatsApp ({settings?.whatsapp_number})</span>
           </button>
         </div>
       ) : (
@@ -130,32 +145,50 @@ export default function Enroll({ currentLang, setActiveTab }) {
                 onChange={(e) => setFormData({ ...formData, courseLevel: e.target.value })}
                 className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
               >
-                {initialCourses.map((c) => (
-                  <option key={c.id} value={c.title}>
-                    {c.title} ({c.fees})
-                  </option>
-                ))}
+                {courses.length === 0 ? (
+                  <option value="">Loading courses...</option>
+                ) : (
+                  courses.map((c) => (
+                    <option key={c.id} value={c.title}>
+                      {c.title} ({c.price})
+                    </option>
+                  ))
+                )}
               </select>
             </div>
 
-            <div>
-              <label className="block text-xs font-medium text-slate-300 mb-1">Preferred PKT Time Batch</label>
-              <select
-                value={formData.preferredBatch}
-                onChange={(e) => setFormData({ ...formData, preferredBatch: e.target.value })}
-                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
-              >
-                <option value="Evening (18:00 - 20:30 PKT)">Evening Batch (18:00 - 20:30 PKT)</option>
-                <option value="Night (21:00 - 23:30 PKT)">Night Batch (21:00 - 23:30 PKT)</option>
-                <option value="Weekend Special (Sat & Sun)">Weekend Special Batch</option>
-              </select>
+            <div className="space-y-1">
+              <label className="text-xs font-bold text-slate-300 ml-1 block">Preferred Batch Timing</label>
+              <div className="relative">
+                <Clock className="w-5 h-5 text-slate-400 absolute left-4 top-3.5" />
+                <select
+                  required
+                  value={formData.preferredBatch}
+                  onChange={(e) => setFormData({...formData, preferredBatch: e.target.value})}
+                  className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-12 pr-4 py-3.5 text-sm text-white focus:outline-none focus:border-amber-500 appearance-none transition shadow-inner"
+                >
+                  <option>Morning (10:00 - 12:30 PKT)</option>
+                  <option>Evening (18:00 - 20:30 PKT)</option>
+                  <option>Weekend (Sat/Sun Morning)</option>
+                </select>
+                <ChevronDown className="w-4 h-4 text-slate-400 absolute right-4 top-4 pointer-events-none" />
+              </div>
             </div>
           </div>
+
+          {settings?.discount_code && (
+            <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4 text-center mt-4">
+              <p className="text-xs text-amber-400 font-bold flex items-center justify-center gap-2">
+                <Star className="w-4 h-4 fill-current" />
+                Use Code: <span className="text-white text-sm bg-slate-950 px-2 py-1 rounded">{settings.discount_code}</span> on WhatsApp to claim your discount!
+              </p>
+            </div>
+          )}
 
           <div className="pt-4 border-t border-slate-800">
             <button
               type="submit"
-              className="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-extrabold text-xs shadow-gold-glow transition flex items-center justify-center gap-2"
+              className="w-full mt-6 py-4 bg-amber-500 hover:bg-amber-400 text-slate-950 font-black rounded-xl text-lg shadow-gold-glow flex items-center justify-center gap-2 transition active:scale-95"
             >
               <MessageCircle className="w-4 h-4 fill-current" />
               <span>Submit Registration & Complete on WhatsApp</span>

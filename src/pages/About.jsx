@@ -1,6 +1,5 @@
 import React from 'react';
 import { ShieldCheck, Award, GraduationCap, Users, CheckCircle, Globe2, BookOpen } from 'lucide-react';
-import { initialTeachers } from '../mockData/seedData';
 
 export default function About({ currentLang, setActiveTab }) {
   return (

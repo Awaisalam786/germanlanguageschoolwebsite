@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { Users, Search, Plus, Edit, Trash2, CheckCircle2, X } from 'lucide-react';
-import { initialStudents } from '../mockData/seedData';
+import React, { useState, useEffect } from 'react';
+import { Users, Search, Plus, Edit, Trash2, CheckCircle2, X, Loader2 } from 'lucide-react';
+import { supabase } from '../lib/supabaseClient';
 
 export default function StudentManagement() {
-  const [students, setStudents] = useState(initialStudents);
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingStudent, setEditingStudent] = useState(null);
@@ -20,10 +21,24 @@ export default function StudentManagement() {
   });
 
   const filteredStudents = students.filter(s => 
-    s.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    s.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    s.courseLevel.toLowerCase().includes(searchTerm.toLowerCase())
+    (s.name || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+    (s.email || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (s.course_level || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  useEffect(() => {
+    fetchStudents();
+  }, []);
+
+  const fetchStudents = async () => {
+    setLoading(true);
+    const { data, error } = await supabase.from('students').select('*').order('join_date', { ascending: false });
+    if (!error && data) {
+      // Map snake_case to camelCase for the UI if needed, or just use snake_case
+      setStudents(data);
+    }
+    setLoading(false);
+  };
 
   const handleOpenAdd = () => {
     setEditingStudent(null);
@@ -31,11 +46,11 @@ export default function StudentManagement() {
       name: '',
       email: '',
       phone: '',
-      courseLevel: 'B1 - Intermediate',
+      course_level: 'B1 - Intermediate',
       attendance: '95%',
       grade: 'A (90/100)',
       status: 'Active',
-      paymentStatus: 'Paid',
+      payment_status: 'Paid',
       mode: 'Online'
     });
     setShowModal(true);
@@ -43,30 +58,68 @@ export default function StudentManagement() {
 
   const handleOpenEdit = (student) => {
     setEditingStudent(student);
-    setFormData({ ...student });
+    setFormData({
+      name: student.name,
+      email: student.email,
+      phone: student.phone,
+      course_level: student.course_level,
+      attendance: student.attendance,
+      grade: student.grade,
+      status: student.status,
+      payment_status: student.payment_status,
+      mode: student.mode
+    });
     setShowModal(true);
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     if (confirm('Are you sure you want to delete this student record?')) {
-      setStudents(students.filter(s => s.id !== id));
+      const { error } = await supabase.from('students').delete().eq('id', id);
+      if (!error) {
+        setStudents(students.filter(s => s.id !== id));
+      } else {
+        alert('Failed to delete student');
+      }
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    const payload = {
+      name: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      course_level: formData.course_level,
+      attendance: formData.attendance,
+      grade: formData.grade,
+      status: formData.status,
+      payment_status: formData.payment_status,
+      mode: formData.mode
+    };
+
     if (editingStudent) {
-      setStudents(students.map(s => s.id === editingStudent.id ? { ...s, ...formData } : s));
+      const { data, error } = await supabase.from('students').update(payload).eq('id', editingStudent.id).select().single();
+      if (!error && data) {
+        setStudents(students.map(s => s.id === editingStudent.id ? data : s));
+        setShowModal(false);
+      }
     } else {
-      const newStd = {
-        id: `std-${Date.now()}`,
-        enrollmentDate: new Date().toISOString().split('T')[0],
-        ...formData
-      };
-      setStudents([newStd, ...students]);
+      const { data, error } = await supabase.from('students').insert([payload]).select().single();
+      if (!error && data) {
+        setStudents([data, ...students]);
+        setShowModal(false);
+      }
     }
-    setShowModal(false);
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 text-amber-500 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -121,15 +174,15 @@ export default function StudentManagement() {
                   <td className="p-4 text-slate-400">{std.email}<br/>{std.phone}</td>
                   <td className="p-4">
                     <span className="px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-bold text-[10px] border border-amber-500/20">
-                      {std.courseLevel}
+                      {std.course_level}
                     </span>
                     <span className="block text-[10px] text-slate-500 mt-0.5">{std.mode}</span>
                   </td>
                   <td className="p-4 font-bold text-emerald-400">{std.attendance}</td>
                   <td className="p-4 font-bold text-white">{std.grade}</td>
                   <td className="p-4">
-                    <span className="px-2 py-0.5 rounded bg-slate-950 border border-slate-800 text-slate-300 font-medium">
-                      {std.paymentStatus}
+                    <span className={`px-2 py-0.5 rounded border ${std.payment_status === 'Paid' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'}`}>
+                      {std.payment_status}
                     </span>
                   </td>
                   <td className="p-4 text-right space-x-2">
@@ -197,14 +250,17 @@ export default function StudentManagement() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs text-slate-300 mb-1">Course Level</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.courseLevel}
-                    onChange={(e) => setFormData({ ...formData, courseLevel: e.target.value })}
-                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
-                  />
+                  <label className="block text-xs font-bold text-slate-400 mb-2">Course Enrolled</label>
+                  <select
+                    value={formData.course_level}
+                    onChange={(e) => setFormData({...formData, course_level: e.target.value})}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-xs text-white focus:outline-none focus:border-amber-500"
+                  >
+                    <option>A1 - Beginner</option>
+                    <option>A2 - Elementary</option>
+                    <option>B1 - Intermediate</option>
+                    <option>B2 - Upper Intermediate</option>
+                  </select>
                 </div>
                 <div>
                   <label className="block text-xs text-slate-300 mb-1">Grade</label>

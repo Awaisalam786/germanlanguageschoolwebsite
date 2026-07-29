@@ -95,3 +95,24 @@
 .animate-pulse-glow {
   animation: pulseGlow 3s infinite ease-in-out;
 }
+
+/* Announcement Ticker Marquee Animation */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  /* We use a long duration. It translates -50% because we duplicated the content 4 times, so halfway through it loops seamlessly. */
+  animation: marquee 30s linear infinite;
+  display: flex;
+  width: max-content;
+}
+
+.pause {
+  animation-play-state: paused !important;
+}

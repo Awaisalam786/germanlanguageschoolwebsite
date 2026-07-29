@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
 // Public Components
+import AnnouncementTicker from './components/AnnouncementTicker';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import TrialClassModal from './components/TrialClassModal';
@@ -20,9 +21,12 @@ import BlogPostDetail from './pages/BlogPostDetail';
 import Contact from './pages/Contact';
 import Enroll from './pages/Enroll';
 import FAQ from './pages/FAQ';
+import Books from './pages/Books';
+import Translator from './pages/Translator';
 
 // Admin Components
 import AdminLogin from './admin/AdminLogin';
+import GlobalContentManager from './admin/GlobalContentManager';
 import AdminLayout from './admin/AdminLayout';
 import Dashboard from './admin/Dashboard';
 import Documents from './admin/Documents';
@@ -41,6 +45,10 @@ import Settings from './admin/Settings';
 import TestimonialManager from './admin/TestimonialManager';
 import GalleryManager from './admin/GalleryManager';
 import GoogleReviewsSettings from './admin/GoogleReviewsSettings';
+import BooksManager from './admin/BooksManager';
+import BookOrdersTracker from './admin/BookOrdersTracker';
+import CouponManager from './admin/CouponManager';
+import AnnouncementsManager from './admin/AnnouncementsManager';
 
 // Theme Engine
 import { applyTheme, getActiveTheme } from './utils/themeEngine';
@@ -137,10 +145,14 @@ export default function App() {
         );
       case 'contact':
         return <Contact currentLang={currentLang} />;
+      case 'books':
+        return <Books />;
       case 'enroll':
         return <Enroll currentLang={currentLang} setActiveTab={setActiveTab} />;
       case 'faq':
         return <FAQ currentLang={currentLang} setActiveTab={setActiveTab} />;
+      case 'translator':
+        return <Translator setActiveTab={setActiveTab} />;
       default:
         return (
           <Home
@@ -181,14 +193,24 @@ export default function App() {
         return <TestimonialManager />;
       case 'galleryManager':
         return <GalleryManager />;
+      case 'booksManager':
+        return <BooksManager />;
+      case 'bookOrders':
+        return <BookOrdersTracker />;
+      case 'couponManager':
+        return <CouponManager />;
       case 'analytics':
         return <Analytics />;
       case 'notifications':
         return <Notifications />;
       case 'googleReviews':
         return <GoogleReviewsSettings />;
+      case 'globalContent':
+        return <GlobalContentManager />;
       case 'settings':
         return <Settings />;
+      case 'announcements':
+        return <AnnouncementsManager />;
       default:
         return <Dashboard setCurrentTab={setAdminTab} />;
     }
@@ -221,6 +243,9 @@ export default function App() {
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-amber-500 selection:text-slate-950">
       
+      {/* Scrolling Announcement Ticker */}
+      <AnnouncementTicker />
+
       {/* Navigation Header */}
       <Navbar
         currentLang={currentLang}

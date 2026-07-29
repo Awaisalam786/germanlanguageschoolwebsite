@@ -16,9 +16,11 @@ import {
   Laptop,
   Play,
   ShieldCheck,
-  ChevronDown
+  ChevronDown,
+  Languages
 } from 'lucide-react';
 import { translations } from '../i18n/translations';
+import { useGlobalContent } from '../context/GlobalContentContext';
 
 export default function Navbar({ 
   currentLang, 
@@ -31,9 +33,21 @@ export default function Navbar({
   const [activeDropdown, setActiveDropdown] = useState(null); // 'about' | 'resources' | null
   const [mobileAboutExpanded, setMobileAboutExpanded] = useState(false);
   const [mobileResourcesExpanded, setMobileResourcesExpanded] = useState(false);
+  const [isMobileDevice, setIsMobileDevice] = useState(false);
   
   const dropdownRef = useRef(null);
   const t = translations[currentLang];
+  const { settings } = useGlobalContent();
+
+  useEffect(() => {
+    const checkMobile = () => {
+      // Use physical screen width to detect mobile/tablet devices, ignoring the 1280px meta viewport
+      setIsMobileDevice(window.screen.width < 1024);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -55,6 +69,8 @@ export default function Navbar({
 
   // Dropdown 2: Resources Group
   const resourcesMenuItems = [
+    { id: 'books', label: 'Books & Resources', icon: BookOpen, desc: 'Official study materials & exam prep books' },
+    { id: 'translator', label: 'Free Translator', icon: Languages, desc: 'Translate German text instantly' },
     { id: 'howItWorks', label: t.nav.howItWorks, icon: Laptop, desc: 'Live Zoom & HD lecture archive' },
     { id: 'gallery', label: t.nav.gallery, icon: GalleryIcon, desc: 'Live class screenshots & events' },
     { id: 'testimonials', label: t.nav.testimonials, icon: MessageSquare, desc: 'Graduation stories & reviews' },
@@ -63,10 +79,11 @@ export default function Navbar({
   ];
 
   const isAboutActive = ['about', 'founder', 'teachers'].includes(activeTab);
-  const isResourcesActive = ['howItWorks', 'gallery', 'testimonials', 'faq', 'blog'].includes(activeTab);
+  const isResourcesActive = ['howItWorks', 'gallery', 'testimonials', 'faq', 'blog', 'books', 'translator'].includes(activeTab);
 
   return (
-    <header className="sticky top-0 z-50 bg-slate-950/95 backdrop-blur-xl border-b border-slate-800/80 shadow-2xl transition-all duration-300">
+    <>
+      <header className="sticky top-0 z-50 bg-slate-950/95 backdrop-blur-xl border-b border-slate-800/80 shadow-2xl transition-all duration-300">
       
       {/* German Flag Strip (Black, Red, Gold) */}
       <div className="h-1 w-full german-flag-strip"></div>
@@ -98,7 +115,8 @@ export default function Navbar({
           </div>
 
           {/* Desktop Navigation Links (Red Accent Palette) */}
-          <nav className="hidden lg:flex items-center space-x-1.5" ref={dropdownRef}>
+          {!isMobileDevice && (
+            <nav className="flex items-center space-x-1.5" ref={dropdownRef}>
             
             {/* 1. Direct Link: Home */}
             <button
@@ -159,12 +177,14 @@ export default function Navbar({
               {/* About Dropdown Panel */}
               {activeDropdown === 'about' && (
                 <div 
-                  className="absolute top-full left-0 mt-2 w-64 bg-slate-900/98 border border-slate-800 rounded-2xl p-2 shadow-2xl backdrop-blur-2xl space-y-1 animate-fade-in z-50"
+                  className="absolute top-full left-0 mt-2 w-[540px] bg-slate-900/98 border border-slate-800 rounded-2xl p-3 shadow-2xl backdrop-blur-2xl animate-fade-in z-50 grid grid-cols-2 gap-2.5"
                   onMouseLeave={() => setActiveDropdown(null)}
                 >
-                  {aboutMenuItems.map((item) => {
+                  {aboutMenuItems.map((item, index) => {
                     const Icon = item.icon;
                     const isActive = activeTab === item.id;
+                    const isFirst = index === 0;
+
                     return (
                       <button
                         key={item.id}
@@ -172,16 +192,24 @@ export default function Navbar({
                           setActiveTab(item.id);
                           setActiveDropdown(null);
                         }}
-                        className={`w-full text-left p-2.5 rounded-xl transition-all duration-200 flex items-start gap-3 ${
+                        className={`group text-left p-3 rounded-xl transition-all duration-200 flex items-start gap-3 border ${
+                          isFirst ? 'col-span-2' : 'col-span-1'
+                        } ${
                           isActive 
-                            ? 'bg-red-600/20 text-white font-bold border border-red-500/30' 
-                            : 'hover:bg-slate-800 text-slate-200 hover:text-red-400'
+                            ? 'bg-red-600/10 border-red-500/30 hover:bg-red-600 hover:border-red-500' 
+                            : 'border-slate-800 bg-slate-900/40 hover:bg-red-600 hover:border-red-500'
                         }`}
                       >
-                        <Icon className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-                        <div>
-                          <div className="text-xs font-bold">{item.label}</div>
-                          <div className="text-[10px] text-slate-400 font-normal">{item.desc}</div>
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 shadow-inner transition-colors duration-200 ${
+                          isActive 
+                            ? 'bg-red-500/20 text-red-500 group-hover:bg-red-700/50 group-hover:text-white' 
+                            : 'bg-slate-800 text-slate-300 group-hover:bg-red-700/50 group-hover:text-white'
+                        }`}>
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1 mt-0.5">
+                          <div className="text-sm font-bold leading-tight text-slate-200 group-hover:text-white transition-colors duration-200">{item.label}</div>
+                          <div className="text-[11px] text-slate-400 font-normal mt-1 leading-snug group-hover:text-red-100 transition-colors duration-200">{item.desc}</div>
                         </div>
                       </button>
                     );
@@ -211,12 +239,14 @@ export default function Navbar({
               {/* Resources Dropdown Panel */}
               {activeDropdown === 'resources' && (
                 <div 
-                  className="absolute top-full left-0 mt-2 w-72 bg-slate-900/98 border border-slate-800 rounded-2xl p-2 shadow-2xl backdrop-blur-2xl space-y-1 animate-fade-in z-50"
+                  className="absolute top-full left-0 mt-2 w-[540px] bg-slate-900/98 border border-slate-800 rounded-2xl p-3 shadow-2xl backdrop-blur-2xl animate-fade-in z-50 grid grid-cols-2 gap-2.5"
                   onMouseLeave={() => setActiveDropdown(null)}
                 >
                   {resourcesMenuItems.map((item) => {
                     const Icon = item.icon;
                     const isActive = activeTab === item.id;
+                    const isPopular = item.id === 'blog';
+
                     return (
                       <button
                         key={item.id}
@@ -224,16 +254,26 @@ export default function Navbar({
                           setActiveTab(item.id);
                           setActiveDropdown(null);
                         }}
-                        className={`w-full text-left p-2.5 rounded-xl transition-all duration-200 flex items-start gap-3 ${
-                          isActive 
-                            ? 'bg-red-600/20 text-white font-bold border border-red-500/30' 
-                            : 'hover:bg-slate-800 text-slate-200 hover:text-red-400'
+                        className={`group text-left p-3 rounded-xl transition-all duration-200 flex items-start gap-3 border ${
+                          isPopular 
+                            ? 'col-span-2 border-2 border-amber-500/40 bg-amber-500/5 hover:bg-red-600 hover:border-red-500 shadow-sm' 
+                            : isActive 
+                              ? 'col-span-1 bg-red-600/10 border-red-500/30 hover:bg-red-600 hover:border-red-500' 
+                              : 'col-span-1 border-slate-800 bg-slate-900/40 hover:bg-red-600 hover:border-red-500'
                         }`}
                       >
-                        <Icon className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
-                        <div>
-                          <div className="text-xs font-bold">{item.label}</div>
-                          <div className="text-[10px] text-slate-400 font-normal">{item.desc}</div>
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 shadow-inner transition-colors duration-200 ${
+                          isPopular 
+                            ? 'bg-amber-500/20 text-amber-500 group-hover:bg-red-700/50 group-hover:text-white' 
+                            : isActive 
+                              ? 'bg-red-500/20 text-red-500 group-hover:bg-red-700/50 group-hover:text-white' 
+                              : 'bg-slate-800 text-slate-300 group-hover:bg-red-700/50 group-hover:text-white'
+                        }`}>
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1 mt-0.5">
+                          <div className={`text-sm font-bold leading-tight transition-colors duration-200 ${isPopular ? 'text-amber-400 group-hover:text-white' : 'text-slate-200 group-hover:text-white'}`}>{item.label}</div>
+                          <div className="text-[11px] text-slate-400 font-normal mt-1 leading-snug transition-colors duration-200 group-hover:text-red-100">{item.desc}</div>
                         </div>
                       </button>
                     );
@@ -262,9 +302,10 @@ export default function Navbar({
             </button>
 
           </nav>
+          )}
 
           {/* Desktop Right Action Area: Red Accent Demo Button & Green WhatsApp Button */}
-          <div className="hidden lg:flex items-center space-x-3 shrink-0">
+          <div className="flex items-center space-x-3 shrink-0">
             
             {/* Language Switcher Badge (Clean Red Active Badge) */}
             <div className="relative flex items-center bg-slate-900 border border-slate-800 rounded-xl p-1 text-xs shadow-inner">
@@ -322,40 +363,27 @@ export default function Navbar({
               <span className="whitespace-nowrap">Enroll on WhatsApp</span>
             </button>
 
+            {/* Mobile Hamburger Toggle Button - Rendered only on physical mobile devices */}
+            {isMobileDevice && (
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-3 rounded-2xl bg-slate-900 border border-slate-800 text-slate-200 hover:text-white hover:border-red-500/50 transition shadow-lg ml-2 shrink-0"
+              >
+                {mobileMenuOpen ? <X className="w-8 h-8 text-red-500" /> : <Menu className="w-8 h-8" />}
+              </button>
+            )}
 
-
-          </div>
-
-          {/* Mobile Hamburger Toggle Button */}
-          <div className="lg:hidden flex items-center space-x-2">
-            <button
-              onClick={() => {
-                const langs = ['en', 'de', 'ur'];
-                const next = langs[(langs.indexOf(currentLang) + 1) % langs.length];
-                setLanguage(next);
-              }}
-              className="px-2.5 py-1 rounded-lg bg-slate-900 text-xs font-bold text-red-400 uppercase border border-slate-800 flex items-center gap-1"
-            >
-              <Globe className="w-3.5 h-3.5" />
-              <span>{currentLang}</span>
-            </button>
-
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-200 hover:text-white hover:border-red-500/50 transition shadow"
-            >
-              {mobileMenuOpen ? <X className="w-6 h-6 text-red-500" /> : <Menu className="w-6 h-6" />}
-            </button>
           </div>
 
         </div>
       </div>
+      </header>
 
-      {/* Mobile Drawer */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden bg-slate-950/98 border-b border-slate-800 px-4 pt-3 pb-8 space-y-3 animate-fade-in backdrop-blur-2xl shadow-2xl max-h-[85vh] overflow-y-auto">
+      {/* Full-Screen Mobile Drawer - Scaled Up for 1280px Viewport */}
+      {isMobileDevice && mobileMenuOpen && (
+        <div className="fixed inset-0 top-20 bg-slate-950/98 px-10 pt-10 pb-20 space-y-6 animate-fade-in backdrop-blur-3xl shadow-2xl overflow-y-auto z-40">
           
-          <div className="space-y-1.5">
+          <div className="space-y-4 max-w-3xl mx-auto">
             
             {/* Mobile Direct Link: Home */}
             <button
@@ -363,13 +391,13 @@ export default function Navbar({
                 setActiveTab('home');
                 setMobileMenuOpen(false);
               }}
-              className={`w-full text-left px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-3 ${
+              className={`w-full text-left px-8 py-8 rounded-[2rem] text-4xl font-extrabold flex items-center gap-6 ${
                 activeTab === 'home' 
-                  ? 'bg-red-600/20 text-white border border-red-500/40' 
-                  : 'text-slate-300 hover:bg-slate-900'
+                  ? 'bg-red-600/20 text-white border-2 border-red-500/40' 
+                  : 'text-slate-300 hover:bg-slate-900 border-2 border-transparent'
               }`}
             >
-              <BookOpen className="w-5 h-5 text-red-500" />
+              <BookOpen className="w-12 h-12 text-red-500 shrink-0" />
               <span>{t.nav.home}</span>
             </button>
 
@@ -379,33 +407,36 @@ export default function Navbar({
                 setActiveTab('courses');
                 setMobileMenuOpen(false);
               }}
-              className={`w-full text-left px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-3 ${
+              className={`w-full text-left px-8 py-8 rounded-[2rem] text-4xl font-extrabold flex items-center gap-6 ${
                 activeTab === 'courses' 
-                  ? 'bg-red-600/20 text-white border border-red-500/40' 
-                  : 'text-slate-300 hover:bg-slate-900'
+                  ? 'bg-red-600/20 text-white border-2 border-red-500/40' 
+                  : 'text-slate-300 hover:bg-slate-900 border-2 border-transparent'
               }`}
             >
-              <GraduationCap className="w-5 h-5 text-red-500" />
+              <GraduationCap className="w-12 h-12 text-red-500 shrink-0" />
               <span>{t.nav.courses}</span>
             </button>
 
             {/* Mobile Accordion 1: About */}
-            <div className="border border-slate-800/80 rounded-2xl overflow-hidden">
+            <div className="border-2 border-slate-800/80 rounded-[2rem] overflow-hidden bg-slate-900/40">
               <button
                 onClick={() => setMobileAboutExpanded(!mobileAboutExpanded)}
-                className="w-full text-left px-4 py-3 bg-slate-900/60 text-xs font-bold text-slate-200 flex items-center justify-between"
+                className="w-full text-left px-8 py-8 text-4xl font-extrabold text-slate-200 flex items-center justify-between"
               >
-                <div className="flex items-center gap-3">
-                  <Users className="w-5 h-5 text-red-500" />
+                <div className="flex items-center gap-6">
+                  <Users className="w-12 h-12 text-red-500 shrink-0" />
                   <span>About German Language School</span>
                 </div>
-                <ChevronDown className={`w-4 h-4 text-red-500 transition-transform ${mobileAboutExpanded ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-10 h-10 text-red-500 transition-transform shrink-0 ${mobileAboutExpanded ? 'rotate-180' : ''}`} />
               </button>
 
               {mobileAboutExpanded && (
-                <div className="bg-slate-950 p-2 space-y-1 border-t border-slate-800">
-                  {aboutMenuItems.map((item) => {
+                <div className="bg-slate-950 p-6 border-t-2 border-slate-800 grid grid-cols-2 gap-4">
+                  {aboutMenuItems.map((item, index) => {
                     const Icon = item.icon;
+                    const isActive = activeTab === item.id;
+                    const isFirst = index === 0;
+
                     return (
                       <button
                         key={item.id}
@@ -413,10 +444,23 @@ export default function Navbar({
                           setActiveTab(item.id);
                           setMobileMenuOpen(false);
                         }}
-                        className="w-full text-left p-2.5 rounded-xl text-xs text-slate-300 hover:text-red-400 hover:bg-slate-900 flex items-center gap-3 font-semibold"
+                        className={`group text-left p-6 rounded-3xl transition-all flex flex-col gap-4 border-2 ${
+                          isFirst ? 'col-span-2' : 'col-span-1'
+                        } ${
+                          isActive
+                            ? 'border-red-500/40 bg-red-900/20 hover:bg-red-600 hover:border-red-500'
+                            : 'border-slate-800 bg-slate-900/50 hover:bg-red-600 hover:border-red-500'
+                        }`}
                       >
-                        <Icon className="w-4 h-4 text-red-500 shrink-0" />
-                        <span>{item.label}</span>
+                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 transition-colors duration-200 ${
+                          isActive ? 'bg-red-500/20 text-red-500 group-hover:bg-red-700/50 group-hover:text-white' : 'bg-slate-800 text-slate-300 group-hover:bg-red-700/50 group-hover:text-white'
+                        }`}>
+                          <Icon className="w-8 h-8" />
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-slate-200 group-hover:text-white transition-colors duration-200">{item.label}</div>
+                          <div className="text-[16px] text-slate-400 font-normal mt-2 leading-tight group-hover:text-red-100 transition-colors duration-200">{item.desc}</div>
+                        </div>
                       </button>
                     );
                   })}
@@ -425,22 +469,25 @@ export default function Navbar({
             </div>
 
             {/* Mobile Accordion 2: Resources */}
-            <div className="border border-slate-800/80 rounded-2xl overflow-hidden">
+            <div className="border-2 border-slate-800/80 rounded-[2rem] overflow-hidden bg-slate-900/40">
               <button
                 onClick={() => setMobileResourcesExpanded(!mobileResourcesExpanded)}
-                className="w-full text-left px-4 py-3 bg-slate-900/60 text-xs font-bold text-slate-200 flex items-center justify-between"
+                className="w-full text-left px-8 py-8 text-4xl font-extrabold text-slate-200 flex items-center justify-between"
               >
-                <div className="flex items-center gap-3">
-                  <Laptop className="w-5 h-5 text-red-500" />
+                <div className="flex items-center gap-6">
+                  <Laptop className="w-12 h-12 text-red-500 shrink-0" />
                   <span>Resources & Visa Tips</span>
                 </div>
-                <ChevronDown className={`w-4 h-4 text-red-500 transition-transform ${mobileResourcesExpanded ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`w-10 h-10 text-red-500 transition-transform shrink-0 ${mobileResourcesExpanded ? 'rotate-180' : ''}`} />
               </button>
 
               {mobileResourcesExpanded && (
-                <div className="bg-slate-950 p-2 space-y-1 border-t border-slate-800">
+                <div className="bg-slate-950 p-6 border-t-2 border-slate-800 grid grid-cols-2 gap-4">
                   {resourcesMenuItems.map((item) => {
                     const Icon = item.icon;
+                    const isPopular = item.id === 'blog';
+                    const isActive = activeTab === item.id;
+
                     return (
                       <button
                         key={item.id}
@@ -448,10 +495,27 @@ export default function Navbar({
                           setActiveTab(item.id);
                           setMobileMenuOpen(false);
                         }}
-                        className="w-full text-left p-2.5 rounded-xl text-xs text-slate-300 hover:text-red-400 hover:bg-slate-900 flex items-center gap-3 font-semibold"
+                        className={`group text-left p-6 rounded-3xl transition-all flex flex-col gap-4 border-2 ${
+                          isPopular 
+                            ? 'col-span-2 border-amber-500/50 bg-amber-500/10 hover:bg-red-600 hover:border-red-500' 
+                            : isActive
+                              ? 'col-span-1 border-red-500/40 bg-red-900/20 hover:bg-red-600 hover:border-red-500'
+                              : 'col-span-1 border-slate-800 bg-slate-900/50 hover:bg-red-600 hover:border-red-500'
+                        }`}
                       >
-                        <Icon className="w-4 h-4 text-red-500 shrink-0" />
-                        <span>{item.label}</span>
+                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 transition-colors duration-200 ${
+                          isPopular 
+                            ? 'bg-amber-500/20 text-amber-500 group-hover:bg-red-700/50 group-hover:text-white' 
+                            : isActive 
+                              ? 'bg-red-500/20 text-red-500 group-hover:bg-red-700/50 group-hover:text-white' 
+                              : 'bg-slate-800 text-slate-300 group-hover:bg-red-700/50 group-hover:text-white'
+                        }`}>
+                          <Icon className="w-8 h-8" />
+                        </div>
+                        <div>
+                          <div className={`text-2xl font-bold transition-colors duration-200 ${isPopular ? 'text-amber-400 group-hover:text-white' : 'text-slate-200 group-hover:text-white'}`}>{item.label}</div>
+                          <div className="text-[16px] text-slate-400 font-normal mt-2 leading-tight transition-colors duration-200 group-hover:text-red-100">{item.desc}</div>
+                        </div>
                       </button>
                     );
                   })}
@@ -465,49 +529,21 @@ export default function Navbar({
                 setActiveTab('contact');
                 setMobileMenuOpen(false);
               }}
-              className={`w-full text-left px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-3 ${
+              className={`w-full text-left px-8 py-8 rounded-[2rem] text-4xl font-extrabold flex items-center gap-6 ${
                 activeTab === 'contact' 
-                  ? 'bg-red-600/20 text-white border border-red-500/40' 
-                  : 'text-slate-300 hover:bg-slate-900'
+                  ? 'bg-red-600/20 text-white border-2 border-red-500/40' 
+                  : 'text-slate-300 hover:bg-slate-900 border-2 border-transparent'
               }`}
             >
-              <PhoneCall className="w-5 h-5 text-red-500" />
+              <PhoneCall className="w-12 h-12 text-red-500 shrink-0" />
               <span>{t.nav.contact}</span>
             </button>
 
           </div>
 
-          {/* Mobile Action Buttons Footer */}
-          <div className="pt-4 border-t border-slate-800/80 space-y-2">
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => {
-                  onOpenTrialModal();
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full py-3 rounded-full text-xs font-bold border-2 border-red-500/40 text-white hover:bg-red-600 text-center flex items-center justify-center gap-1.5"
-              >
-                <Play className="w-3.5 h-3.5 fill-current text-red-500" />
-                <span>{t.nav.freeTrial}</span>
-              </button>
-
-              <button
-                onClick={() => {
-                  const msg = encodeURIComponent("Hi, I want to enroll in German Language School. Please share payment details.");
-                  window.open(`https://wa.me/923421189593?text=${msg}`, '_blank');
-                  setMobileMenuOpen(false);
-                }}
-                className="w-full py-3 rounded-full text-xs font-extrabold text-slate-950 bg-gradient-to-r from-emerald-500 to-teal-500 text-center shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-1.5"
-              >
-                <MessageCircle className="w-4 h-4 fill-current" />
-                <span>Enroll Now</span>
-              </button>
-            </div>
-          </div>
-
         </div>
       )}
 
-    </header>
+    </>
   );
 }

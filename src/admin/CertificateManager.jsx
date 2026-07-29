@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
-import { Award, Plus, Eye, Trash2, ShieldCheck, Lock, Upload, Sparkles, CheckCircle2 } from 'lucide-react';
-import { initialCertificates } from '../mockData/seedData';
+import React, { useState, useEffect } from 'react';
+import { Award, Plus, Eye, Trash2, ShieldCheck, Lock, Upload, Sparkles, CheckCircle2, Loader2 } from 'lucide-react';
 import ProtectedImage from '../components/ProtectedImage';
+import { supabase } from '../lib/supabaseClient';
 
 export default function CertificateManager() {
-  const [certificates, setCertificates] = useState(initialCertificates);
+  const [certificates, setCertificates] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [previewCert, setPreviewCert] = useState(null);
   const [showPrivateOriginal, setShowPrivateOriginal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
@@ -21,52 +22,112 @@ export default function CertificateManager() {
     imageUrl: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80'
   });
 
-  const toggleFeatured = (id) => {
-    setCertificates(certificates.map(c => c.id === id ? { ...c, verified: !c.verified } : c));
+  useEffect(() => {
+    fetchCertificates();
+  }, []);
+
+  const fetchCertificates = async () => {
+    setLoading(true);
+    const { data, error } = await supabase.from('certificates').select('*').order('issue_date', { ascending: false });
+    if (!error && data) {
+      const mapped = data.map(c => ({
+        id: c.id,
+        studentName: c.student_name,
+        congratsTitle: c.congrats_title,
+        examBody: c.exam_body,
+        city: c.city,
+        score: c.score,
+        date: c.issue_date,
+        quote: c.quote,
+        imageUrl: c.image_url,
+        verified: c.verified
+      }));
+      setCertificates(mapped);
+    }
+    setLoading(false);
   };
 
-  const handleDelete = (id) => {
-    if (confirm('Remove certificate from showcase?')) {
-      setCertificates(certificates.filter(c => c.id !== id));
+  const toggleFeatured = async (id) => {
+    const cert = certificates.find(c => c.id === id);
+    if (!cert) return;
+    
+    const { error } = await supabase.from('certificates').update({ verified: !cert.verified }).eq('id', id);
+    if (!error) {
+      setCertificates(certificates.map(c => c.id === id ? { ...c, verified: !c.verified } : c));
     }
   };
 
-  const handleQuickUploadSubmit = (e) => {
+  const handleDelete = async (id) => {
+    if (confirm('Remove certificate from showcase?')) {
+      const { error } = await supabase.from('certificates').delete().eq('id', id);
+      if (!error) {
+        setCertificates(certificates.filter(c => c.id !== id));
+      }
+    }
+  };
+
+  const handleQuickUploadSubmit = async (e) => {
     e.preventDefault();
     if (!newCert.studentName) {
       alert('Please enter student name');
       return;
     }
 
-    const createdCert = {
-      id: `cert-${Date.now()}`,
-      studentName: newCert.studentName,
-      congratsTitle: `Congratulations to ${newCert.studentName}!`,
-      examBody: newCert.examBody,
+    const payload = {
+      student_name: newCert.studentName,
+      congrats_title: `Congratulations to ${newCert.studentName}!`,
+      exam_body: newCert.examBody,
       city: newCert.city,
       score: newCert.score,
-      date: newCert.date || 'July 2026',
+      issue_date: newCert.date || 'July 2026',
       quote: newCert.quote,
-      imageUrl: newCert.imageUrl,
+      image_url: newCert.imageUrl,
       verified: true
     };
 
-    setCertificates([createdCert, ...certificates]);
-    setShowUploadModal(false);
-    setUploadNotice(`Certificate for ${newCert.studentName} uploaded and watermarked!`);
-    setTimeout(() => setUploadNotice(''), 4000);
+    const { data, error } = await supabase.from('certificates').insert([payload]).select().single();
 
-    // Reset form
-    setNewCert({
-      studentName: '',
-      examBody: 'Goethe-Zertifikat B1',
-      city: '',
-      score: '',
-      date: '',
-      quote: '',
-      imageUrl: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80'
-    });
+    if (!error && data) {
+      const mapped = {
+        id: data.id,
+        studentName: data.student_name,
+        congratsTitle: data.congrats_title,
+        examBody: data.exam_body,
+        city: data.city,
+        score: data.score,
+        date: data.issue_date,
+        quote: data.quote,
+        imageUrl: data.image_url,
+        verified: data.verified
+      };
+      
+      setCertificates([mapped, ...certificates]);
+      setShowUploadModal(false);
+      setUploadNotice(`Certificate for ${newCert.studentName} uploaded and watermarked!`);
+      setTimeout(() => setUploadNotice(''), 4000);
+
+      // Reset form
+      setNewCert({
+        studentName: '',
+        examBody: 'Goethe-Zertifikat B1',
+        city: '',
+        score: '',
+        date: '',
+        quote: '',
+        imageUrl: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80'
+      });
+    } else {
+      alert('Failed to upload certificate');
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Loader2 className="w-8 h-8 text-amber-500 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -79,7 +140,7 @@ export default function CertificateManager() {
             <span>Featured Certificate Showcase Manager</span>
           </h2>
           <p className="text-xs text-slate-400">
-            Upload raw landscape certificates in under 30 seconds. The system automatically applies the diagonal watermark (<span className="text-amber-400 font-bold">0342 1189593</span>) for public view.
+            Upload raw landscape certificates in under 30 seconds. The system automatically applies the diagonal watermark (<span className="text-amber-400 font-bold">03421189593</span>) for public view.
           </p>
         </div>
 
@@ -282,7 +343,7 @@ export default function CertificateManager() {
                     !showPrivateOriginal ? 'bg-amber-500 text-slate-950' : 'bg-slate-900 text-slate-400'
                   }`}
                 >
-                  Public Watermarked (0342 1189593)
+                  Public Watermarked (03421189593)
                 </button>
                 <button
                   onClick={() => setShowPrivateOriginal(true)}
@@ -299,7 +360,7 @@ export default function CertificateManager() {
               <ProtectedImage
                 src={previewCert.imageUrl}
                 alt={previewCert.studentName}
-                watermarkText="0342 1189593"
+                watermarkText="03421189593"
                 isPrivateOriginal={showPrivateOriginal}
                 objectFit="contain"
                 className="w-full h-full rounded-xl"
