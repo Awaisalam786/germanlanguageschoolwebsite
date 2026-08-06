@@ -28,16 +28,11 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal }) {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    const fetchCourses = async () => {
-      const { data } = await supabase.from('courses').select('*').order('created_at', { ascending: true });
-      if (data) {
-        const levelOrder = { 'A1': 1, 'A2': 2, 'B1': 3, 'B2': 4 };
-        const sortedData = data.sort((a, b) => (levelOrder[a.level] || 99) - (levelOrder[b.level] || 99));
-        setCourses(sortedData);
-      }
+    // Temporarily load from seedData until database migration is complete
+    import('../mockData/seedData').then((module) => {
+      setCourses(module.initialCourses);
       setLoading(false);
-    };
-    fetchCourses();
+    });
   }, []);
 
   const handleWhatsAppEnroll = (courseName = "German Language Course") => {
