@@ -110,7 +110,7 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal }) {
                 </div>
               </div>
 
-              <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl pt-4">
+              <p className="text-sm sm:text-base text-slate-400 leading-relaxed max-w-2xl">
                 {t.hero.desc}
               </p>
 
