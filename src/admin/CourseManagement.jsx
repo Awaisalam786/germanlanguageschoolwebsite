@@ -1,97 +1,104 @@
 import React, { useState, useEffect } from 'react';
-import { GraduationCap, Plus, Edit, Trash2, Clock, Calendar, X } from 'lucide-react';
+import { GraduationCap, Plus, Edit, Trash2, Clock, Calendar, X, Eye, EyeOff, Star } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 
 export default function CourseManagement() {
+  const [activeTab, setActiveTab] = useState('courses'); // 'courses' or 'bundles'
   const [courses, setCourses] = useState([]);
+  const [bundles, setBundles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
+  
+  const [showCourseModal, setShowCourseModal] = useState(false);
+  const [showBundleModal, setShowBundleModal] = useState(false);
+  
   const [editingCourse, setEditingCourse] = useState(null);
-  const [formData, setFormData] = useState({
-    level: 'B1',
-    title: '',
-    duration: '8 Weeks (80 Hours)',
-    price: '€590',
-    schedule: 'Flexible Live Batches Available'
+  const [editingBundle, setEditingBundle] = useState(null);
+  
+  const [courseFormData, setCourseFormData] = useState({
+    level: 'B1', title: '', duration: '', price: '', schedule: '', description: '', badge: '', is_featured: false, is_hidden: false
+  });
+  
+  const [bundleFormData, setBundleFormData] = useState({
+    title: '', description: '', badge: '', recommendedRibbon: '', duration: '', originalPricePKR: '', bundlePricePKR: '', bundlePriceEUR: '', youSaveText: '', isRecommended: false, is_hidden: false, levelsIncluded: []
   });
 
   useEffect(() => {
-    fetchCourses();
+    fetchData();
   }, []);
 
-  const fetchCourses = async () => {
+  const fetchData = async () => {
     setLoading(true);
-    const { data, error } = await supabase.from('courses').select('*').order('created_at', { ascending: true });
-    if (error) {
-      console.error('Error fetching courses:', error);
-    } else {
-      setCourses(data || []);
-    }
+    const [coursesRes, bundlesRes] = await Promise.all([
+      supabase.from('courses').select('*').order('created_at', { ascending: true }),
+      supabase.from('course_bundles').select('*').order('created_at', { ascending: true })
+    ]);
+    if (coursesRes.data) setCourses(coursesRes.data);
+    if (bundlesRes.data) setBundles(bundlesRes.data);
     setLoading(false);
   };
 
-  const handleOpenAdd = () => {
+  // --- COURSE HANDLERS ---
+  const handleOpenCourseAdd = () => {
     setEditingCourse(null);
-    setFormData({
-      level: 'B1',
-      title: '',
-      duration: '8 Weeks (80 Hours)',
-      price: '€590',
-      schedule: 'Flexible Live Batches Available'
-    });
-    setShowModal(true);
+    setCourseFormData({ level: 'B1', title: '', duration: '', price: '', schedule: '', description: '', badge: '', is_featured: false, is_hidden: false });
+    setShowCourseModal(true);
   };
 
-  const handleOpenEdit = (course) => {
+  const handleOpenCourseEdit = (course) => {
     setEditingCourse(course);
-    setFormData({ 
-      level: course.level,
-      title: course.title,
-      duration: course.duration,
-      price: course.price,
-      schedule: course.schedule
-    });
-    setShowModal(true);
+    setCourseFormData(course);
+    setShowCourseModal(true);
   };
 
-  const handleDelete = async (id) => {
-    if (confirm('Delete this course offering?')) {
-      const { error } = await supabase.from('courses').delete().eq('id', id);
-      if (!error) {
-        setCourses(courses.filter(c => c.id !== id));
-      } else {
-        alert('Error deleting course: ' + error.message);
-      }
-    }
-  };
-
-  const handleSubmit = async (e) => {
+  const handleCourseSubmit = async (e) => {
     e.preventDefault();
     if (editingCourse) {
-      const { data, error } = await supabase
-        .from('courses')
-        .update(formData)
-        .eq('id', editingCourse.id)
-        .select();
-      
-      if (!error && data) {
-        setCourses(courses.map(c => c.id === editingCourse.id ? data[0] : c));
-      } else {
-        alert('Error updating course: ' + error?.message);
-      }
+      const { data } = await supabase.from('courses').update(courseFormData).eq('id', editingCourse.id).select();
+      if (data) setCourses(courses.map(c => c.id === editingCourse.id ? data[0] : c));
     } else {
-      const { data, error } = await supabase
-        .from('courses')
-        .insert([formData])
-        .select();
-        
-      if (!error && data) {
-        setCourses([...courses, data[0]]);
-      } else {
-        alert('Error adding course: ' + error?.message);
-      }
+      const { data } = await supabase.from('courses').insert([courseFormData]).select();
+      if (data) setCourses([...courses, data[0]]);
     }
-    setShowModal(false);
+    setShowCourseModal(false);
+  };
+
+  const deleteCourse = async (id) => {
+    if (window.confirm('Delete this course?')) {
+      await supabase.from('courses').delete().eq('id', id);
+      setCourses(courses.filter(c => c.id !== id));
+    }
+  };
+
+  // --- BUNDLE HANDLERS ---
+  const handleOpenBundleAdd = () => {
+    setEditingBundle(null);
+    setBundleFormData({ title: '', description: '', badge: '', recommendedRibbon: '', duration: '', originalPricePKR: '', bundlePricePKR: '', bundlePriceEUR: '', youSaveText: '', isRecommended: false, is_hidden: false, levelsIncluded: [] });
+    setShowBundleModal(true);
+  };
+
+  const handleOpenBundleEdit = (bundle) => {
+    setEditingBundle(bundle);
+    setBundleFormData(bundle);
+    setShowBundleModal(true);
+  };
+
+  const handleBundleSubmit = async (e) => {
+    e.preventDefault();
+    if (editingBundle) {
+      const { data } = await supabase.from('course_bundles').update(bundleFormData).eq('id', editingBundle.id).select();
+      if (data) setBundles(bundles.map(b => b.id === editingBundle.id ? data[0] : b));
+    } else {
+      const { data } = await supabase.from('course_bundles').insert([bundleFormData]).select();
+      if (data) setBundles([...bundles, data[0]]);
+    }
+    setShowBundleModal(false);
+  };
+
+  const deleteBundle = async (id) => {
+    if (window.confirm('Delete this bundle?')) {
+      await supabase.from('course_bundles').delete().eq('id', id);
+      setBundles(bundles.filter(b => b.id !== id));
+    }
   };
 
   return (
@@ -100,152 +107,131 @@ export default function CourseManagement() {
         <div>
           <h2 className="text-2xl font-extrabold text-white flex items-center gap-2">
             <GraduationCap className="w-6 h-6 text-amber-400" />
-            <span>Course Catalog & Schedule Management</span>
+            <span>Course & Bundles Management</span>
           </h2>
-          <p className="text-xs text-slate-400">Manage course levels (A1-B2), tuition fees, schedules, and capacity (Synced with Supabase).</p>
+          <p className="text-xs text-slate-400">Manage individual courses and package bundles dynamically.</p>
         </div>
-
-        <button
-          onClick={handleOpenAdd}
-          className="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs shadow-gold-glow flex items-center gap-2"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add New Course</span>
-        </button>
+        <div className="flex gap-2 bg-slate-900 p-1 rounded-xl border border-slate-800">
+          <button onClick={() => setActiveTab('courses')} className={`px-4 py-2 rounded-lg text-xs font-bold transition ${activeTab === 'courses' ? 'bg-amber-500 text-slate-900' : 'text-slate-400 hover:text-white'}`}>Individual Courses</button>
+          <button onClick={() => setActiveTab('bundles')} className={`px-4 py-2 rounded-lg text-xs font-bold transition ${activeTab === 'bundles' ? 'bg-amber-500 text-slate-900' : 'text-slate-400 hover:text-white'}`}>Course Bundles</button>
+        </div>
       </div>
 
       {loading ? (
-        <div className="text-center py-10 text-amber-400 font-bold">Loading courses from Supabase...</div>
+        <div className="text-center py-10 text-amber-400 font-bold">Loading data...</div>
+      ) : activeTab === 'courses' ? (
+        // COURSES VIEW
+        <div className="space-y-4">
+          <div className="flex justify-end">
+            <button onClick={handleOpenCourseAdd} className="px-4 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-2"><Plus className="w-4 h-4" /> Add Course</button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {courses.map(course => (
+              <div key={course.id} className={`bg-slate-900 border ${course.is_hidden ? 'border-red-500/30 opacity-60' : 'border-slate-800'} rounded-2xl p-6 relative flex flex-col justify-between`}>
+                <div className="absolute top-0 right-0 bg-slate-800 text-slate-300 font-bold px-3 py-1 rounded-bl-2xl text-xs flex gap-2">
+                  {course.is_featured && <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />}
+                  {course.is_hidden ? <EyeOff className="w-3.5 h-3.5 text-red-400" /> : <Eye className="w-3.5 h-3.5 text-emerald-400" />}
+                  {course.level}
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white pr-16">{course.title}</h3>
+                  <div className="text-xs text-slate-400 mt-2 space-y-1">
+                    <div><Clock className="w-3 h-3 inline mr-1 text-amber-400"/>{course.duration}</div>
+                    <div><Calendar className="w-3 h-3 inline mr-1 text-amber-400"/>{course.schedule}</div>
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t border-slate-800 flex justify-between items-center">
+                  <div className="text-emerald-400 font-bold">{course.price}</div>
+                  <div className="flex gap-2">
+                    <button onClick={() => handleOpenCourseEdit(course)} className="p-1.5 bg-slate-800 text-amber-400 rounded"><Edit className="w-4 h-4"/></button>
+                    <button onClick={() => deleteCourse(course.id)} className="p-1.5 bg-slate-800 text-red-400 rounded"><Trash2 className="w-4 h-4"/></button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {courses.map((course) => (
-            <div key={course.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-6 relative overflow-hidden flex flex-col justify-between">
-              
-              {/* Level Badge */}
-              <div className="absolute top-0 right-0 bg-amber-500/10 text-amber-400 font-bold px-4 py-2 rounded-bl-2xl text-xs border-b border-l border-amber-500/20">
-                {course.level}
-              </div>
-
-              <div className="space-y-4">
-                <h3 className="text-lg font-bold text-white pr-12">{course.title}</h3>
-                
-                <div className="space-y-2">
-                  <div className="flex items-center text-xs text-slate-400 gap-2">
-                    <Clock className="w-3.5 h-3.5 text-amber-400" />
-                    <span>{course.duration}</span>
+        // BUNDLES VIEW
+        <div className="space-y-4">
+          <div className="flex justify-end">
+            <button onClick={handleOpenBundleAdd} className="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs flex items-center gap-2"><Plus className="w-4 h-4" /> Add Bundle</button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {bundles.map(bundle => (
+              <div key={bundle.id} className={`bg-slate-900 border ${bundle.is_hidden ? 'border-red-500/30 opacity-60' : 'border-slate-800'} rounded-2xl p-6 relative flex flex-col justify-between`}>
+                <div className="absolute top-0 right-0 bg-slate-800 text-slate-300 font-bold px-3 py-1 rounded-bl-2xl text-xs flex gap-2">
+                  {bundle.isRecommended && <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />}
+                  {bundle.is_hidden ? <EyeOff className="w-3.5 h-3.5 text-red-400" /> : <Eye className="w-3.5 h-3.5 text-emerald-400" />}
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-white pr-12">{bundle.title}</h3>
+                  <div className="text-xs text-slate-400 mt-2">{bundle.description}</div>
+                  <div className="mt-3 flex gap-1 flex-wrap">
+                    {(bundle.levelsIncluded || []).map(lvl => (
+                      <span key={lvl} className="px-2 py-0.5 bg-slate-800 text-[10px] rounded text-white">{lvl}</span>
+                    ))}
                   </div>
-                  <div className="flex items-center text-xs text-slate-400 gap-2">
-                    <Calendar className="w-3.5 h-3.5 text-amber-400" />
-                    <span>{course.schedule}</span>
+                </div>
+                <div className="mt-4 pt-4 border-t border-slate-800 flex justify-between items-center">
+                  <div className="text-emerald-400 font-bold">{bundle.bundlePricePKR}</div>
+                  <div className="flex gap-2">
+                    <button onClick={() => handleOpenBundleEdit(bundle)} className="p-1.5 bg-slate-800 text-amber-400 rounded"><Edit className="w-4 h-4"/></button>
+                    <button onClick={() => deleteBundle(bundle.id)} className="p-1.5 bg-slate-800 text-red-400 rounded"><Trash2 className="w-4 h-4"/></button>
                   </div>
                 </div>
               </div>
-
-              <div className="mt-6 pt-5 border-t border-slate-800/80 flex items-center justify-between">
-                <div className="text-sm font-black text-emerald-400">{course.price}</div>
-                <div className="flex space-x-2">
-                  <button onClick={() => handleOpenEdit(course)} className="p-1.5 rounded bg-slate-800 text-amber-400 hover:bg-slate-700">
-                    <Edit className="w-4 h-4" />
-                  </button>
-                  <button onClick={() => handleDelete(course.id)} className="p-1.5 rounded bg-slate-800 text-red-400 hover:bg-slate-700">
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
 
-      {/* Add/Edit Modal */}
-      {showModal && (
+      {/* COURSE MODAL */}
+      {showCourseModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
           <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl">
-            <div className="p-5 border-b border-slate-800 flex items-center justify-between">
-              <h3 className="text-lg font-bold text-white">{editingCourse ? 'Edit Course' : 'Add New Course'}</h3>
-              <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white transition">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+            <div className="p-5 border-b border-slate-800 flex justify-between"><h3 className="text-lg font-bold text-white">{editingCourse ? 'Edit Course' : 'Add Course'}</h3><button onClick={() => setShowCourseModal(false)} className="text-slate-400"><X className="w-5 h-5"/></button></div>
+            <form onSubmit={handleCourseSubmit} className="p-6 space-y-4">
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-400 mb-1.5">Level (e.g. A1)</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.level}
-                    onChange={(e) => setFormData({...formData, level: e.target.value})}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-amber-500/50"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-400 mb-1.5">Title</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.title}
-                    onChange={(e) => setFormData({...formData, title: e.target.value})}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-amber-500/50"
-                  />
-                </div>
+                <div><label className="block text-xs font-bold text-slate-400 mb-1">Level</label><input type="text" required value={courseFormData.level} onChange={e => setCourseFormData({...courseFormData, level: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white" /></div>
+                <div><label className="block text-xs font-bold text-slate-400 mb-1">Title</label><input type="text" required value={courseFormData.title} onChange={e => setCourseFormData({...courseFormData, title: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white" /></div>
               </div>
-
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold text-slate-400 mb-1.5">Duration</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.duration}
-                    onChange={(e) => setFormData({...formData, duration: e.target.value})}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-amber-500/50"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-slate-400 mb-1.5">Tuition Fee</label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.price}
-                    onChange={(e) => setFormData({...formData, price: e.target.value})}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-amber-500/50"
-                  />
-                </div>
+                <div><label className="block text-xs font-bold text-slate-400 mb-1">Duration</label><input type="text" required value={courseFormData.duration} onChange={e => setCourseFormData({...courseFormData, duration: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white" /></div>
+                <div><label className="block text-xs font-bold text-slate-400 mb-1">Price</label><input type="text" required value={courseFormData.price} onChange={e => setCourseFormData({...courseFormData, price: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white" /></div>
               </div>
-
-              <div>
-                <label className="block text-xs font-bold text-slate-400 mb-1.5">Schedule Information</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.schedule}
-                  onChange={(e) => setFormData({...formData, schedule: e.target.value})}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-amber-500/50"
-                />
+              <div><label className="block text-xs font-bold text-slate-400 mb-1">Schedule</label><input type="text" required value={courseFormData.schedule} onChange={e => setCourseFormData({...courseFormData, schedule: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white" /></div>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2 text-xs text-white"><input type="checkbox" checked={courseFormData.is_featured} onChange={e => setCourseFormData({...courseFormData, is_featured: e.target.checked})} /> Featured</label>
+                <label className="flex items-center gap-2 text-xs text-white"><input type="checkbox" checked={courseFormData.is_hidden} onChange={e => setCourseFormData({...courseFormData, is_hidden: e.target.checked})} /> Hidden</label>
               </div>
-
-              <div className="pt-4 flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-xs font-bold text-slate-400 hover:text-white transition"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-6 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs shadow-gold-glow transition"
-                >
-                  Save Course to Database
-                </button>
-              </div>
+              <div className="flex justify-end gap-3 pt-4"><button type="button" onClick={() => setShowCourseModal(false)} className="text-xs text-slate-400">Cancel</button><button type="submit" className="px-6 py-2 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs">Save</button></div>
             </form>
           </div>
         </div>
       )}
 
+      {/* BUNDLE MODAL */}
+      {showBundleModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl">
+            <div className="p-5 border-b border-slate-800 flex justify-between"><h3 className="text-lg font-bold text-white">{editingBundle ? 'Edit Bundle' : 'Add Bundle'}</h3><button onClick={() => setShowBundleModal(false)} className="text-slate-400"><X className="w-5 h-5"/></button></div>
+            <form onSubmit={handleBundleSubmit} className="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+              <div><label className="block text-xs font-bold text-slate-400 mb-1">Title</label><input type="text" required value={bundleFormData.title} onChange={e => setBundleFormData({...bundleFormData, title: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white" /></div>
+              <div><label className="block text-xs font-bold text-slate-400 mb-1">Description</label><textarea required value={bundleFormData.description} onChange={e => setBundleFormData({...bundleFormData, description: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white h-20" /></div>
+              <div className="grid grid-cols-2 gap-4">
+                <div><label className="block text-xs font-bold text-slate-400 mb-1">Price PKR</label><input type="text" required value={bundleFormData.bundlePricePKR} onChange={e => setBundleFormData({...bundleFormData, bundlePricePKR: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white" /></div>
+                <div><label className="block text-xs font-bold text-slate-400 mb-1">Price EUR</label><input type="text" required value={bundleFormData.bundlePriceEUR} onChange={e => setBundleFormData({...bundleFormData, bundlePriceEUR: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white" /></div>
+              </div>
+              <div className="flex gap-4">
+                <label className="flex items-center gap-2 text-xs text-white"><input type="checkbox" checked={bundleFormData.isRecommended} onChange={e => setBundleFormData({...bundleFormData, isRecommended: e.target.checked})} /> Recommended Badge</label>
+                <label className="flex items-center gap-2 text-xs text-white"><input type="checkbox" checked={bundleFormData.is_hidden} onChange={e => setBundleFormData({...bundleFormData, is_hidden: e.target.checked})} /> Hidden</label>
+              </div>
+              <div className="flex justify-end gap-3 pt-4"><button type="button" onClick={() => setShowBundleModal(false)} className="text-xs text-slate-400">Cancel</button><button type="submit" className="px-6 py-2 bg-emerald-500 text-slate-950 font-bold rounded-xl text-xs">Save</button></div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
