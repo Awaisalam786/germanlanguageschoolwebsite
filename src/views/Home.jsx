@@ -28,11 +28,16 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal }) {
   const [loading, setLoading] = React.useState(true);
 
   React.useEffect(() => {
-    // Temporarily load from seedData until database migration is complete
-    import('../mockData/seedData').then((module) => {
-      setCourses(module.initialCourses);
+    const fetchCourses = async () => {
+      const { data } = await supabase.from('courses').select('*').order('created_at', { ascending: true });
+      if (data) {
+        const levelOrder = { 'A1': 1, 'A2': 2, 'B1': 3, 'B2': 4 };
+        const sortedData = data.sort((a, b) => (levelOrder[a.level] || 99) - (levelOrder[b.level] || 99));
+        setCourses(sortedData);
+      }
       setLoading(false);
-    });
+    };
+    fetchCourses();
   }, []);
 
   const handleWhatsAppEnroll = (courseName = "German Language Course") => {
@@ -66,9 +71,6 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal }) {
                 )}
               </h1>
 
-              <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl">
-                {t.hero.desc}
-              </p>
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
@@ -107,6 +109,10 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal }) {
                   <div className="text-sm sm:text-xs text-slate-400 mt-1 sm:mt-0">{t.hero.statRatingLabel}</div>
                 </div>
               </div>
+
+              <p className="text-base sm:text-lg text-slate-300 leading-relaxed max-w-2xl pt-4">
+                {t.hero.desc}
+              </p>
 
             </div>
 
