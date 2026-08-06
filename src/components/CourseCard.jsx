@@ -90,9 +90,9 @@ export default function CourseCard({ course, onEnroll }) {
           onEnroll(course.title, appliedCoupon?.coupon_code);
         }
       }}
-      className="group relative bg-slate-900 border border-slate-800 rounded-2xl p-6 hover:border-amber-500/40 transition-all duration-300 flex flex-col justify-between h-full shadow-xl hover:shadow-2xl hover:scale-[1.01] hover:-translate-y-1 cursor-pointer overflow-hidden"
+      className="w-full max-w-full box-border group relative bg-slate-900 border border-slate-800 rounded-2xl p-6 hover:border-amber-500/40 transition-all duration-300 flex flex-col justify-between h-full shadow-xl hover:shadow-2xl hover:scale-[1.01] hover:-translate-y-1 cursor-pointer overflow-hidden"
     >
-      <div className="space-y-4 flex flex-col flex-1">
+      <div className="space-y-4 flex flex-col flex-1 w-full box-border">
         
         {/* Top Row: Clean Level Badge & Optional Subtle Feature Tag */}
         <div className="flex flex-wrap items-center justify-between gap-2">

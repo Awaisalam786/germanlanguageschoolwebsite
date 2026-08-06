@@ -76,40 +76,40 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal }) {
               </p>
 
               {/* Action Buttons */}
-              <div className="flex flex-wrap items-center gap-4 pt-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
                 <button
                   onClick={() => handleWhatsAppEnroll("German Language Course")}
-                  className="group relative px-7 py-3.5 rounded-full bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold text-sm shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/40 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2.5 whitespace-nowrap"
+                  className="group relative w-full sm:w-auto px-7 py-3.5 rounded-full bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold text-sm shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/40 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-2.5 whitespace-nowrap"
                 >
                   <MessageCircle className="w-5 h-5 fill-current shrink-0 animate-pulse group-hover:scale-110 transition-transform duration-300" />
-                  <span className="whitespace-nowrap">Enroll on WhatsApp (03421189593)</span>
+                  <span>Enroll on WhatsApp (03421189593)</span>
                 </button>
 
                 <button
                   onClick={onOpenTrialModal}
-                  className="group relative px-7 py-3.5 rounded-full text-slate-200 border-2 border-red-500/40 hover:border-red-500 hover:bg-gradient-to-r hover:from-red-600 hover:to-red-700 hover:text-white font-extrabold text-sm shadow-md shadow-red-500/10 hover:shadow-xl hover:shadow-red-500/30 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2 whitespace-nowrap"
+                  className="group relative w-full sm:w-auto px-7 py-3.5 rounded-full text-slate-200 border-2 border-red-500/40 hover:border-red-500 hover:bg-gradient-to-r hover:from-red-600 hover:to-red-700 hover:text-white font-extrabold text-sm shadow-md shadow-red-500/10 hover:shadow-xl hover:shadow-red-500/30 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-2 whitespace-nowrap"
                 >
                   <Play className="w-4 h-4 text-red-500 group-hover:text-white fill-current group-hover:rotate-12 transition-transform duration-300 shrink-0" />
-                  <span className="whitespace-nowrap">{t.hero.ctaSecondary}</span>
+                  <span>{t.hero.ctaSecondary}</span>
                 </button>
               </div>
 
               {/* Quick Key Highlights */}
-              <div className="pt-6 border-t border-slate-800/80 grid grid-cols-3 gap-4">
-                <div>
-                  <div className="text-2xl font-extrabold text-white">{t.hero.statStudents}</div>
-                  <div className="text-xs text-slate-400">{t.hero.statStudentsLabel}</div>
+              <div className="pt-6 border-t border-slate-800/80 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-4 text-center sm:text-left">
+                <div className="bg-slate-900/50 sm:bg-transparent p-4 sm:p-0 rounded-2xl sm:rounded-none border border-slate-800/50 sm:border-none">
+                  <div className="text-3xl sm:text-2xl font-extrabold text-white">{t.hero.statStudents}</div>
+                  <div className="text-sm sm:text-xs text-slate-400 mt-1 sm:mt-0">{t.hero.statStudentsLabel}</div>
                 </div>
-                <div>
-                  <div className="text-2xl font-extrabold text-amber-400">{t.hero.statPassRate}</div>
-                  <div className="text-xs text-slate-400">{t.hero.statPassRateLabel}</div>
+                <div className="bg-slate-900/50 sm:bg-transparent p-4 sm:p-0 rounded-2xl sm:rounded-none border border-slate-800/50 sm:border-none">
+                  <div className="text-3xl sm:text-2xl font-extrabold text-amber-400">{t.hero.statPassRate}</div>
+                  <div className="text-sm sm:text-xs text-slate-400 mt-1 sm:mt-0">{t.hero.statPassRateLabel}</div>
                 </div>
-                <div>
-                  <div className="text-2xl font-extrabold text-white flex items-center gap-1">
+                <div className="bg-slate-900/50 sm:bg-transparent p-4 sm:p-0 rounded-2xl sm:rounded-none border border-slate-800/50 sm:border-none">
+                  <div className="text-3xl sm:text-2xl font-extrabold text-white flex items-center justify-center sm:justify-start gap-1">
                     <span>{t.hero.statRating}</span>
-                    <Star className="w-4 h-4 fill-amber-400 text-amber-400 inline" />
+                    <Star className="w-5 h-5 sm:w-4 sm:h-4 fill-amber-400 text-amber-400 inline" />
                   </div>
-                  <div className="text-xs text-slate-400">{t.hero.statRatingLabel}</div>
+                  <div className="text-sm sm:text-xs text-slate-400 mt-1 sm:mt-0">{t.hero.statRatingLabel}</div>
                 </div>
               </div>
 

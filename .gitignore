@@ -3,3 +3,11 @@ node_modules/
 .env.*
 dist/
 .DS_Store
+
+admin_backup_app/
+admin_backup_src/
+src_backup_pre_phase1/
+scratch/
+GitHub Desktop.lnk
+
+.next/

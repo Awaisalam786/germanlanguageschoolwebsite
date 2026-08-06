@@ -17,8 +17,10 @@ import {
   Play,
   ShieldCheck,
   ChevronDown,
+
   Languages
 } from 'lucide-react';
+import Link from 'next/link';
 import { translations } from '../i18n/translations';
 import { useGlobalContent } from '../context/GlobalContentContext';
 
@@ -33,21 +35,10 @@ export default function Navbar({
   const [activeDropdown, setActiveDropdown] = useState(null); // 'about' | 'resources' | null
   const [mobileAboutExpanded, setMobileAboutExpanded] = useState(false);
   const [mobileResourcesExpanded, setMobileResourcesExpanded] = useState(false);
-  const [isMobileDevice, setIsMobileDevice] = useState(false);
   
   const dropdownRef = useRef(null);
   const t = translations[currentLang];
   const { settings } = useGlobalContent();
-
-  useEffect(() => {
-    const checkMobile = () => {
-      // Use physical screen width to detect mobile/tablet devices, ignoring the 1280px meta viewport
-      setIsMobileDevice(window.screen.width < 1024);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -94,10 +85,6 @@ export default function Navbar({
           {/* Brand Logo: Clean White & Red Title with Minimal Gold Border Badge */}
           <div 
             className="flex items-center space-x-3 cursor-pointer group shrink-0"
-            onClick={() => {
-              setActiveTab('home');
-              setActiveDropdown(null);
-            }}
           >
             <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-red-600 via-red-800 to-slate-900 p-0.5 shadow-lg group-hover:scale-105 transition-transform duration-300 border border-amber-500/30">
               <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
@@ -115,15 +102,11 @@ export default function Navbar({
           </div>
 
           {/* Desktop Navigation Links (Red Accent Palette) */}
-          {!isMobileDevice && (
-            <nav className="flex items-center space-x-1.5" ref={dropdownRef}>
+          <nav className="hidden lg:flex items-center space-x-1.5" ref={dropdownRef}>
             
             {/* 1. Direct Link: Home */}
-            <button
-              onClick={() => {
-                setActiveTab('home');
-                setActiveDropdown(null);
-              }}
+            <Link
+              href="/"
               className={`relative group px-3.5 py-2 rounded-xl text-[13px] font-semibold tracking-wide transition-all duration-300 flex items-center gap-2 ${
                 activeTab === 'home'
                   ? 'text-white bg-red-600/20 border border-red-500/40 shadow-sm font-bold' 
@@ -135,14 +118,11 @@ export default function Navbar({
               <span className={`absolute bottom-0 left-0 h-[2px] rounded-full bg-red-500 transition-all duration-300 ${
                 activeTab === 'home' ? 'w-full opacity-100' : 'w-0 group-hover:w-full opacity-80'
               }`} />
-            </button>
+            </Link>
 
             {/* 2. Direct Link: Courses & Fees */}
-            <button
-              onClick={() => {
-                setActiveTab('courses');
-                setActiveDropdown(null);
-              }}
+            <Link
+              href="/courses"
               className={`relative group px-3.5 py-2 rounded-xl text-[13px] font-semibold tracking-wide transition-all duration-300 flex items-center gap-2 ${
                 activeTab === 'courses'
                   ? 'text-white bg-red-600/20 border border-red-500/40 shadow-sm font-bold' 
@@ -154,7 +134,7 @@ export default function Navbar({
               <span className={`absolute bottom-0 left-0 h-[2px] rounded-full bg-red-500 transition-all duration-300 ${
                 activeTab === 'courses' ? 'w-full opacity-100' : 'w-0 group-hover:w-full opacity-80'
               }`} />
-            </button>
+            </Link>
 
             {/* 3. Dropdown Group: About */}
             <div 
@@ -186,12 +166,9 @@ export default function Navbar({
                     const isFirst = index === 0;
 
                     return (
-                      <button
+                      <Link
                         key={item.id}
-                        onClick={() => {
-                          setActiveTab(item.id);
-                          setActiveDropdown(null);
-                        }}
+                        href={item.id === 'home' ? '/' : '/' + item.id}
                         className={`group text-left p-3 rounded-xl transition-all duration-200 flex items-start gap-3 border ${
                           isFirst ? 'col-span-2' : 'col-span-1'
                         } ${
@@ -211,7 +188,7 @@ export default function Navbar({
                           <div className="text-sm font-bold leading-tight text-slate-200 group-hover:text-white transition-colors duration-200">{item.label}</div>
                           <div className="text-[11px] text-slate-400 font-normal mt-1 leading-snug group-hover:text-red-100 transition-colors duration-200">{item.desc}</div>
                         </div>
-                      </button>
+                      </Link>
                     );
                   })}
                 </div>
@@ -248,12 +225,9 @@ export default function Navbar({
                     const isPopular = item.id === 'blog';
 
                     return (
-                      <button
+                      <Link
                         key={item.id}
-                        onClick={() => {
-                          setActiveTab(item.id);
-                          setActiveDropdown(null);
-                        }}
+                        href={item.id === 'home' ? '/' : '/' + item.id}
                         className={`group text-left p-3 rounded-xl transition-all duration-200 flex items-start gap-3 border ${
                           isPopular 
                             ? 'col-span-2 border-2 border-amber-500/40 bg-amber-500/5 hover:bg-red-600 hover:border-red-500 shadow-sm' 
@@ -275,7 +249,7 @@ export default function Navbar({
                           <div className={`text-sm font-bold leading-tight transition-colors duration-200 ${isPopular ? 'text-amber-400 group-hover:text-white' : 'text-slate-200 group-hover:text-white'}`}>{item.label}</div>
                           <div className="text-[11px] text-slate-400 font-normal mt-1 leading-snug transition-colors duration-200 group-hover:text-red-100">{item.desc}</div>
                         </div>
-                      </button>
+                      </Link>
                     );
                   })}
                 </div>
@@ -283,11 +257,8 @@ export default function Navbar({
             </div>
 
             {/* 5. Direct Link: Contact Us */}
-            <button
-              onClick={() => {
-                setActiveTab('contact');
-                setActiveDropdown(null);
-              }}
+            <Link
+              href="/contact"
               className={`relative group px-3.5 py-2 rounded-xl text-[13px] font-semibold tracking-wide transition-all duration-300 flex items-center gap-2 ${
                 activeTab === 'contact'
                   ? 'text-white bg-red-600/20 border border-red-500/40 shadow-sm font-bold' 
@@ -299,10 +270,9 @@ export default function Navbar({
               <span className={`absolute bottom-0 left-0 h-[2px] rounded-full bg-red-500 transition-all duration-300 ${
                 activeTab === 'contact' ? 'w-full opacity-100' : 'w-0 group-hover:w-full opacity-80'
               }`} />
-            </button>
+            </Link>
 
           </nav>
-          )}
 
           {/* Desktop Right Action Area: Red Accent Demo Button & Green WhatsApp Button */}
           <div className="flex items-center space-x-3 shrink-0">
@@ -342,36 +312,13 @@ export default function Navbar({
               </button>
             </div>
 
-            {/* Red Accent Demo Button (Red Border -> Red Gradient Fill on Hover) */}
+            {/* Mobile Hamburger Toggle Button - Rendered via CSS on mobile */}
             <button
-              onClick={onOpenTrialModal}
-              className="group relative px-4 py-2.5 rounded-full text-xs font-bold text-white border-2 border-red-500/40 hover:border-red-500 hover:bg-gradient-to-r hover:from-red-600 hover:to-red-700 shadow-md shadow-red-500/10 hover:shadow-lg hover:shadow-red-500/30 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-1.5 whitespace-nowrap"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-3 rounded-2xl bg-slate-900 border border-slate-800 text-slate-200 hover:text-white hover:border-red-500/50 transition shadow-lg ml-2 shrink-0 flex items-center justify-center"
             >
-              <Play className="w-3.5 h-3.5 text-red-500 group-hover:text-white fill-current group-hover:rotate-12 transition-transform duration-300 shrink-0" />
-              <span className="whitespace-nowrap">{t.nav.freeTrial}</span>
+              {mobileMenuOpen ? <X className="w-8 h-8 text-red-500" /> : <Menu className="w-8 h-8" />}
             </button>
-
-            {/* Primary WhatsApp CTA Button (Kept Green as requested) */}
-            <button
-              onClick={() => {
-                const msg = encodeURIComponent("Hi, I want to enroll in German Language School. Please share payment details.");
-                window.open(`https://wa.me/923421189593?text=${msg}`, '_blank');
-              }}
-              className="group relative px-5 py-2.5 rounded-full text-xs font-extrabold text-slate-950 bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 shadow-lg shadow-emerald-500/25 hover:shadow-xl hover:shadow-emerald-500/40 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2 whitespace-nowrap"
-            >
-              <MessageCircle className="w-4 h-4 fill-current shrink-0 animate-pulse group-hover:scale-110 transition-transform duration-300" />
-              <span className="whitespace-nowrap">Enroll on WhatsApp</span>
-            </button>
-
-            {/* Mobile Hamburger Toggle Button - Rendered only on physical mobile devices */}
-            {isMobileDevice && (
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="p-3 rounded-2xl bg-slate-900 border border-slate-800 text-slate-200 hover:text-white hover:border-red-500/50 transition shadow-lg ml-2 shrink-0"
-              >
-                {mobileMenuOpen ? <X className="w-8 h-8 text-red-500" /> : <Menu className="w-8 h-8" />}
-              </button>
-            )}
 
           </div>
 
@@ -379,171 +326,161 @@ export default function Navbar({
       </div>
       </header>
 
-      {/* Full-Screen Mobile Drawer - Scaled Up for 1280px Viewport */}
-      {isMobileDevice && mobileMenuOpen && (
-        <div className="fixed inset-0 top-20 bg-slate-950/98 px-10 pt-10 pb-20 space-y-6 animate-fade-in backdrop-blur-3xl shadow-2xl overflow-y-auto z-40">
-          
-          <div className="space-y-4 max-w-3xl mx-auto">
-            
-            {/* Mobile Direct Link: Home */}
-            <button
-              onClick={() => {
-                setActiveTab('home');
-                setMobileMenuOpen(false);
-              }}
-              className={`w-full text-left px-8 py-8 rounded-[2rem] text-4xl font-extrabold flex items-center gap-6 ${
-                activeTab === 'home' 
-                  ? 'bg-red-600/20 text-white border-2 border-red-500/40' 
-                  : 'text-slate-300 hover:bg-slate-900 border-2 border-transparent'
-              }`}
-            >
-              <BookOpen className="w-12 h-12 text-red-500 shrink-0" />
-              <span>{t.nav.home}</span>
-            </button>
-
-            {/* Mobile Direct Link: Courses & Fees */}
-            <button
-              onClick={() => {
-                setActiveTab('courses');
-                setMobileMenuOpen(false);
-              }}
-              className={`w-full text-left px-8 py-8 rounded-[2rem] text-4xl font-extrabold flex items-center gap-6 ${
-                activeTab === 'courses' 
-                  ? 'bg-red-600/20 text-white border-2 border-red-500/40' 
-                  : 'text-slate-300 hover:bg-slate-900 border-2 border-transparent'
-              }`}
-            >
-              <GraduationCap className="w-12 h-12 text-red-500 shrink-0" />
-              <span>{t.nav.courses}</span>
-            </button>
-
-            {/* Mobile Accordion 1: About */}
-            <div className="border-2 border-slate-800/80 rounded-[2rem] overflow-hidden bg-slate-900/40">
-              <button
-                onClick={() => setMobileAboutExpanded(!mobileAboutExpanded)}
-                className="w-full text-left px-8 py-8 text-4xl font-extrabold text-slate-200 flex items-center justify-between"
-              >
-                <div className="flex items-center gap-6">
-                  <Users className="w-12 h-12 text-red-500 shrink-0" />
-                  <span>About German Language School</span>
-                </div>
-                <ChevronDown className={`w-10 h-10 text-red-500 transition-transform shrink-0 ${mobileAboutExpanded ? 'rotate-180' : ''}`} />
-              </button>
-
-              {mobileAboutExpanded && (
-                <div className="bg-slate-950 p-6 border-t-2 border-slate-800 grid grid-cols-2 gap-4">
-                  {aboutMenuItems.map((item, index) => {
-                    const Icon = item.icon;
-                    const isActive = activeTab === item.id;
-                    const isFirst = index === 0;
-
-                    return (
-                      <button
-                        key={item.id}
-                        onClick={() => {
-                          setActiveTab(item.id);
-                          setMobileMenuOpen(false);
-                        }}
-                        className={`group text-left p-6 rounded-3xl transition-all flex flex-col gap-4 border-2 ${
-                          isFirst ? 'col-span-2' : 'col-span-1'
-                        } ${
-                          isActive
-                            ? 'border-red-500/40 bg-red-900/20 hover:bg-red-600 hover:border-red-500'
-                            : 'border-slate-800 bg-slate-900/50 hover:bg-red-600 hover:border-red-500'
-                        }`}
-                      >
-                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 transition-colors duration-200 ${
-                          isActive ? 'bg-red-500/20 text-red-500 group-hover:bg-red-700/50 group-hover:text-white' : 'bg-slate-800 text-slate-300 group-hover:bg-red-700/50 group-hover:text-white'
-                        }`}>
-                          <Icon className="w-8 h-8" />
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold text-slate-200 group-hover:text-white transition-colors duration-200">{item.label}</div>
-                          <div className="text-[16px] text-slate-400 font-normal mt-2 leading-tight group-hover:text-red-100 transition-colors duration-200">{item.desc}</div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Mobile Accordion 2: Resources */}
-            <div className="border-2 border-slate-800/80 rounded-[2rem] overflow-hidden bg-slate-900/40">
-              <button
-                onClick={() => setMobileResourcesExpanded(!mobileResourcesExpanded)}
-                className="w-full text-left px-8 py-8 text-4xl font-extrabold text-slate-200 flex items-center justify-between"
-              >
-                <div className="flex items-center gap-6">
-                  <Laptop className="w-12 h-12 text-red-500 shrink-0" />
-                  <span>Resources & Visa Tips</span>
-                </div>
-                <ChevronDown className={`w-10 h-10 text-red-500 transition-transform shrink-0 ${mobileResourcesExpanded ? 'rotate-180' : ''}`} />
-              </button>
-
-              {mobileResourcesExpanded && (
-                <div className="bg-slate-950 p-6 border-t-2 border-slate-800 grid grid-cols-2 gap-4">
-                  {resourcesMenuItems.map((item) => {
-                    const Icon = item.icon;
-                    const isPopular = item.id === 'blog';
-                    const isActive = activeTab === item.id;
-
-                    return (
-                      <button
-                        key={item.id}
-                        onClick={() => {
-                          setActiveTab(item.id);
-                          setMobileMenuOpen(false);
-                        }}
-                        className={`group text-left p-6 rounded-3xl transition-all flex flex-col gap-4 border-2 ${
-                          isPopular 
-                            ? 'col-span-2 border-amber-500/50 bg-amber-500/10 hover:bg-red-600 hover:border-red-500' 
-                            : isActive
-                              ? 'col-span-1 border-red-500/40 bg-red-900/20 hover:bg-red-600 hover:border-red-500'
-                              : 'col-span-1 border-slate-800 bg-slate-900/50 hover:bg-red-600 hover:border-red-500'
-                        }`}
-                      >
-                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center shrink-0 transition-colors duration-200 ${
-                          isPopular 
-                            ? 'bg-amber-500/20 text-amber-500 group-hover:bg-red-700/50 group-hover:text-white' 
-                            : isActive 
-                              ? 'bg-red-500/20 text-red-500 group-hover:bg-red-700/50 group-hover:text-white' 
-                              : 'bg-slate-800 text-slate-300 group-hover:bg-red-700/50 group-hover:text-white'
-                        }`}>
-                          <Icon className="w-8 h-8" />
-                        </div>
-                        <div>
-                          <div className={`text-2xl font-bold transition-colors duration-200 ${isPopular ? 'text-amber-400 group-hover:text-white' : 'text-slate-200 group-hover:text-white'}`}>{item.label}</div>
-                          <div className="text-[16px] text-slate-400 font-normal mt-2 leading-tight transition-colors duration-200 group-hover:text-red-100">{item.desc}</div>
-                        </div>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Mobile Direct Link: Contact Us */}
-            <button
-              onClick={() => {
-                setActiveTab('contact');
-                setMobileMenuOpen(false);
-              }}
-              className={`w-full text-left px-8 py-8 rounded-[2rem] text-4xl font-extrabold flex items-center gap-6 ${
-                activeTab === 'contact' 
-                  ? 'bg-red-600/20 text-white border-2 border-red-500/40' 
-                  : 'text-slate-300 hover:bg-slate-900 border-2 border-transparent'
-              }`}
-            >
-              <PhoneCall className="w-12 h-12 text-red-500 shrink-0" />
-              <span>{t.nav.contact}</span>
-            </button>
-
-          </div>
-
-        </div>
+      {/* Mobile Sidebar Backdrop */}
+      {mobileMenuOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 transition-opacity animate-fade-in"
+          onClick={() => setMobileMenuOpen(false)}
+        />
       )}
 
+      {/* Sliding Mobile Sidebar */}
+      <div 
+        className={`lg:hidden fixed inset-y-0 right-0 w-80 sm:w-96 bg-slate-950 border-l border-slate-800 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${
+          mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+      >
+        <div className="flex items-center justify-between p-6 border-b border-slate-800">
+          <span className="text-xl font-bold text-white tracking-tight">Menu</span>
+          <button 
+            onClick={() => setMobileMenuOpen(false)}
+            className="p-2 rounded-xl bg-slate-900 text-slate-400 hover:text-white transition"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+          
+          {/* Mobile Direct Link: Home */}
+          <Link
+            href="/" onClick={() => setMobileMenuOpen(false)}
+            className={`w-full text-left px-5 py-4 rounded-2xl text-lg font-bold flex items-center gap-4 transition-all ${
+              activeTab === 'home' 
+                ? 'bg-red-600/20 text-white border border-red-500/40' 
+                : 'text-slate-300 hover:bg-slate-900 border border-transparent'
+            }`}
+          >
+            <BookOpen className="w-6 h-6 text-red-500 shrink-0" />
+            <span>{t.nav.home}</span>
+          </Link>
+
+          {/* Mobile Direct Link: Courses & Fees */}
+          <Link
+            href="/courses" onClick={() => setMobileMenuOpen(false)}
+            className={`w-full text-left px-5 py-4 rounded-2xl text-lg font-bold flex items-center gap-4 transition-all ${
+              activeTab === 'courses' 
+                ? 'bg-red-600/20 text-white border border-red-500/40' 
+                : 'text-slate-300 hover:bg-slate-900 border border-transparent'
+            }`}
+          >
+            <GraduationCap className="w-6 h-6 text-red-500 shrink-0" />
+            <span>{t.nav.courses}</span>
+          </Link>
+
+          {/* Mobile Accordion 1: About */}
+          <div className="border border-slate-800/80 rounded-2xl overflow-hidden bg-slate-900/40">
+            <button
+              onClick={() => setMobileAboutExpanded(!mobileAboutExpanded)}
+              className="w-full text-left px-5 py-4 text-lg font-bold text-slate-200 flex items-center justify-between"
+            >
+              <div className="flex items-center gap-4">
+                <Users className="w-6 h-6 text-red-500 shrink-0" />
+                <span>About</span>
+              </div>
+              <ChevronDown className={`w-5 h-5 text-red-500 transition-transform shrink-0 ${mobileAboutExpanded ? 'rotate-180' : ''}`} />
+            </button>
+
+            {mobileAboutExpanded && (
+              <div className="bg-slate-950 p-4 border-t border-slate-800 space-y-2">
+                {aboutMenuItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeTab === item.id;
+
+                  return (
+                    <Link
+                      key={item.id}
+                      href={'/' + item.id} onClick={() => setMobileMenuOpen(false)}
+                      className={`group text-left p-3 rounded-xl transition-all flex items-center gap-3 border ${
+                        isActive
+                          ? 'border-red-500/40 bg-red-900/20'
+                          : 'border-slate-800 bg-slate-900/50'
+                      }`}
+                    >
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+                        isActive ? 'bg-red-500/20 text-red-500' : 'bg-slate-800 text-slate-300'
+                      }`}>
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-sm font-bold text-slate-200">{item.label}</div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Mobile Accordion 2: Resources */}
+          <div className="border border-slate-800/80 rounded-2xl overflow-hidden bg-slate-900/40">
+            <button
+              onClick={() => setMobileResourcesExpanded(!mobileResourcesExpanded)}
+              className="w-full text-left px-5 py-4 text-lg font-bold text-slate-200 flex items-center justify-between"
+            >
+              <div className="flex items-center gap-4">
+                <Laptop className="w-6 h-6 text-red-500 shrink-0" />
+                <span>Resources</span>
+              </div>
+              <ChevronDown className={`w-5 h-5 text-red-500 transition-transform shrink-0 ${mobileResourcesExpanded ? 'rotate-180' : ''}`} />
+            </button>
+
+            {mobileResourcesExpanded && (
+              <div className="bg-slate-950 p-4 border-t border-slate-800 space-y-2">
+                {resourcesMenuItems.map((item) => {
+                  const Icon = item.icon;
+                  const isActive = activeTab === item.id;
+
+                  return (
+                    <Link
+                      key={item.id}
+                      href={'/' + item.id} onClick={() => setMobileMenuOpen(false)}
+                      className={`group text-left p-3 rounded-xl transition-all flex items-center gap-3 border ${
+                        isActive
+                          ? 'border-red-500/40 bg-red-900/20'
+                          : 'border-slate-800 bg-slate-900/50'
+                      }`}
+                    >
+                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
+                        isActive ? 'bg-red-500/20 text-red-500' : 'bg-slate-800 text-slate-300'
+                      }`}>
+                        <Icon className="w-5 h-5" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-sm font-bold text-slate-200">{item.label}</div>
+                      </div>
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Mobile Direct Link: Contact Us */}
+          <Link
+            href="/contact" onClick={() => setMobileMenuOpen(false)}
+            className={`w-full text-left px-5 py-4 rounded-2xl text-lg font-bold flex items-center gap-4 transition-all ${
+              activeTab === 'contact' 
+                ? 'bg-red-600/20 text-white border border-red-500/40' 
+                : 'text-slate-300 hover:bg-slate-900 border border-transparent'
+            }`}
+          >
+            <PhoneCall className="w-6 h-6 text-red-500 shrink-0" />
+            <span>{t.nav.contact}</span>
+          </Link>
+
+        </div>
+      </div>
     </>
   );
 }

@@ -6,7 +6,7 @@ export default function VideoTestimonialsReels() {
   const [activeReel, setActiveReel] = useState(null);
 
   return (
-    <div className="space-y-6">
+    <div className="w-full max-w-full box-border overflow-x-hidden space-y-6 px-1 sm:px-0">
       
       <div className="text-center max-w-2xl mx-auto space-y-2">
         <span className="px-3 py-1 rounded-full bg-red-500/10 text-red-400 text-xs font-bold border border-red-500/30">
@@ -21,15 +21,15 @@ export default function VideoTestimonialsReels() {
           <div
             key={reel.id}
             onClick={() => setActiveReel(reel)}
-            className="group bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden cursor-pointer hover:border-amber-500/50 transition duration-300 relative shadow-xl"
+            className="w-full max-w-full box-border group bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden cursor-pointer hover:border-amber-500/50 transition duration-300 relative shadow-xl flex flex-col"
           >
-            <div className="h-72 overflow-hidden relative">
+            <div className="w-full max-w-full box-border h-72 overflow-hidden relative">
               <img
                 src={reel.thumbnail}
                 alt={reel.studentName}
-                className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                className="w-full h-full max-w-full box-border object-cover group-hover:scale-105 transition duration-500"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent"></div>
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent box-border"></div>
               
               {/* Play Button Icon */}
               <div className="absolute inset-0 flex items-center justify-center">

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Mail, Phone, Globe, CheckCircle2, ArrowRight, ShieldCheck, Video } from 'lucide-react';
+import Link from 'next/link';
 import { translations } from '../i18n/translations';
 
 export default function Footer({ currentLang, setActiveTab }) {
@@ -15,12 +16,12 @@ export default function Footer({ currentLang, setActiveTab }) {
           
           {/* Col 1: Brand Info */}
           <div className="space-y-4">
-            <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveTab('home')}>
+            <Link href="/" className="flex items-center space-x-3 cursor-pointer">
               <span className="text-3xl">🇵🇰🇩🇪</span>
               <span className="text-xl font-extrabold tracking-tight text-white font-sans">
                 German <span className="gold-gradient-text">Language School</span>
               </span>
-            </div>
+            </Link>
             <p className="text-xs text-slate-400 leading-relaxed">
               Pakistan’s premier 100% online German language academy. Live interactive Zoom classes, recorded lecture archives, and Goethe exam preparation for students across Pakistan.
             </p>
@@ -38,13 +39,12 @@ export default function Footer({ currentLang, setActiveTab }) {
             <ul className="space-y-2 text-xs">
               {['home', 'courses', 'howItWorks', 'teachers', 'gallery', 'blog', 'payments', 'faq', 'contact'].map((page) => (
                 <li key={page}>
-                  <button
-                    onClick={() => setActiveTab(page)}
+                  <Link href={page === "home" ? "/" : "/" + page}
                     className="hover:text-amber-400 transition-colors capitalize flex items-center gap-1.5"
                   >
                     <ArrowRight className="w-3 h-3 text-slate-600" />
                     <span>{t.nav[page] || page}</span>
-                  </button>
+                  </Link>
                 </li>
               ))}
             </ul>

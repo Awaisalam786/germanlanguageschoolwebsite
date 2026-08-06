@@ -79,13 +79,13 @@ export default function CourseBundles() {
               </div>
 
               {/* Levels Included Chips */}
-              <div className="space-y-2">
+              <div className="space-y-2 w-full">
                 <span className="text-[10px] font-extrabold text-slate-400 uppercase tracking-widest block">Included CEFR Levels</span>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="flex flex-nowrap sm:flex-wrap w-full gap-1 sm:gap-1.5">
                   {bundle.levelsIncluded.map((lvl) => (
                     <span 
                       key={lvl}
-                      className="px-2.5 py-1 rounded-lg bg-slate-900 border border-amber-500/30 text-amber-400 text-xs font-bold shadow-sm"
+                      className="flex-1 min-w-0 text-[9px] sm:text-xs p-1 sm:px-2.5 sm:py-1 rounded-lg bg-slate-900 border border-amber-500/30 text-amber-400 font-bold shadow-sm whitespace-nowrap overflow-hidden text-ellipsis text-center sm:flex-none sm:overflow-visible"
                     >
                       {lvl} Level
                     </span>
