@@ -46,7 +46,7 @@ export default function Footer({ currentLang, setActiveTab }) {
               Quick Links
             </h4>
             <ul className="space-y-2 text-xs">
-              {['home', 'courses', 'howItWorks', 'teachers', 'gallery', 'blog', 'payments', 'faq', 'contact'].map((page) => (
+              {['home', 'courses', 'howItWorks', 'teachers', 'gallery', 'blog', 'faq', 'contact'].map((page) => (
                 <li key={page}>
                   <Link href={page === "home" ? "/" : "/" + page}
                     className="hover:text-amber-400 transition-colors capitalize flex items-center gap-1.5"
