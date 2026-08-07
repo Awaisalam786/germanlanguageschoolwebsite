@@ -71,20 +71,38 @@ export default function AdminLayout({
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col lg:flex-row">
       
-      {/* Sidebar for Desktop */}
-      <aside className="hidden lg:flex flex-col w-64 bg-slate-900 border-r border-slate-800 shrink-0 h-screen sticky top-0">
+      {/* Mobile Sidebar Backdrop */}
+      {mobileSidebarOpen && (
+        <div 
+          className="lg:hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 transition-opacity"
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar - Desktop & Mobile */}
+      <aside className={`fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 lg:relative lg:translate-x-0 lg:flex flex-col w-64 bg-slate-900 border-r border-slate-800 shrink-0 h-[100dvh] lg:h-screen lg:sticky lg:top-0 ${
+        mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}>
         
         {/* Top Brand Header */}
-        <div className="p-5 border-b border-slate-800 flex items-center space-x-3">
-          <div className="w-9 h-9 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold text-lg shadow-gold-glow">
-            🇩🇪
+        <div className="p-5 border-b border-slate-800 flex items-center justify-between">
+          <div className="flex items-center space-x-3">
+            <div className="w-9 h-9 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold text-lg shadow-gold-glow">
+              🇩🇪
+            </div>
+            <div>
+              <h2 className="text-sm font-extrabold text-white tracking-tight">German Language</h2>
+              <span className="text-[10px] text-amber-400 font-bold block uppercase tracking-widest">
+                Admin Portal
+              </span>
+            </div>
           </div>
-          <div>
-            <h2 className="text-sm font-extrabold text-white tracking-tight">German Language School</h2>
-            <span className="text-[10px] text-amber-400 font-bold block uppercase tracking-widest">
-              Admin Portal
-            </span>
-          </div>
+          <button 
+            onClick={() => setMobileSidebarOpen(false)}
+            className="lg:hidden p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         {/* User Session Card */}
@@ -109,7 +127,10 @@ export default function AdminLayout({
             return (
               <button
                 key={item.id}
-                onClick={() => setCurrentTab(item.id)}
+                onClick={() => {
+                  setCurrentTab(item.id);
+                  setMobileSidebarOpen(false);
+                }}
                 className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all ${
                   isActive
                     ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30 font-bold'
