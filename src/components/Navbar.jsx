@@ -112,7 +112,7 @@ export default function Navbar({
               </div>
             </div>
             <div className="min-w-0">
-              <span className="text-sm sm:text-xl font-extrabold tracking-tight text-white font-sans flex items-center gap-1 sm:gap-1.5 leading-none truncate">
+              <span className="text-[15px] sm:text-xl font-extrabold tracking-tight text-white font-sans flex items-center gap-1 sm:gap-1.5 leading-none truncate">
                 German <span className="text-red-500 font-extrabold ml-1">Language School</span>
               </span>
               <span className="hidden sm:block text-[9px] tracking-widest text-slate-400 uppercase font-bold mt-1 truncate">
