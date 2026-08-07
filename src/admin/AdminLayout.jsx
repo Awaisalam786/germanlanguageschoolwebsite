@@ -27,7 +27,8 @@ import {
   BookOpen,
   ShoppingCart,
   Ticket,
-  Megaphone
+  Megaphone,
+  FileCode2
 } from 'lucide-react';
 import { translations } from '../i18n/translations';
 
@@ -57,6 +58,7 @@ export default function AdminLayout({
     { id: 'paymentStatus', label: t.admin.paymentStatus, icon: CreditCard },
     { id: 'couponManager', label: 'Coupon Manager', icon: Ticket },
     { id: 'themeCustomizer', label: 'Theme Customizer', icon: Palette, badge: 'CSS' },
+    { id: 'practiceTests', label: 'Practice Tests', icon: FileCode2, badge: 'New' },
     { id: 'blogCMS', label: t.admin.blogCMS, icon: Newspaper },
     { id: 'inquiries', label: t.admin.inquiries, icon: MessageSquare, badge: '3' },
     { id: 'testimonialsManager', label: 'Testimonials', icon: Star },

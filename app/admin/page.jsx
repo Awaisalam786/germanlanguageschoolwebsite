@@ -24,6 +24,7 @@ import BookOrdersTracker from '../../src/admin/BookOrdersTracker';
 import CouponManager from '../../src/admin/CouponManager';
 import AnnouncementsManager from '../../src/admin/AnnouncementsManager';
 import GlobalContentManager from '../../src/admin/GlobalContentManager';
+import PracticeTestManager from '../../src/admin/PracticeTestManager';
 import { useGlobalState } from '../../src/context/GlobalStateContext';
 import { useRouter } from 'next/navigation';
 
@@ -58,6 +59,7 @@ export default function AdminPage() {
       case 'certificateManager': return <CertificateManager />;
       case 'paymentStatus': return <PaymentStatusTracker />;
       case 'themeCustomizer': return <ThemeCustomizer />;
+      case 'practiceTests': return <PracticeTestManager />;
       case 'blogCMS': return <BlogCMS />;
       case 'inquiries': return <Inquiries />;
       case 'testimonialsManager': return <TestimonialManager />;
