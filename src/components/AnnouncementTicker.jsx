@@ -46,10 +46,10 @@ export default function AnnouncementTicker() {
 
   // To create a seamless infinite marquee, duplicate the array
   const tickerContent = (
-    <div className="flex items-center shrink-0 space-x-4 md:space-x-6">
+    <div className="flex items-center shrink-0 space-x-2 md:space-x-6">
       {announcements.map((msg, index) => (
-        <div key={index} className="flex items-center space-x-4 md:space-x-6">
-          <span className="font-bold text-amber-400 uppercase tracking-widest whitespace-nowrap text-[10px] md:text-[11px]">
+        <div key={index} className="flex items-center space-x-2 md:space-x-6">
+          <span className="font-bold text-amber-400 uppercase tracking-widest whitespace-nowrap text-[9px] md:text-[11px]">
             {msg}
           </span>
           <span className="text-slate-600 text-[8px] md:text-[10px]">•</span>
@@ -60,17 +60,17 @@ export default function AnnouncementTicker() {
 
   return (
     <div className="bg-slate-950 border-b border-slate-800/80 overflow-hidden relative z-[60] w-full box-border">
-      <div className="flex items-stretch h-7 md:h-8 w-full box-border">
+      <div className="flex items-stretch h-6 md:h-8 w-full box-border">
         
         {/* Left Icon Badge (Sticky) */}
-        <div className="bg-red-600 flex items-center justify-center z-20 shrink-0 shadow-[4px_0_12px_rgba(0,0,0,0.5)] px-3 md:px-4">
-          <Megaphone className="text-white w-3.5 h-3.5 md:w-4 md:h-4" />
+        <div className="bg-red-600 flex items-center justify-center z-20 shrink-0 shadow-[4px_0_12px_rgba(0,0,0,0.5)] px-2 md:px-4">
+          <Megaphone className="text-white w-3 h-3 md:w-4 md:h-4" />
         </div>
 
         {/* Scrolling Ticker Container */}
         <div className="flex-1 overflow-hidden relative flex items-center group box-border w-full">
           
-          <div className="flex items-center animate-marquee group-hover:pause gap-4 md:gap-6 pl-4 md:pl-6 w-max">
+          <div className="flex items-center animate-marquee group-hover:pause gap-2 md:gap-6 pl-2 md:pl-6 w-max">
             {tickerContent}
             {tickerContent}
             {tickerContent}
