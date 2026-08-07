@@ -17,7 +17,7 @@ import {
   Play,
   ShieldCheck,
   ChevronDown,
-
+  CheckSquare,
   Languages
 } from 'lucide-react';
 import Link from 'next/link';
@@ -79,6 +79,7 @@ export default function Navbar({
     { id: 'books', label: 'Books & Resources', icon: BookOpen, desc: 'Official study materials & exam prep books' },
     { id: 'translator', label: 'Free Translator', icon: Languages, desc: 'Translate German text instantly' },
     { id: 'howItWorks', label: t.nav.howItWorks, icon: Laptop, desc: 'Live Zoom & HD lecture archive' },
+    { id: 'practice-tests', label: 'Practice Tests', icon: CheckSquare, desc: 'Interactive HTML tests with auto-grading' },
     { id: 'gallery', label: t.nav.gallery, icon: GalleryIcon, desc: 'Live class screenshots & events' },
     { id: 'testimonials', label: t.nav.testimonials, icon: MessageSquare, desc: 'Graduation stories & reviews' },
     { id: 'faq', label: t.nav.faq, icon: HelpCircle, desc: 'Common questions answered' },
