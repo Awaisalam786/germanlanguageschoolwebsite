@@ -28,7 +28,7 @@ export default function Footer({ currentLang, setActiveTab }) {
                 )}
               </div>
               <span className="text-xl font-extrabold tracking-tight text-white font-sans flex items-center flex-wrap gap-1 leading-none">
-                German <span className="gold-gradient-text">Learning School</span>
+                German <span className="gold-gradient-text">Language School</span>
               </span>
             </Link>
             <p className="text-xs text-slate-400 leading-relaxed">
