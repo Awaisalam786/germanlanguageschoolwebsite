@@ -426,3 +426,7 @@
 {"timestamp":"24:13:38.546","source":"Server","level":"LOG","message":"✓ Compiled in 975ms"}
 {"timestamp":"24:18:50.396","source":"Server","level":"LOG","message":"✓ Compiled in 3.4s"}
 {"timestamp":"24:22:35.625","source":"Server","level":"LOG","message":"✓ Compiled in 5.1s"}
+{"timestamp":"24:24:03.440","source":"Browser","level":"WARN","message":"Backend /api/google-reviews server offline or unconfigured. Using graceful fallback data. {}"}
+{"timestamp":"24:24:03.456","source":"Server","level":"WARN","message":"[browser] \"Backend /api/google-reviews server offline or unconfigured. Using graceful fallback data.\" \"Error: Server returned status 404\\n    at fetchLiveGoogleReviews (file://C:/Users/ABC/Desktop/german language website/.next/dev/static/chunks/_080kyz2._.js:1354:19)\" \"(file://C:/Users/ABC/Desktop/german language website/.next/dev/static/chunks/node_modules_next_dist_1ybzpk2._.js:2489:13)\""}
+{"timestamp":"24:24:03.470","source":"Browser","level":"WARN","message":"Backend /api/google-reviews server offline or unconfigured. Using graceful fallback data. \"Error: Server returned status 404\\n    at fetchLiveGoogleReviews (file://C:/Users/ABC/Desktop/german language website/.next/dev/static/chunks/_080kyz2._.js:1354:19)\""}
+{"timestamp":"24:24:49.761","source":"Server","level":"LOG","message":"✓ Compiled in 2.3s"}

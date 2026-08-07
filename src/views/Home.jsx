@@ -79,12 +79,11 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal }) {
               <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 pt-2">
                 <button
                   onClick={() => handleWhatsAppEnroll("German Learning School Courses")}
-                  className="group relative w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-white font-extrabold text-[15px] shadow-[0_0_20px_rgba(37,211,102,0.4)] hover:shadow-[0_0_30px_rgba(37,211,102,0.6)] transition-all duration-300 hover:scale-[1.03] active:scale-95 flex items-center justify-center gap-2.5 overflow-hidden"
+                  className="group relative w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold text-[15px] shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/40 transition-all duration-300 hover:scale-[1.03] active:scale-95 flex items-center justify-center gap-2.5 overflow-hidden whitespace-nowrap"
                 >
                   <div className="absolute inset-0 w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"></div>
-                  <MessageCircle className="w-5 h-5 fill-current shrink-0 relative z-10" />
-                  <span className="relative z-10 tracking-wide drop-shadow-md">Enroll on WhatsApp</span>
-                  <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform" />
+                  <MessageCircle className="w-5 h-5 fill-current shrink-0 relative z-10 animate-pulse group-hover:scale-110 transition-transform duration-300" />
+                  <span className="relative z-10 tracking-wide">Enroll on WhatsApp</span>
                 </button>
 
                 <button
