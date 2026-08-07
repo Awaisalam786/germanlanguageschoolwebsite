@@ -28,7 +28,7 @@ export default function Footer({ currentLang, setActiveTab }) {
                 )}
               </div>
               <span className="text-xl font-extrabold tracking-tight text-white font-sans flex items-center flex-wrap gap-1 leading-none">
-                German <span className="gold-gradient-text">Language School</span>
+                German <span className="gold-gradient-text">Learning School</span>
               </span>
             </Link>
             <p className="text-xs text-slate-400 leading-relaxed">
@@ -120,7 +120,7 @@ export default function Footer({ currentLang, setActiveTab }) {
 
         {/* Bottom Disclaimer & Copyright */}
         <div className="pt-8 border-t border-slate-800/80 flex flex-col md:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-          <p className="text-center md:text-left">© {new Date().getFullYear()} German Language School. All rights reserved. 100% Online Institute.</p>
+          <p className="text-center md:text-left">© {new Date().getFullYear()} German Learning School. All rights reserved. 100% Online Institute.</p>
           <div className="flex items-center space-x-4">
             <button onClick={() => window.open(`https://wa.me/${formattedPhone}?text=Hi,%20I%20would%20like%20to%20enroll.%20Please%20share%20the%20payment%20details.`, '_blank')} className="hover:text-slate-300">WhatsApp Payment Guide</button>
           </div>

@@ -29,7 +29,7 @@ export default function Contact({ currentLang }) {
         <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-bold border border-amber-500/30">
           Get in Touch With Admissions
         </span>
-        <h1 className="text-4xl font-extrabold text-white">Contact German Language School</h1>
+        <h1 className="text-4xl font-extrabold text-white">Contact German Learning School</h1>
         <p className="text-sm text-slate-300">
           Have questions about course fees, Goethe exam registrations, or visa advice? Speak to our counselor.
         </p>
@@ -158,7 +158,7 @@ export default function Contact({ currentLang }) {
               
               <div className="relative z-10 bg-slate-900/90 border border-amber-500/50 p-4 rounded-xl text-center space-y-1">
                 <MapPin className="w-8 h-8 text-red-500 mx-auto animate-bounce" />
-                <div className="text-xs font-bold text-white">German Language School Admissions</div>
+                <div className="text-xs font-bold text-white">German Learning School Admissions</div>
                 <div className="text-[10px] text-slate-400">100% Live Online Academy — Serving Students Across Pakistan</div>
                 <a
                   href="https://maps.google.com"

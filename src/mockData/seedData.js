@@ -159,7 +159,7 @@ export const founderData = {
   title: 'Founder & Academic Director',
   credentials: 'Ph.D. in Germanic Linguistics (Heidelberg) • Former Goethe Examiner',
   experience: '15+ Years Experience',
-  bio: 'Prof. Dr. Michael Weber founded German Language School to provide world-class, communicative German language education directly to students across Pakistan. Having trained over 12,500 students, Dr. Weber leads our online curriculum and exam strategy.',
+  bio: 'Prof. Dr. Michael Weber founded German Learning School to provide world-class, communicative German language education directly to students across Pakistan. Having trained over 12,500 students, Dr. Weber leads our online curriculum and exam strategy.',
   image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80',
   message: 'My mission is to ensure every Pakistani student achieves fluent German communication and clears their Goethe, telc, or ÖSD exam on the first attempt, opening doors to tuition-free education and rewarding careers in Germany.'
 };

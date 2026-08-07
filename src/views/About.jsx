@@ -10,7 +10,7 @@ export default function About({ currentLang, setActiveTab }) {
         <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-bold border border-amber-500/30">
           Established in Berlin, Germany
         </span>
-        <h1 className="text-4xl font-extrabold text-white">About German Language School</h1>
+        <h1 className="text-4xl font-extrabold text-white">About German Learning School</h1>
         <p className="text-sm text-slate-300 leading-relaxed">
           Pioneering communicative German language instruction for over 15 years. Dedicated to empowering global talent to succeed in higher education, healthcare careers, and integration in Germany.
         </p>
@@ -34,7 +34,7 @@ export default function About({ currentLang, setActiveTab }) {
           </div>
           <h3 className="text-xl font-bold text-white">Our Global Impact</h3>
           <p className="text-xs text-slate-400 leading-relaxed">
-            With students originating from over 45 countries, German Language School serves as a global launchpad for engineers, doctors, nurses, researchers, and university candidates aiming for a bright future in Germany.
+            With students originating from over 45 countries, German Learning School serves as a global launchpad for engineers, doctors, nurses, researchers, and university candidates aiming for a bright future in Germany.
           </p>
         </div>
       </div>

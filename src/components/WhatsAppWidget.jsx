@@ -5,7 +5,7 @@ import { useGlobalContent } from '../context/GlobalContentContext';
 export default function WhatsAppWidget() {
   const { settings } = useGlobalContent();
   const [isOpen, setIsOpen] = useState(false);
-  const [message, setMessage] = useState("AOA German Language School! I want to inquire about online course fees and enrollment.");
+  const [message, setMessage] = useState("AOA German Learning School! I want to inquire about online course fees and enrollment.");
 
   const formatWaLink = (num) => {
     // Remove leading zero and prepend 92 for wa.me link
@@ -30,7 +30,7 @@ export default function WhatsAppWidget() {
                 <MessageCircle className="w-5 h-5 fill-current text-white" />
               </div>
               <div>
-                <h4 className="text-xs font-bold text-white">German Language School</h4>
+                <h4 className="text-xs font-bold text-white">German Learning School</h4>
                 <span className="flex items-center text-[10px] text-emerald-400 font-medium">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1 animate-pulse"></span>
                   Admissions Officer Online

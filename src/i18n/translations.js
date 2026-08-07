@@ -1,7 +1,7 @@
 export const translations = {
   en: {
     dir: 'ltr',
-    brand: 'German Language School',
+    brand: 'German Learning School',
     tagline: '100% Online German Language Institute',
     subTagline: 'Master German (A1 to B2) from home. Goethe-Zertifikat, TestDaF, telc & ÖSD exam prep for study & work visas in Germany.',
     nav: {
@@ -22,7 +22,7 @@ export const translations = {
       completeWhatsApp: 'Complete Enrollment on WhatsApp',
     },
     hero: {
-      badge: '🇵🇰🇩🇪 #1 Online German Language School in Pakistan',
+      badge: '🇵🇰🇩🇪 #1 Online German Learning School in Pakistan',
       title: 'Learn German 100% Online from Anywhere in Pakistan',
       desc: 'Join 12,500+ successful Pakistani students. Live interactive Zoom classes, Goethe/TestDaF/telc/ÖSD preparation, recorded lecture access, and 98.4% exam pass rate.',
       ctaPrimary: 'Explore Online Courses',
@@ -62,7 +62,7 @@ export const translations = {
       successMsg: 'Your details have been recorded! Click the button below to complete enrollment and receive payment details on WhatsApp.',
     },
     admin: {
-      portalTitle: 'German Language School Admin System',
+      portalTitle: 'German Learning School Admin System',
       dashboard: 'Dashboard',
       documents: 'Document & CNIC OCR Vault',
       students: 'Student Records',
@@ -100,7 +100,7 @@ export const translations = {
   },
   de: {
     dir: 'ltr',
-    brand: 'German Language School',
+    brand: 'German Learning School',
     tagline: '100% Online Deutsche Sprachschule',
     subTagline: 'Lernen Sie Deutsch (A1 bis C2) von zu Hause. Vorbereitung auf Goethe, TestDaF, telc & ÖSD.',
     nav: {
@@ -161,7 +161,7 @@ export const translations = {
       successMsg: 'Ihre Daten wurden erfasst! Klicken Sie unten, um die Anmeldung über WhatsApp abzuschließen.',
     },
     admin: {
-      portalTitle: 'German Language School Verwaltung',
+      portalTitle: 'German Learning School Verwaltung',
       dashboard: 'Dashboard',
       documents: 'Dokumente & OCR',
       students: 'Studierende',
