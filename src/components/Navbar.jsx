@@ -51,6 +51,22 @@ export default function Navbar({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => { document.body.style.overflow = 'unset'; };
+  }, [mobileMenuOpen]);
+
+  // Debug click handler
+  const toggleMobileMenu = () => {
+    console.log("Hamburger clicked. Previous state:", mobileMenuOpen, "New state:", !mobileMenuOpen);
+    setMobileMenuOpen(!mobileMenuOpen);
+  };
+
   // Dropdown 1: About Group
   const aboutMenuItems = [
     { id: 'about', label: t.nav.about, icon: Users, desc: 'Our mission & 100% online model' },
@@ -79,23 +95,23 @@ export default function Navbar({
       {/* German Flag Strip (Black, Red, Gold) */}
       <div className="h-1 w-full german-flag-strip"></div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20 gap-4">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-20 gap-2 sm:gap-4">
           
-          {/* Brand Logo: Clean White & Red Title with Minimal Gold Border Badge */}
+          {/* Brand Logo */}
           <div 
-            className="flex items-center space-x-3 cursor-pointer group shrink-0"
+            className="flex items-center space-x-2 sm:space-x-3 cursor-pointer group shrink-0 min-w-0"
           >
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-red-600 via-red-800 to-slate-900 p-0.5 shadow-lg group-hover:scale-105 transition-transform duration-300 border border-amber-500/30">
-              <div className="w-full h-full bg-slate-950 rounded-[14px] flex items-center justify-center">
-                <span className="text-xl">🇵🇰🇩🇪</span>
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-red-600 via-red-800 to-slate-900 p-0.5 shadow-lg group-hover:scale-105 transition-transform duration-300 border border-amber-500/30 shrink-0">
+              <div className="w-full h-full bg-slate-950 rounded-[10px] sm:rounded-[14px] flex items-center justify-center">
+                <span className="text-sm sm:text-xl">🇵🇰🇩🇪</span>
               </div>
             </div>
-            <div>
-              <span className="text-lg sm:text-xl font-extrabold tracking-tight text-white font-sans flex items-center gap-1.5 leading-none">
-                German <span className="text-red-500 font-extrabold">Language School</span>
+            <div className="min-w-0">
+              <span className="text-sm sm:text-xl font-extrabold tracking-tight text-white font-sans flex items-center gap-1 sm:gap-1.5 leading-none truncate">
+                German <span className="text-red-500 font-extrabold ml-1">Language School</span>
               </span>
-              <span className="block text-[9px] tracking-widest text-slate-400 uppercase font-bold mt-1">
+              <span className="hidden sm:block text-[9px] tracking-widest text-slate-400 uppercase font-bold mt-1 truncate">
                 100% Online Institute • Pakistan
               </span>
             </div>
@@ -274,17 +290,17 @@ export default function Navbar({
 
           </nav>
 
-          {/* Desktop Right Action Area: Red Accent Demo Button & Green WhatsApp Button */}
-          <div className="flex items-center space-x-3 shrink-0">
+          {/* Desktop Right Action Area: Language Switcher & Hamburger Button */}
+          <div className="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
             
-            {/* Language Switcher Badge (Clean Red Active Badge) */}
-            <div className="relative flex items-center bg-slate-900 border border-slate-800 rounded-xl p-1 text-xs shadow-inner">
-              <Globe className="w-3.5 h-3.5 text-slate-400 ml-1.5 mr-1" />
+            {/* Language Switcher Badge */}
+            <div className="relative flex items-center bg-slate-900 border border-slate-800 rounded-lg sm:rounded-xl p-0.5 sm:p-1 text-[10px] sm:text-xs shadow-inner">
+              <Globe className="hidden sm:block w-3.5 h-3.5 text-slate-400 ml-1.5 mr-1 shrink-0" />
               <button
                 onClick={() => setLanguage('en')}
-                className={`px-2 py-1 rounded-lg font-bold transition-all duration-200 ${
+                className={`px-1.5 py-1 sm:px-2 sm:py-1 rounded-md sm:rounded-lg font-bold transition-all duration-200 ${
                   currentLang === 'en' 
-                    ? 'bg-red-600 text-white shadow-md scale-105' 
+                    ? 'bg-red-600 text-white shadow-md sm:scale-105' 
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -292,9 +308,9 @@ export default function Navbar({
               </button>
               <button
                 onClick={() => setLanguage('de')}
-                className={`px-2 py-1 rounded-lg font-bold transition-all duration-200 ${
+                className={`px-1.5 py-1 sm:px-2 sm:py-1 rounded-md sm:rounded-lg font-bold transition-all duration-200 ${
                   currentLang === 'de' 
-                    ? 'bg-red-600 text-white shadow-md scale-105' 
+                    ? 'bg-red-600 text-white shadow-md sm:scale-105' 
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -302,9 +318,9 @@ export default function Navbar({
               </button>
               <button
                 onClick={() => setLanguage('ur')}
-                className={`px-2 py-1 rounded-lg font-bold transition-all duration-200 font-urdu ${
+                className={`px-1.5 py-1 sm:px-2 sm:py-1 rounded-md sm:rounded-lg font-bold transition-all duration-200 font-urdu ${
                   currentLang === 'ur' 
-                    ? 'bg-red-600 text-white shadow-md scale-105' 
+                    ? 'bg-red-600 text-white shadow-md sm:scale-105' 
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -312,12 +328,12 @@ export default function Navbar({
               </button>
             </div>
 
-            {/* Mobile Hamburger Toggle Button - Rendered via CSS on mobile */}
+            {/* Mobile Hamburger Toggle Button */}
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-3 rounded-2xl bg-slate-900 border border-slate-800 text-slate-200 hover:text-white hover:border-red-500/50 transition shadow-lg ml-2 shrink-0 flex items-center justify-center"
+              onClick={toggleMobileMenu}
+              className="lg:hidden p-1.5 sm:p-3 rounded-xl sm:rounded-2xl bg-slate-900 border border-slate-800 text-slate-200 hover:text-white hover:border-red-500/50 transition shadow-lg shrink-0 flex items-center justify-center relative z-[9999]"
             >
-              {mobileMenuOpen ? <X className="w-8 h-8 text-red-500" /> : <Menu className="w-8 h-8" />}
+              {mobileMenuOpen ? <X className="w-6 h-6 sm:w-8 sm:h-8 text-red-500 shrink-0" /> : <Menu className="w-6 h-6 sm:w-8 sm:h-8 shrink-0" />}
             </button>
 
           </div>
@@ -329,14 +345,14 @@ export default function Navbar({
       {/* Mobile Sidebar Backdrop */}
       {mobileMenuOpen && (
         <div 
-          className="lg:hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 transition-opacity animate-fade-in"
+          className="lg:hidden fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-[9998] transition-opacity animate-fade-in"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
 
       {/* Sliding Mobile Sidebar */}
       <div 
-        className={`lg:hidden fixed inset-y-0 right-0 w-80 sm:w-96 bg-slate-950 border-l border-slate-800 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col ${
+        className={`lg:hidden fixed top-0 right-0 w-80 sm:w-96 h-[100dvh] bg-slate-950 border-l border-slate-800 shadow-[0_0_50px_rgba(0,0,0,0.5)] z-[9999] transform transition-transform duration-300 ease-in-out flex flex-col ${
           mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
