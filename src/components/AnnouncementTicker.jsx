@@ -28,7 +28,6 @@ export default function AnnouncementTicker() {
 
     fetchAnnouncements();
 
-    // Optionally set up real-time listener for announcements
     const subscription = supabase
       .channel('announcements_changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'announcements' }, () => {
@@ -41,56 +40,45 @@ export default function AnnouncementTicker() {
     };
   }, []);
 
-  const [isMobileDevice, setIsMobileDevice] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobileDevice(window.screen.width < 1024);
-    };
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
   if (loading || announcements.length === 0) {
     return null;
   }
 
-  // To create a seamless infinite marquee, we can duplicate the announcements array a few times.
+  // To create a seamless infinite marquee, duplicate the array
   const tickerContent = (
-    <div className={`flex items-center shrink-0 ${isMobileDevice ? 'space-x-12' : 'space-x-6'}`}>
+    <div className="flex items-center shrink-0 space-x-4 md:space-x-6">
       {announcements.map((msg, index) => (
-        <div key={index} className={`flex items-center ${isMobileDevice ? 'space-x-12' : 'space-x-6'}`}>
-          <span className={`font-bold text-amber-400 uppercase tracking-widest whitespace-nowrap ${isMobileDevice ? 'text-2xl' : 'text-[11px]'}`}>
+        <div key={index} className="flex items-center space-x-4 md:space-x-6">
+          <span className="font-bold text-amber-400 uppercase tracking-widest whitespace-nowrap text-[10px] md:text-[11px]">
             {msg}
           </span>
-          <span className={`text-slate-600 ${isMobileDevice ? 'text-xl' : 'text-[10px]'}`}>•</span>
+          <span className="text-slate-600 text-[8px] md:text-[10px]">•</span>
         </div>
       ))}
     </div>
   );
 
   return (
-    <div className="bg-slate-950 border-b border-slate-800/80 overflow-hidden relative z-50">
-      <div className={`flex items-stretch ${isMobileDevice ? 'h-16' : 'h-8'}`}>
+    <div className="bg-slate-950 border-b border-slate-800/80 overflow-hidden relative z-[60] w-full box-border">
+      <div className="flex items-stretch h-7 md:h-8 w-full box-border">
         
         {/* Left Icon Badge (Sticky) */}
-        <div className={`bg-red-600 flex items-center justify-center z-10 shrink-0 shadow-[4px_0_12px_rgba(0,0,0,0.5)] ${isMobileDevice ? 'px-6' : 'px-3'}`}>
-          <Megaphone className={`text-white ${isMobileDevice ? 'w-7 h-7' : 'w-3.5 h-3.5'}`} />
+        <div className="bg-red-600 flex items-center justify-center z-20 shrink-0 shadow-[4px_0_12px_rgba(0,0,0,0.5)] px-3 md:px-4">
+          <Megaphone className="text-white w-3.5 h-3.5 md:w-4 md:h-4" />
         </div>
 
         {/* Scrolling Ticker Container */}
-        <div className="flex-1 overflow-hidden relative flex items-center group">
+        <div className="flex-1 overflow-hidden relative flex items-center group box-border w-full">
           
-          <div className={`flex items-center animate-marquee group-hover:pause ${isMobileDevice ? 'gap-12 pl-12' : 'gap-6 pl-6'}`}>
+          <div className="flex items-center animate-marquee group-hover:pause gap-4 md:gap-6 pl-4 md:pl-6 w-max">
             {tickerContent}
             {tickerContent}
             {tickerContent}
             {tickerContent}
           </div>
 
-          <div className={`absolute left-0 top-0 bottom-0 bg-gradient-to-r from-slate-950 to-transparent pointer-events-none z-10 ${isMobileDevice ? 'w-16' : 'w-8'}`}></div>
-          <div className={`absolute right-0 top-0 bottom-0 bg-gradient-to-l from-slate-950 to-transparent pointer-events-none z-10 ${isMobileDevice ? 'w-24' : 'w-12'}`}></div>
+          <div className="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-slate-950 to-transparent pointer-events-none z-10 w-6 md:w-8"></div>
+          <div className="absolute right-0 top-0 bottom-0 bg-gradient-to-l from-slate-950 to-transparent pointer-events-none z-10 w-12 md:w-16"></div>
         </div>
       </div>
     </div>

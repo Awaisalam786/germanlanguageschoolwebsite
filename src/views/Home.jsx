@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { translations } from '../i18n/translations';
+import { useGlobalContent } from '../context/GlobalContentContext';
 import CertificateShowcase from '../components/CertificateShowcase';
 import GoogleReviewsWidget from '../components/GoogleReviewsWidget';
 import VideoTestimonialsReels from '../components/VideoTestimonialsReels';
@@ -24,6 +25,7 @@ import DemoClassBanner from '../components/DemoClassBanner';
 
 export default function Home({ currentLang, setActiveTab, onOpenTrialModal }) {
   const t = translations[currentLang];
+  const { settings } = useGlobalContent();
   const [courses, setCourses] = React.useState([]);
   const [loading, setLoading] = React.useState(true);
 
@@ -41,8 +43,9 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal }) {
   }, []);
 
   const handleWhatsAppEnroll = (courseName = "German Language Course") => {
+    const formattedPhone = settings?.whatsapp_number?.replace(/^0/, '92') || '923421189593';
     const msg = encodeURIComponent(`Hi, I want to enroll in ${courseName}. Please share payment details.`);
-    window.open(`https://wa.me/923421189593?text=${msg}`, '_blank');
+    window.open(`https://wa.me/${formattedPhone}?text=${msg}`, '_blank');
   };
 
   return (
@@ -67,7 +70,7 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal }) {
                 {currentLang === 'ur' ? (
                   <span className="font-urdu leading-loose">پاکستان کے کسی بھی شہر سے <span className="gold-gradient-text">100% آن لائن جرمن زبان</span> سیکھیں</span>
                 ) : (
-                  <>Learn German <span className="gold-gradient-text">100% Online</span> from Anywhere in Pakistan</>
+                  <>{settings.hero_title || 'Learn German 100% Online from Anywhere in Pakistan'}</>
                 )}
               </h1>
 
@@ -79,7 +82,7 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal }) {
                   className="group relative w-full sm:w-auto px-7 py-3.5 rounded-full bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-extrabold text-sm shadow-xl shadow-emerald-500/25 hover:shadow-2xl hover:shadow-emerald-500/40 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-2.5 whitespace-nowrap"
                 >
                   <MessageCircle className="w-5 h-5 fill-current shrink-0 animate-pulse group-hover:scale-110 transition-transform duration-300" />
-                  <span>Enroll on WhatsApp (03421189593)</span>
+                  <span>Enroll on WhatsApp ({settings?.whatsapp_number || '03421189593'})</span>
                 </button>
 
                 <button
@@ -111,7 +114,7 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal }) {
               </div>
 
               <p className="text-sm sm:text-base text-slate-400 leading-relaxed max-w-2xl">
-                {t.hero.desc}
+                {settings.hero_description || t.hero.desc}
               </p>
 
             </div>

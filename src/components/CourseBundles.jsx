@@ -6,13 +6,30 @@ import {
   Clock, 
   Tag
 } from 'lucide-react';
-import { initialBundles } from '../mockData/seedData';
+import { supabase } from '../lib/supabaseClient';
+import { useGlobalContent } from '../context/GlobalContentContext';
 import ScrollReveal from './ScrollReveal';
 
 export default function CourseBundles() {
+  const { settings } = useGlobalContent();
+  const formattedPhone = settings?.whatsapp_number?.replace(/^0/, '92') || '923421189593';
+  const [bundles, setBundles] = React.useState([]);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    const fetchBundles = async () => {
+      const { data } = await supabase.from('course_bundles').select('*').order('created_at', { ascending: true });
+      if (data) {
+        setBundles(data);
+      }
+      setLoading(false);
+    };
+    fetchBundles();
+  }, []);
+
   const handleWhatsAppEnrollBundle = (bundleTitle) => {
     const msg = encodeURIComponent(`Hi, I want to enroll in the ${bundleTitle}. Please share payment details.`);
-    window.open(`https://wa.me/923421189593?text=${msg}`, '_blank');
+    window.open(`https://wa.me/${formattedPhone}?text=${msg}`, '_blank');
   };
 
   return (
@@ -34,7 +51,9 @@ export default function CourseBundles() {
 
       {/* Grid of 3 Bundle Cards (A1-A2, A1-B1, A1-B2) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {initialBundles.map((bundle) => (
+        {loading ? (
+          <div className="col-span-full text-center text-slate-400">Loading course bundles...</div>
+        ) : bundles.map((bundle) => (
           <ScrollReveal key={bundle.id} className="h-full">
             <div
               onClick={() => handleWhatsAppEnrollBundle(bundle.title)}

@@ -14,6 +14,7 @@ import { useGlobalContent } from '../context/GlobalContentContext';
 
 export default function Enroll({ currentLang, setActiveTab, selectedCourse }) {
   const { settings } = useGlobalContent();
+  const formattedPhone = settings?.whatsapp_number?.replace(/^0/, '92') || '923421189593';
   const t = translations[currentLang];
   const [courses, setCourses] = useState([]);
   
@@ -37,7 +38,7 @@ export default function Enroll({ currentLang, setActiveTab, selectedCourse }) {
 
   const handleOpenWhatsApp = (levelName = formData.courseLevel) => {
     const msg = encodeURIComponent(`Hi, I want to enroll in ${levelName}. My name is ${formData.fullName || 'Student'}. Please share payment details.`);
-    window.open(`https://wa.me/923421189593?text=${msg}`, '_blank');
+    window.open(`https://wa.me/${formattedPhone}?text=${msg}`, '_blank');
   };
 
   const handleSubmit = (e) => {
@@ -85,7 +86,7 @@ export default function Enroll({ currentLang, setActiveTab, selectedCourse }) {
           </div>
 
           <button
-            onClick={handleSendWhatsApp}
+            onClick={() => handleOpenWhatsApp()}
             className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black rounded-xl shadow-lg flex items-center justify-center gap-2 transition active:scale-95"
           >
             <Send className="w-5 h-5" />

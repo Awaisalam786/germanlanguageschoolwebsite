@@ -2,9 +2,12 @@ import React from 'react';
 import { Mail, Phone, Globe, CheckCircle2, ArrowRight, ShieldCheck, Video } from 'lucide-react';
 import Link from 'next/link';
 import { translations } from '../i18n/translations';
+import { useGlobalContent } from '../context/GlobalContentContext';
 
 export default function Footer({ currentLang, setActiveTab }) {
   const t = translations[currentLang];
+  const { settings } = useGlobalContent();
+  const formattedPhone = settings?.whatsapp_number?.replace(/^0/, '92') || '923421189593';
 
   return (
     <footer className="bg-slate-950 text-slate-400 border-t border-slate-800 pt-16 pb-8 relative overflow-hidden">
@@ -79,11 +82,11 @@ export default function Footer({ currentLang, setActiveTab }) {
             <ul className="space-y-3 text-xs mb-4">
               <li className="flex items-center gap-2.5">
                 <Phone className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>+92 300 9988776 (WhatsApp & Call)</span>
+                <span>{settings?.whatsapp_number || '+92 342 1189593'} (WhatsApp & Call)</span>
               </li>
               <li className="flex items-center gap-2.5">
                 <Mail className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>germanlanguageschool1@gmail.com</span>
+                <span>{settings?.support_email || 'germanlanguageschool1@gmail.com'}</span>
               </li>
               <li className="flex items-center gap-2.5">
                 <Video className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -113,7 +116,7 @@ export default function Footer({ currentLang, setActiveTab }) {
         <div className="pt-8 border-t border-slate-800/80 flex flex-col md:flex-row items-center justify-between text-xs text-slate-500 gap-4">
           <p className="text-center md:text-left">© {new Date().getFullYear()} German Language School. All rights reserved. 100% Online Institute.</p>
           <div className="flex items-center space-x-4">
-            <button onClick={() => window.open('https://wa.me/923421189593?text=Hi,%20I%20would%20like%20to%20enroll.%20Please%20share%20the%20payment%20details.', '_blank')} className="hover:text-slate-300">WhatsApp Payment Guide</button>
+            <button onClick={() => window.open(`https://wa.me/${formattedPhone}?text=Hi,%20I%20would%20like%20to%20enroll.%20Please%20share%20the%20payment%20details.`, '_blank')} className="hover:text-slate-300">WhatsApp Payment Guide</button>
           </div>
         </div>
 

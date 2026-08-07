@@ -25,9 +25,9 @@ export default function GlobalContentManager() {
 
     try {
       // Supabase requires updating rows individually or using upsert
-      const updates = Object.keys(formData).map(id => ({
-        id,
-        value: formData[id],
+      const updates = Object.keys(formData).map(key => ({
+        key,
+        value: formData[key],
         updated_at: new Date().toISOString()
       }));
 
@@ -101,6 +101,33 @@ export default function GlobalContentManager() {
                 onChange={(e) => handleChange('support_email', e.target.value)}
                 className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 transition"
               />
+            </div>
+          </div>
+        </div>
+
+        {/* Website Main Copy */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-bold text-white border-b border-slate-800 pb-2">Website Main Text</h3>
+          
+          <div className="grid grid-cols-1 gap-6">
+            <div>
+              <label className="block text-xs font-bold text-slate-400 mb-2">Main Hero Title</label>
+              <input
+                type="text"
+                value={formData.hero_title || ''}
+                onChange={(e) => handleChange('hero_title', e.target.value)}
+                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 transition"
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-400 mb-2">Main Hero Description</label>
+              <textarea
+                value={formData.hero_description || ''}
+                onChange={(e) => handleChange('hero_description', e.target.value)}
+                rows={3}
+                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-amber-500 transition resize-none"
+              ></textarea>
             </div>
           </div>
         </div>

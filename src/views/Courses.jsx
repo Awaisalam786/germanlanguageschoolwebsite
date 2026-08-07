@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { translations } from '../i18n/translations';
+import { useGlobalContent } from '../context/GlobalContentContext';
 import CourseCard from '../components/CourseCard';
 import CourseBundles from '../components/CourseBundles';
 import ScrollReveal from '../components/ScrollReveal';
 
 export default function Courses({ currentLang, setActiveTab, onOpenTrialModal }) {
   const t = translations[currentLang];
+  const { settings } = useGlobalContent();
+  const formattedPhone = settings?.whatsapp_number?.replace(/^0/, '92') || '923421189593';
   const [selectedLevel, setSelectedLevel] = useState('All');
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -34,7 +37,7 @@ export default function Courses({ currentLang, setActiveTab, onOpenTrialModal })
       msg += ` I am applying the coupon code: ${couponCode}.`;
     }
     msg += ` Please share payment details.`;
-    window.open(`https://wa.me/923421189593?text=${encodeURIComponent(msg)}`, '_blank');
+    window.open(`https://wa.me/${formattedPhone}?text=${encodeURIComponent(msg)}`, '_blank');
   };
 
   return (

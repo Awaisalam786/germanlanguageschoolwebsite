@@ -16,8 +16,8 @@ envFile.split('\n').forEach(line => {
   }
 });
 
-const SUPABASE_URL = envVars.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = envVars.VITE_SUPABASE_ANON_KEY;
+const SUPABASE_URL = envVars.NEXT_PUBLIC_SUPABASE_URL || envVars.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = envVars.SUPABASE_SERVICE_ROLE_KEY || envVars.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
   console.error("Missing Supabase credentials in .env");
@@ -32,7 +32,8 @@ import {
   initialTeachers,
   initialCertificates,
   initialTestimonials,
-  initialBlogPosts
+  initialBlogPosts,
+  initialBundles
 } from '../mockData/seedData.js';
 
 async function migrate() {
@@ -40,69 +41,26 @@ async function migrate() {
 
   try {
     // 1. Courses
-    if (initialCourses && initialCourses.length > 0) {
-      console.log('Migrating Courses...');
-      const coursesToInsert = initialCourses.map(c => ({
-        level: c.level,
-        title: c.title,
-        duration: c.duration,
-        price: c.feesPKR, // Mapping feesPKR to price
-        schedule: c.schedule
-      }));
-      const { error } = await supabase.from('courses').insert(coursesToInsert);
-      if (error) console.error('Error inserting courses:', error);
-      else console.log(`Inserted ${coursesToInsert.length} courses.`);
-    }
+    // Migrated already
+
+    // 1.5 Course Bundles
+    // Migrated already
 
     // 2. Teachers
-    if (initialTeachers && initialTeachers.length > 0) {
-      console.log('Migrating Teachers...');
-      const teachersToInsert = initialTeachers.map(t => ({
-        name: t.name,
-        role: t.role,
-        qualification: t.qualification,
-        experience: t.experience,
-        specialty: t.specialty,
-        image: t.image
-      }));
-      const { error } = await supabase.from('teachers').insert(teachersToInsert);
-      if (error) console.error('Error inserting teachers:', error);
-      else console.log(`Inserted ${teachersToInsert.length} teachers.`);
-    }
+    // Migrated already
 
     // 3. Certificates
-    if (initialCertificates && initialCertificates.length > 0) {
-      console.log('Migrating Certificates...');
-      const certsToInsert = initialCertificates.map(c => ({
-        student_name: c.studentName,
-        level: c.examBody,
-        image_url: c.imageUrl
-      }));
-      const { error } = await supabase.from('certificates').insert(certsToInsert);
-      if (error) console.error('Error inserting certificates:', error);
-      else console.log(`Inserted ${certsToInsert.length} certificates.`);
-    }
+    // Migrated already
 
     // 5. Testimonials
-    if (initialTestimonials && initialTestimonials.length > 0) {
-      console.log('Migrating Testimonials...');
-      const testToInsert = initialTestimonials.map(t => ({
-        name: t.name,
-        course: t.levelAchieved, // Using levelAchieved as course
-        rating: t.rating,
-        text: t.text,
-        type: 'text'
-      }));
-      const { error } = await supabase.from('testimonials').insert(testToInsert);
-      if (error) console.error('Error inserting testimonials:', error);
-      else console.log(`Inserted ${testToInsert.length} testimonials.`);
-    }
+    // Migrated already
 
     // 6. Blog Posts
     if (initialBlogPosts && initialBlogPosts.length > 0) {
       console.log('Migrating Blog Posts...');
       const blogsToInsert = initialBlogPosts.map(b => ({
         title: b.title,
+        slug: b.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''),
         category: b.category,
         author: b.author,
         read_time: b.readTime,

@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Calendar, Clock, User, ArrowRight, Tag, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
+import Link from 'next/link';
 
-export default function Blog({ onSelectPost }) {
+export default function Blog() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [posts, setPosts] = useState([]);
@@ -12,7 +13,7 @@ export default function Blog({ onSelectPost }) {
 
   useEffect(() => {
     const fetchPosts = async () => {
-      const { data } = await supabase.from('blog_posts').select('*').order('created_at', { ascending: false });
+      const { data } = await supabase.from('blog_posts').select('*').eq('status', 'Published').order('created_at', { ascending: false });
       if (data) setPosts(data);
       setLoading(false);
     };
@@ -84,10 +85,10 @@ export default function Blog({ onSelectPost }) {
             No blog posts found matching your criteria.
           </div>
         ) : filteredPosts.map((post) => (
-          <div 
+          <Link 
+            href={`/blog/${post.slug}`}
             key={post.id}
-            onClick={() => onSelectPost(post)}
-            className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-amber-500/40 transition duration-300 cursor-pointer flex flex-col justify-between group shadow-lg"
+            className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden hover:border-amber-500/40 transition duration-300 cursor-pointer flex flex-col justify-between group shadow-lg block"
           >
             <div>
               <div className="h-48 overflow-hidden relative">
@@ -128,7 +129,7 @@ export default function Blog({ onSelectPost }) {
               <span>Read Full Article</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 
