@@ -405,3 +405,12 @@
 {"timestamp":"23:11:31.979","source":"Browser","level":"WARN","message":"Backend /api/google-reviews server offline or unconfigured. Using graceful fallback data. {}"}
 {"timestamp":"23:11:32.012","source":"Server","level":"WARN","message":"[browser] \"Backend /api/google-reviews server offline or unconfigured. Using graceful fallback data.\" \"Error: Server returned status 404\\n    at fetchLiveGoogleReviews (file://C:/Users/ABC/Desktop/german language website/.next/dev/static/chunks/_080kyz2._.js:1354:19)\" \"(file://C:/Users/ABC/Desktop/german language website/.next/dev/static/chunks/node_modules_next_dist_1ybzpk2._.js:2489:13)\""}
 {"timestamp":"23:11:32.023","source":"Browser","level":"WARN","message":"Backend /api/google-reviews server offline or unconfigured. Using graceful fallback data. \"Error: Server returned status 404\\n    at fetchLiveGoogleReviews (file://C:/Users/ABC/Desktop/german language website/.next/dev/static/chunks/_080kyz2._.js:1354:19)\""}
+{"timestamp":"23:56:35.531","source":"Browser","level":"LOG","message":"Hamburger clicked. Previous state: false New state: true"}
+{"timestamp":"23:59:43.857","source":"Browser","level":"WARN","message":"Backend /api/google-reviews server offline or unconfigured. Using graceful fallback data. {}"}
+{"timestamp":"24:00:24.176","source":"Server","level":"LOG","message":"✓ Compiled in 4.1s"}
+{"timestamp":"24:00:24.212","source":"Server","level":"WARN","message":"⚠ Fast Refresh had to perform a full reload when ./src/context/GlobalContentContext.jsx changed. Read more: https://nextjs.org/docs/messages/fast-refresh-reload"}
+{"timestamp":"24:00:47.449","source":"Server","level":"LOG","message":"✓ Compiled in 3.9s"}
+{"timestamp":"24:00:48.468","source":"Browser","level":"WARN","message":"Backend /api/google-reviews server offline or unconfigured. Using graceful fallback data. {}"}
+{"timestamp":"24:02:43.813","source":"Server","level":"LOG","message":"✓ Compiled in 8s"}
+{"timestamp":"24:02:52.521","source":"Server","level":"LOG","message":"✓ Compiled in 2s"}
+{"timestamp":"24:03:07.986","source":"Server","level":"LOG","message":"✓ Compiled in 1948ms"}

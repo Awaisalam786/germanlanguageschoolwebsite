@@ -99,23 +99,27 @@ export default function Navbar({
         <div className="flex items-center justify-between h-20 gap-2 sm:gap-4">
           
           {/* Brand Logo */}
-          <div 
+          <Link href="/"
             className="flex items-center space-x-2 sm:space-x-3 cursor-pointer group shrink-0 min-w-0"
           >
-            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-red-600 via-red-800 to-slate-900 p-0.5 shadow-lg group-hover:scale-105 transition-transform duration-300 border border-amber-500/30 shrink-0">
-              <div className="w-full h-full bg-slate-950 rounded-[10px] sm:rounded-[14px] flex items-center justify-center">
-                <span className="text-sm sm:text-xl">🇵🇰🇩🇪</span>
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-slate-900 via-slate-800 to-slate-950 p-0.5 shadow-lg group-hover:scale-105 transition-transform duration-300 border border-amber-500/30 shrink-0">
+              <div className="w-full h-full bg-slate-950 rounded-[10px] sm:rounded-[14px] flex items-center justify-center overflow-hidden">
+                {settings?.logo_url ? (
+                  <img src={settings.logo_url} alt="Logo" className="w-full h-full object-cover scale-[1.2]" />
+                ) : (
+                  <span className="text-sm sm:text-xl">🇩🇪</span>
+                )}
               </div>
             </div>
             <div className="min-w-0">
               <span className="text-sm sm:text-xl font-extrabold tracking-tight text-white font-sans flex items-center gap-1 sm:gap-1.5 leading-none truncate">
-                German <span className="text-red-500 font-extrabold ml-1">Language School</span>
+                German <span className="text-red-500 font-extrabold ml-1">Learning School</span>
               </span>
               <span className="hidden sm:block text-[9px] tracking-widest text-slate-400 uppercase font-bold mt-1 truncate">
-                100% Online Institute • Pakistan
+                {settings?.tagline || 'Learn, Practice, Pass Goethe'}
               </span>
             </div>
-          </div>
+          </Link>
 
           {/* Desktop Navigation Links (Red Accent Palette) */}
           <nav className="hidden lg:flex items-center space-x-1.5" ref={dropdownRef}>

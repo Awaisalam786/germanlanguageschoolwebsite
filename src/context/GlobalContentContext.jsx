@@ -6,6 +6,8 @@ const GlobalContentContext = createContext();
 
 export function GlobalContentProvider({ children }) {
   const [settings, setSettings] = useState({
+    logo_url: '/temp-logo.png',
+    tagline: 'Learn, Practice, Pass Goethe',
     whatsapp_number: '03421189593',
     support_email: 'germanlanguageschool1@gmail.com',
     watermark_text: '03421189593',
@@ -41,6 +43,17 @@ export function GlobalContentProvider({ children }) {
         newSettings[item.key] = item.value;
       });
       setSettings(prev => ({ ...prev, ...newSettings }));
+      
+      // Dynamically update favicon
+      if (newSettings.logo_url) {
+        let link = document.querySelector("link[rel~='icon']");
+        if (!link) {
+          link = document.createElement('link');
+          link.rel = 'icon';
+          document.head.appendChild(link);
+        }
+        link.href = newSettings.logo_url;
+      }
     }
     setLoading(false);
   };

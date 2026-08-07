@@ -20,9 +20,15 @@ export default function Footer({ currentLang, setActiveTab }) {
           {/* Col 1: Brand Info */}
           <div className="space-y-4">
             <Link href="/" className="flex items-center space-x-3 cursor-pointer">
-              <span className="text-3xl">🇵🇰🇩🇪</span>
-              <span className="text-xl font-extrabold tracking-tight text-white font-sans">
-                German <span className="gold-gradient-text">Language School</span>
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-slate-900 via-slate-800 to-slate-950 p-[1px] shadow-lg flex items-center justify-center shrink-0 border border-amber-500/20 overflow-hidden">
+                {settings?.logo_url ? (
+                  <img src={settings.logo_url} alt="Logo" className="w-full h-full object-cover scale-[1.2]" />
+                ) : (
+                  <span className="text-xl">🇩🇪</span>
+                )}
+              </div>
+              <span className="text-xl font-extrabold tracking-tight text-white font-sans flex items-center flex-wrap gap-1 leading-none">
+                German <span className="gold-gradient-text">Learning School</span>
               </span>
             </Link>
             <p className="text-xs text-slate-400 leading-relaxed">
