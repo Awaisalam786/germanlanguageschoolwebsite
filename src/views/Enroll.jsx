@@ -19,7 +19,8 @@ export default function Enroll({ currentLang, setActiveTab, selectedCourse }) {
   const [courses, setCourses] = useState([]);
   
   const [formData, setFormData] = useState({
-    fullName: '',
+    first_name: '',
+    last_name: '',
     email: '',
     phone: '',
     cnic: '',
@@ -37,7 +38,7 @@ export default function Enroll({ currentLang, setActiveTab, selectedCourse }) {
   }, []);
 
   const handleOpenWhatsApp = (levelName = formData.courseLevel) => {
-    const msg = encodeURIComponent(`Hi, I want to enroll in ${levelName}. My name is ${formData.fullName || 'Student'}. Please share payment details.`);
+    const msg = encodeURIComponent(`Hi, I want to enroll in ${levelName}. My name is ${formData.first_name || 'Student'} ${formData.last_name || ''}. Please share payment details.`);
     window.open(`https://wa.me/${formattedPhone}?text=${msg}`, '_blank');
   };
 
@@ -73,7 +74,7 @@ export default function Enroll({ currentLang, setActiveTab, selectedCourse }) {
           <div className="bg-slate-950 border border-slate-800 rounded-2xl p-6 max-w-md mx-auto text-left text-xs space-y-2.5">
             <div className="flex justify-between text-slate-400">
               <span>Student Name:</span>
-              <span className="text-white font-bold">{formData.fullName}</span>
+              <span className="text-white font-bold">{formData.first_name} {formData.last_name}</span>
             </div>
             <div className="flex justify-between text-slate-400">
               <span>Course Level:</span>
@@ -101,16 +102,23 @@ export default function Enroll({ currentLang, setActiveTab, selectedCourse }) {
             <span>Student Registration Details</span>
           </h3>
 
-          <div>
-            <label className="block text-xs font-medium text-slate-300 mb-1">{t.enroll.fullName} *</label>
-            <input
-              type="text"
-              required
-              placeholder="e.g. Muhammad Usman Chaudhry"
-              value={formData.fullName}
-              onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-              className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-medium text-slate-300 mb-1">First Name *</label>
+              <input
+                type="text" required placeholder="e.g. Muhammad"
+                value={formData.first_name} onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-300 mb-1">Last Name *</label>
+              <input
+                type="text" required placeholder="e.g. Chaudhry"
+                value={formData.last_name} onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                className="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
