@@ -5,7 +5,8 @@ import { translations } from '../i18n/translations';
 export default function TrialClassModal({ isOpen, onClose, currentLang }) {
   const t = translations[currentLang];
   const [formData, setFormData] = useState({
-    name: '',
+    first_name: '',
+    last_name: '',
     email: '',
     phone: '',
     targetLevel: 'A1 - Beginner',
@@ -61,16 +62,23 @@ export default function TrialClassModal({ isOpen, onClose, currentLang }) {
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Your Full Name</label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Alexander Schmidt"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">First Name</label>
+                  <input
+                    type="text" required placeholder="e.g. Alexander"
+                    value={formData.first_name} onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">Last Name</label>
+                  <input
+                    type="text" required placeholder="e.g. Schmidt"
+                    value={formData.last_name} onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
+                  />
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -88,11 +96,8 @@ export default function TrialClassModal({ isOpen, onClose, currentLang }) {
                 <div>
                   <label className="block text-xs font-medium text-slate-300 mb-1">WhatsApp / Phone</label>
                   <input
-                    type="tel"
-                    required
-                    placeholder="+49 176 00000"
-                    value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    type="tel" required placeholder="+92 300 0000000"
+                    value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-700 rounded-lg px-3.5 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
                   />
                 </div>

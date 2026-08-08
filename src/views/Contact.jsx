@@ -5,7 +5,8 @@ import { translations } from '../i18n/translations';
 export default function Contact({ currentLang }) {
   const t = translations[currentLang];
   const [formData, setFormData] = useState({
-    name: '',
+    first_name: '',
+    last_name: '',
     email: '',
     phone: '',
     courseInterest: 'B1 Intermediate',
@@ -18,7 +19,7 @@ export default function Contact({ currentLang }) {
     setSubmitted(true);
     setTimeout(() => {
       setSubmitted(false);
-      setFormData({ name: '', email: '', phone: '', courseInterest: 'B1 Intermediate', message: '' });
+      setFormData({ first_name: '', last_name: '', email: '', phone: '', courseInterest: 'B1 Intermediate', message: '' });
     }, 4000);
   };
 
@@ -52,16 +53,24 @@ export default function Contact({ currentLang }) {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1">Full Name *</label>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">First Name *</label>
                   <input
-                    type="text"
-                    required
-                    placeholder="e.g. Johann Schmidt"
-                    value={formData.name}
-                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    type="text" required placeholder="e.g. Johann"
+                    value={formData.first_name} onChange={(e) => setFormData({ ...formData, first_name: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
                   />
                 </div>
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">Last Name *</label>
+                  <input
+                    type="text" required placeholder="e.g. Schmidt"
+                    value={formData.last_name} onChange={(e) => setFormData({ ...formData, last_name: e.target.value })}
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 mt-4">
                 <div>
                   <label className="block text-xs font-medium text-slate-300 mb-1">Email Address *</label>
                   <input
@@ -80,7 +89,8 @@ export default function Contact({ currentLang }) {
                   <label className="block text-xs font-medium text-slate-300 mb-1">Phone / WhatsApp</label>
                   <input
                     type="tel"
-                    placeholder="+49 176 998877"
+                    required
+                    placeholder="+92 300 0000000"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-xs text-white focus:outline-none focus:border-amber-500"

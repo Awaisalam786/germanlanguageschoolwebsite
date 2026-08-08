@@ -11,6 +11,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        {/* Meta Pixel base code will be added here once Pixel ID is generated */}
+      </head>
       <body className="min-h-screen overflow-x-hidden bg-slate-950 text-slate-100 font-sans selection:bg-amber-500 selection:text-slate-950">
         <GlobalStateProvider>
           <GlobalContentProvider>

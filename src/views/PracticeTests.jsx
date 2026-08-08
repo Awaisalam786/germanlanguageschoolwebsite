@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { 
@@ -38,6 +40,7 @@ export default function PracticeTests() {
 
   const handleSelectMaterial = (mat) => {
     setSelectedMaterial(mat);
+    setAccessType('');
     setStep(2);
   };
 
@@ -199,7 +202,7 @@ export default function PracticeTests() {
       {step === 2 && (
         <div className="max-w-3xl mx-auto space-y-8 animate-fade-in">
           <div className="text-center space-y-2">
-             <button onClick={() => setStep(1)} className="text-xs text-slate-400 hover:text-amber-400 mb-4 inline-block">&larr; Back to tests</button>
+             <button onClick={() => { setStep(1); setAccessType(''); }} className="text-xs text-slate-400 hover:text-amber-400 mb-4 inline-block">&larr; Back to tests</button>
              <h2 className="text-3xl font-extrabold text-white">Access Verification</h2>
              <p className="text-sm text-slate-400">Selected Test: <strong className="text-white">{selectedMaterial?.title}</strong></p>
           </div>
