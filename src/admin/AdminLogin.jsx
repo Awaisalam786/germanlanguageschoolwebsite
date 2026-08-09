@@ -17,13 +17,23 @@ export default function AdminLogin({ onLogin }) {
     setSuccessMsg('');
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
+      const response = await fetch('/api/admin-login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
       
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Login failed');
+
+      // Set the returned session securely in the client Supabase instance
+      const { error: sessionError } = await supabase.auth.setSession(data.session);
+      if (sessionError) throw sessionError;
+
       // Pass the session to the parent
       onLogin({ 
-        email: data.user.email, 
-        role: 'Super Admin', // In a real app, fetch role from a profiles table
+        email: data.session.user.email, 
+        role: 'Super Admin',
         session: data.session 
       });
     } catch (err) {
