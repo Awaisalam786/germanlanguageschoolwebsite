@@ -325,7 +325,7 @@ export default function PracticeTests() {
           {/* Sandbox Iframe */}
           <div className="flex-1 bg-white relative">
             <iframe 
-              src={selectedMaterial?.file_url}
+              src={selectedMaterial ? `/api/serve-test/${selectedMaterial.id}` : ''}
               className="w-full h-full border-0"
               sandbox="allow-scripts allow-same-origin allow-forms"
               title="Practice Test"
