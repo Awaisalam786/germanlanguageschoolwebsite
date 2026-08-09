@@ -55,8 +55,11 @@ export default function PracticeTestManager() {
       const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
       const filePath = `${uploadForm.level}/${fileName}`;
 
-      // 1. Upload to Storage
-      const { error: uploadError } = await supabase.storage.from('practice_tests').upload(filePath, uploadFile);
+      // 1. Upload to Storage with proper HTML Content-Type so browsers render it instead of showing code
+      const { error: uploadError } = await supabase.storage.from('practice_tests').upload(filePath, uploadFile, {
+        contentType: 'text/html; charset=utf-8',
+        upsert: true
+      });
       if (uploadError) throw uploadError;
 
       // 2. Get Public URL
