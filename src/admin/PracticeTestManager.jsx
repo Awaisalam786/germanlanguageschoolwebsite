@@ -362,20 +362,20 @@ export default function PracticeTestManager() {
                   <div className="flex items-center gap-2">
                     <button 
                       onClick={() => {
-                        const link = `${window.location.origin}/practice-tests`;
+                        const link = `${window.location.origin}/practice-tests?testId=${mat.id}`;
                         navigator.clipboard.writeText(link);
-                        showMessage("Copied official student link to clipboard!");
+                        showMessage(`Copied direct test link for "${mat.title}" to clipboard!`);
                       }}
                       className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-amber-400 text-xs font-bold rounded-lg transition flex items-center gap-1.5 border border-slate-700"
-                      title="Copy Student Link to share with students"
+                      title="Copy Direct Student Test Link"
                     >
                       <Copy className="w-3.5 h-3.5" />
-                      <span className="hidden sm:inline">Copy Student Link</span>
+                      <span className="hidden sm:inline">Copy Test Link</span>
                     </button>
                     <button 
-                      onClick={() => window.open(mat.file_url, '_blank')}
+                      onClick={() => window.open(`/practice-tests?testId=${mat.id}`, '_blank')}
                       className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded-md transition"
-                      title="Raw HTML Asset Preview"
+                      title="Preview Student Experience on Website"
                     >
                       <ExternalLink className="w-4 h-4" />
                     </button>

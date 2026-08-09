@@ -34,7 +34,23 @@ export default function PracticeTests() {
   const fetchMaterials = async () => {
     setLoading(true);
     const { data, error } = await supabase.from('practice_materials').select('*').eq('is_active', true).order('created_at', { ascending: false });
-    if (!error && data) setMaterials(data);
+    if (!error && data) {
+      setMaterials(data);
+      
+      // Check if a specific testId was provided in the URL
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const testId = params.get('testId');
+        if (testId) {
+          const match = data.find(m => m.id === testId);
+          if (match) {
+            setSelectedMaterial(match);
+            setAccessType('');
+            setStep(2);
+          }
+        }
+      }
+    }
     setLoading(false);
   };
 
