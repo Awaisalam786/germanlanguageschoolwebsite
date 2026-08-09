@@ -17,22 +17,15 @@ export default function AdminLogin({ onLogin }) {
     setSuccessMsg('');
 
     try {
-      if (isRegistering) {
-        const { data, error } = await supabase.auth.signUp({ email, password });
-        if (error) throw error;
-        setSuccessMsg('Account created! You can now log in.');
-        setIsRegistering(false);
-      } else {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        if (error) throw error;
-        
-        // Pass the session to the parent
-        onLogin({ 
-          email: data.user.email, 
-          role: 'Super Admin', // In a real app, fetch role from a profiles table
-          session: data.session 
-        });
-      }
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      
+      // Pass the session to the parent
+      onLogin({ 
+        email: data.user.email, 
+        role: 'Super Admin', // In a real app, fetch role from a profiles table
+        session: data.session 
+      });
     } catch (err) {
       setErrorMsg(err.message);
     } finally {
@@ -92,15 +85,7 @@ export default function AdminLogin({ onLogin }) {
             />
           </div>
 
-          <div className="flex items-center justify-between text-xs pt-2">
-            <button 
-              type="button" 
-              onClick={() => setIsRegistering(!isRegistering)}
-              className="text-slate-400 hover:text-amber-400 transition"
-            >
-              {isRegistering ? 'Already have an account? Log In' : 'Create new admin account'}
-            </button>
-          </div>
+
 
           <button
             type="submit"
@@ -109,11 +94,6 @@ export default function AdminLogin({ onLogin }) {
           >
             {loading ? (
               <span>Processing...</span>
-            ) : isRegistering ? (
-              <>
-                <UserPlus className="w-4 h-4" />
-                <span>Register Admin</span>
-              </>
             ) : (
               <>
                 <span>Secure Login</span>
