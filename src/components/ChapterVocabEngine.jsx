@@ -33,7 +33,6 @@ export default function ChapterVocabEngine({
   
   // Setup Mode State
   const [selectedChapterIds, setSelectedChapterIds] = useState(new Set());
-  const [testMode, setTestMode] = useState('mcq'); // 'mcq' or 'typing'
   
   // Test Run State
   const [testStarted, setTestStarted] = useState(false);
@@ -90,7 +89,16 @@ export default function ChapterVocabEngine({
       return;
     }
 
-    // Shuffle
+    // Distribute randomly across the 3 formats (mcq, type_de, type_en)
+    const formats = ['mcq', 'type_de', 'type_en'];
+    let fIdx = 0;
+    combined = combined.map(word => {
+      const assignedFormat = formats[fIdx % 3];
+      fIdx++;
+      return { ...word, testFormat: assignedFormat };
+    });
+
+    // Shuffle again to randomize the format sequence
     combined = combined.sort(() => Math.random() - 0.5);
     
     setQuestions(combined);
@@ -102,7 +110,7 @@ export default function ChapterVocabEngine({
     setUserAnswer('');
     setWordResults([]);
     
-    if (testMode === 'mcq') {
+    if (combined[0].testFormat === 'mcq') {
       generateMcqOptions(combined[0], combined);
     }
   };
@@ -148,7 +156,13 @@ export default function ChapterVocabEngine({
 
     // Check with basic normalization (case insensitive, trim spaces)
     const normalizedUser = userAnswer.trim().toLowerCase();
-    const normalizedCorrect = questions[currentQIndex].german.trim().toLowerCase();
+    
+    // For type_en, the correct answer is the english field, for type_de it's the german field
+    const correctStr = questions[currentQIndex].testFormat === 'type_en' 
+      ? questions[currentQIndex].english 
+      : questions[currentQIndex].german;
+      
+    const normalizedCorrect = correctStr.trim().toLowerCase();
     
     const isCorrect = normalizedUser === normalizedCorrect;
     setFeedback(isCorrect ? 'correct' : 'incorrect');
@@ -177,7 +191,7 @@ export default function ChapterVocabEngine({
       setCurrentQIndex(nextIdx);
       setFeedback(null);
       setUserAnswer('');
-      if (testMode === 'mcq') {
+      if (questions[nextIdx].testFormat === 'mcq') {
         generateMcqOptions(questions[nextIdx], questions);
       }
     }
@@ -213,7 +227,7 @@ export default function ChapterVocabEngine({
         access_code_used: userType === 'student' ? verifiedCode : null,
         level: level,
         chapters_selected: Array.from(selectedChapterIds),
-        test_mode: testMode,
+        test_mode: 'mixed',
         total_questions: totalQuestions,
         correct_count: finalCorrectCount,
         wrong_count: totalQuestions - finalCorrectCount,
@@ -303,42 +317,31 @@ export default function ChapterVocabEngine({
               </div>
             </div>
 
-            {/* Right: Test Settings */}
+            {/* Right: Info Box */}
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col">
               <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                <SettingsIcon className="w-5 h-5 text-emerald-400" /> Test Mode
+                <List className="w-5 h-5 text-emerald-400" /> Mixed Format Test
               </h2>
               
-              <div className="space-y-4 mb-auto">
-                <button
-                  onClick={() => setTestMode('mcq')}
-                  className={`w-full flex items-start gap-4 p-4 rounded-xl border transition-all text-left ${
-                    testMode === 'mcq'
-                      ? 'bg-emerald-500/10 border-emerald-500 text-white'
-                      : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-600'
-                  }`}
-                >
-                  <List className={`w-6 h-6 mt-0.5 ${testMode === 'mcq' ? 'text-emerald-400' : 'text-slate-500'}`} />
-                  <div>
-                    <h3 className="font-bold">Multiple Choice</h3>
-                    <p className="text-xs mt-1 opacity-80">Select the correct German translation from 4 options.</p>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => setTestMode('typing')}
-                  className={`w-full flex items-start gap-4 p-4 rounded-xl border transition-all text-left ${
-                    testMode === 'typing'
-                      ? 'bg-emerald-500/10 border-emerald-500 text-white'
-                      : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-600'
-                  }`}
-                >
-                  <Type className={`w-6 h-6 mt-0.5 ${testMode === 'typing' ? 'text-emerald-400' : 'text-slate-500'}`} />
-                  <div>
-                    <h3 className="font-bold">Typing Mode</h3>
-                    <p className="text-xs mt-1 opacity-80">Type the exact German word. Includes special characters.</p>
-                  </div>
-                </button>
+              <div className="space-y-4 mb-auto text-slate-400 text-sm">
+                <p>To maximize your retention, this test automatically mixes three formats:</p>
+                <ul className="space-y-3 mt-4">
+                  <li className="flex items-start gap-3">
+                    <CheckSquare className="w-5 h-5 text-amber-500 shrink-0" />
+                    <span><strong>Multiple Choice:</strong> Select correct German word.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Type className="w-5 h-5 text-emerald-500 shrink-0" />
+                    <span><strong>Typing (German):</strong> Translate English to German.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <Type className="w-5 h-5 text-blue-500 shrink-0" />
+                    <span><strong>Typing (English):</strong> Translate German to English.</span>
+                  </li>
+                </ul>
+                <p className="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-500">
+                  Every selected word will appear exactly once, assigned randomly to one of these formats.
+                </p>
               </div>
 
               <button
@@ -393,26 +396,54 @@ export default function ChapterVocabEngine({
     }
 
     const percentage = Math.round((score / questions.length) * 100);
+    
+    let gradeLabel = 'Fail';
+    let gradeStyle = 'text-red-400 bg-red-400/10 border-red-400/20';
+    if (percentage >= 90) {
+      gradeLabel = 'Excellent';
+      gradeStyle = 'text-amber-400 bg-amber-400/10 border-amber-400/20';
+    } else if (percentage >= 75) {
+      gradeLabel = 'Good';
+      gradeStyle = 'text-emerald-400 bg-emerald-400/10 border-emerald-400/20';
+    } else if (percentage >= 60) {
+      gradeLabel = 'Pass';
+      gradeStyle = 'text-blue-400 bg-blue-400/10 border-blue-400/20';
+    }
+
     return (
       <div className="animate-fade-in max-w-3xl mx-auto space-y-8 text-center py-12">
-        <div className="w-24 h-24 mx-auto bg-amber-500/10 border-4 border-amber-500/20 rounded-full flex items-center justify-center">
-          <Trophy className="w-12 h-12 text-amber-400" />
-        </div>
-        <h2 className="text-4xl font-extrabold text-white">Test Complete!</h2>
+        {percentage >= 75 ? (
+          <div className="w-24 h-24 mx-auto bg-amber-500/10 border-4 border-amber-500/20 rounded-full flex items-center justify-center animate-bounce">
+            <Trophy className="w-12 h-12 text-amber-400" />
+          </div>
+        ) : (
+          <div className="w-24 h-24 mx-auto bg-slate-800 border-4 border-slate-700 rounded-full flex items-center justify-center">
+            <CheckCircle className="w-12 h-12 text-slate-500" />
+          </div>
+        )}
+        <h2 className="text-4xl font-extrabold text-white">
+          {percentage >= 90 ? 'Outstanding!' : percentage >= 75 ? 'Great Job!' : percentage >= 60 ? 'Test Complete!' : 'Keep Practicing!'}
+        </h2>
         
         <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-xl max-w-2xl mx-auto">
-          <p className="text-sm text-slate-500 uppercase tracking-widest font-bold mb-2">Final Score</p>
-          <div className="text-7xl font-mono font-extrabold text-amber-400 mb-6">
+          <div className={`inline-block px-4 py-1 rounded-full border mb-4 font-bold tracking-widest uppercase text-sm ${gradeStyle}`}>
+            Grade: {gradeLabel}
+          </div>
+          <div className="text-7xl font-mono font-extrabold text-white mb-6">
             {score} <span className="text-3xl text-slate-500">/ {questions.length}</span>
           </div>
           
           <div className="w-full bg-slate-800 rounded-full h-3 mb-2">
             <div
-              className={`h-3 rounded-full transition-all duration-1000 ${percentage >= 80 ? 'bg-emerald-500' : percentage >= 50 ? 'bg-amber-500' : 'bg-red-500'}`}
+              className={`h-3 rounded-full transition-all duration-1000 ${
+                percentage >= 90 ? 'bg-amber-400' :
+                percentage >= 75 ? 'bg-emerald-500' :
+                percentage >= 60 ? 'bg-blue-500' : 'bg-red-500'
+              }`}
               style={{ width: `${percentage}%` }}
             />
           </div>
-          <p className="text-slate-400 text-sm">{percentage}% Accuracy</p>
+          <p className="text-slate-400 text-sm font-bold">{percentage}% Accuracy</p>
         </div>
 
         {/* Detailed Review for Free Users */}
@@ -472,16 +503,26 @@ export default function ChapterVocabEngine({
 
       <div className="flex-1 flex flex-col items-center justify-center">
         <div className="text-center mb-12">
+          {currentQ.testFormat === 'type_en' ? (
+             <div className="inline-block px-3 py-1 bg-blue-500/20 text-blue-400 rounded text-xs font-bold uppercase tracking-wider mb-4 border border-blue-500/20">
+               Translate to English
+             </div>
+          ) : (
+             <div className="inline-block px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded text-xs font-bold uppercase tracking-wider mb-4 border border-emerald-500/20">
+               Translate to German
+             </div>
+          )}
+
           <h2 className="text-3xl md:text-5xl font-extrabold text-white tracking-wide">
-            {currentQ.english}
+            {currentQ.testFormat === 'type_en' ? currentQ.german : currentQ.english}
           </h2>
-          {currentQ.article && (
+          {currentQ.article && currentQ.testFormat !== 'type_en' && (
             <p className="mt-4 text-slate-400 text-sm">Hint: Article is <span className="text-emerald-400 font-bold font-mono">{currentQ.article}</span></p>
           )}
         </div>
 
         {/* MCQ Mode */}
-        {testMode === 'mcq' && (
+        {currentQ.testFormat === 'mcq' && (
           <div className="w-full grid sm:grid-cols-2 gap-4 max-w-2xl">
             {mcqOptions.map((opt, idx) => {
               let btnClass = "bg-slate-900 border-slate-800 text-white hover:border-amber-500 hover:bg-slate-800";
@@ -506,7 +547,7 @@ export default function ChapterVocabEngine({
         )}
 
         {/* Typing Mode */}
-        {testMode === 'typing' && (
+        {(currentQ.testFormat === 'type_de' || currentQ.testFormat === 'type_en') && (
           <div className="w-full max-w-xl mx-auto space-y-6">
             <form onSubmit={handleTypingSubmit} className="relative">
               <input
@@ -515,7 +556,7 @@ export default function ChapterVocabEngine({
                 disabled={feedback !== null}
                 value={userAnswer}
                 onChange={e => setUserAnswer(e.target.value)}
-                placeholder="Type in German..."
+                placeholder={currentQ.testFormat === 'type_en' ? "Type in English..." : "Type in German..."}
                 className={`w-full bg-slate-900 border-2 rounded-2xl px-6 py-5 text-center text-2xl font-bold text-white focus:outline-none shadow-xl transition-colors ${
                   feedback === 'correct' ? 'border-emerald-500 text-emerald-400' :
                   feedback === 'incorrect' ? 'border-red-500 text-red-400' :
@@ -531,8 +572,10 @@ export default function ChapterVocabEngine({
               </button>
             </form>
             
-            {/* Built-in Umlaut Keyboard */}
-            <UmlautKeyboard onInsert={handleInsertUmlaut} />
+            {/* Built-in Umlaut Keyboard (Only show when typing German) */}
+            {currentQ.testFormat === 'type_de' && (
+              <UmlautKeyboard onInsert={handleInsertUmlaut} />
+            )}
           </div>
         )}
 
@@ -551,7 +594,9 @@ export default function ChapterVocabEngine({
                 <span className="text-xl font-bold">Falsch!</span>
               </div>
               <div className="text-slate-300 text-sm">
-                Correct answer: <strong className="text-emerald-400">{currentQ.german}</strong>
+                Correct answer: <strong className="text-emerald-400">
+                  {currentQ.testFormat === 'type_en' ? currentQ.english : currentQ.german}
+                </strong>
               </div>
             </div>
           )}
