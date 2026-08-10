@@ -1,7 +1,9 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
   "/admin/page": "app/admin/page.js",
   "/api/admin-login/route": "app/api/admin-login/route.js",
   "/api/save-attempt/route": "app/api/save-attempt/route.js",
   "/api/serve-test/[id]/route": "app/api/serve-test/[id]/route.js",
+  "/page": "app/page.js",
   "/practice-tests/page": "app/practice-tests/page.js"
 }

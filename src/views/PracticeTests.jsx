@@ -29,6 +29,8 @@ export default function PracticeTests() {
   const [userType, setUserType] = useState(''); // 'free' | 'student'
   const [accessCode, setAccessCode] = useState('');
   const [verifiedCode, setVerifiedCode] = useState(null);
+  const [studentName, setStudentName] = useState('');
+  const [batchName, setBatchName] = useState('');
 
   // Step 3
   const [htmlContent, setHtmlContent] = useState('');
@@ -198,13 +200,14 @@ export default function PracticeTests() {
     setLoading(true);
     setErrorMsg('');
     try {
-      const { data, error } = await supabase.rpc('check_access_code', { code_input: accessCode.trim() });
+      const { data, error } = await supabase.rpc('check_batch_code', { code_input: accessCode.trim() });
       if (error) throw error;
       if (data && data.length > 0) {
         setVerifiedCode(accessCode.trim());
-        setStep(3);
+        setBatchName(data[0].batch_name);
+        setStep(2.5);
       } else {
-        setErrorMsg('Code not recognized or inactive. Please check with admin.');
+        setErrorMsg('Batch code not recognized or inactive. Please check with admin.');
       }
     } catch (err) {
       console.error(err);
@@ -254,29 +257,30 @@ export default function PracticeTests() {
   // --- Save attempt via server API ---
   const saveAttempt = async (score, totalMarks, answers, isFallback) => {
     setLoading(true);
-    const percentage = (!isFallback && totalMarks > 0)
-      ? Math.round((score / totalMarks) * 100)
-      : null;
+    const isComplete = !isFallback && totalMarks > 0;
+    const percentage = isComplete ? Math.round((score / totalMarks) * 100) : null;
 
     const payload = {
       material_id: selectedMaterial?.id || null,
       user_type: userType, // 'free' or 'student'
-      // Free User fields (server API handles using session user_id)
-      // but we pass it anyway
-      user_id: userType === 'free' ? session?.user?.id : null,
-      
-      // We don't send name/phone anymore! Profiles table handles it.
-      
-      // Student fields
-      access_code_used: userType === 'student' ? verifiedCode : null,
-      
-      // Scores
-      score: isFallback ? null : score,
-      total_marks: isFallback ? null : totalMarks,
-      percentage: isFallback ? null : percentage,
+      score: isComplete ? score : null,
+      total_marks: isComplete ? totalMarks : null,
+      percentage: percentage,
       answers: answers || null,
       country: 'Pakistan',
     };
+
+    if (userType === 'student') {
+      payload.access_code_used = verifiedCode;
+      payload.batch_name = batchName;
+      payload.student_name = studentName;
+      payload.first_name = studentName;
+    } else {
+      payload.user_id = session?.user?.id;
+      payload.email = session?.user?.email;
+      payload.first_name = profile?.name;
+      payload.phone = profile?.phone;
+    }
 
     try {
       const res = await fetch('/api/save-attempt', {
@@ -465,7 +469,7 @@ export default function PracticeTests() {
       )}
 
       {/* ───── STEP 2: Identity Choice ───── */}
-      {step === 2 && (
+      {step === 2 && !userType && (
         <div className="max-w-3xl mx-auto space-y-8 animate-fade-in">
           <div className="text-center space-y-2">
             <button onClick={() => { setStep(1); setUserType(''); }} className="text-xs text-slate-400 hover:text-amber-400 mb-4 inline-block">← Back to tests</button>
@@ -473,97 +477,83 @@ export default function PracticeTests() {
             <p className="text-sm text-slate-400">Selected: <strong className="text-white">{selectedMaterial?.title}</strong></p>
           </div>
 
-          {!userType && (
-            <div className="grid sm:grid-cols-2 gap-6">
-              {/* Free / Magic Link */}
-              <button
-                onClick={() => { setUserType('free'); setErrorMsg(''); }}
-                className="p-8 bg-slate-900 border border-slate-800 rounded-2xl text-center hover:border-amber-500 hover:bg-amber-500/5 transition-all group"
-              >
-                <div className="w-16 h-16 mx-auto bg-amber-500/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform border border-amber-500/20">
-                  <User className="w-8 h-8 text-amber-400" />
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2">Free Signup / Login</h3>
-                <p className="text-xs text-slate-400">Track your progress and see your scores instantly.</p>
-                <div className="mt-4 text-xs text-amber-400 font-bold flex items-center justify-center gap-1">
-                  <Trophy className="w-3.5 h-3.5" /> My Progress Dashboard
-                </div>
-              </button>
+          <div className="grid sm:grid-cols-2 gap-6">
+            <button
+              onClick={() => { setUserType('free'); setErrorMsg(''); }}
+              className="p-8 bg-slate-900 border border-slate-800 rounded-2xl text-center hover:border-amber-500 hover:bg-amber-500/5 transition-all group"
+            >
+              <div className="w-16 h-16 mx-auto bg-amber-500/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform border border-amber-500/20">
+                <User className="w-8 h-8 text-amber-400" />
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2">Free Signup / Login</h3>
+              <p className="text-xs text-slate-400">Track your progress and see your scores instantly.</p>
+            </button>
 
-              {/* Existing / Student with code */}
-              <button
-                onClick={() => { setUserType('student'); setErrorMsg(''); }}
-                className="p-8 bg-slate-900 border border-slate-800 rounded-2xl text-center hover:border-emerald-500 hover:bg-emerald-500/5 transition-all group"
-              >
-                <div className="w-16 h-16 mx-auto bg-emerald-500/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform border border-emerald-500/20">
-                  <Key className="w-8 h-8 text-emerald-400" />
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2">I'm an Enrolled Student</h3>
-                <p className="text-xs text-slate-400">Use your student access code to begin.</p>
-                <div className="mt-4 text-xs text-emerald-400 font-bold flex items-center justify-center gap-1">
-                  <Star className="w-3.5 h-3.5" /> Results sent to teacher
-                </div>
-              </button>
+            <button
+              onClick={() => { setUserType('student'); setErrorMsg(''); }}
+              className="p-8 bg-slate-900 border border-slate-800 rounded-2xl text-center hover:border-emerald-500 hover:bg-emerald-500/5 transition-all group"
+            >
+              <div className="w-16 h-16 mx-auto bg-emerald-500/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform border border-emerald-500/20">
+                <Key className="w-8 h-8 text-emerald-400" />
+              </div>
+              <h3 className="text-lg font-bold text-white mb-2">I'm an Enrolled Student</h3>
+              <p className="text-xs text-slate-400">Use your student access code to begin.</p>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {step === 2 && userType === 'free' && (
+        <div className="max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-xl relative">
+          <button onClick={() => { setUserType(''); setErrorMsg(''); }} className="absolute top-4 right-4 text-xs text-slate-500 hover:text-white">← Change</button>
+          <form onSubmit={handleSendMagicLink} className="space-y-4">
+            <h3 className="text-xl font-bold text-white">Login with Email</h3>
+            <div>
+              <label className="block text-xs font-medium text-slate-400 mb-1">Email Address</label>
+              <input type="email" required placeholder="you@example.com" value={emailInput} onChange={e => setEmailInput(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white" />
             </div>
-          )}
+            <button disabled={loading} type="submit" className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg flex items-center justify-center gap-2">
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Send Magic Link <Mail className="w-4 h-4" /></>}
+            </button>
+          </form>
+        </div>
+      )}
 
-          {/* Forms */}
-          {userType && (
-            <div className="max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl relative">
-              <button onClick={() => { setUserType(''); setErrorMsg(''); }} className="absolute top-4 right-4 text-xs text-slate-500 hover:text-white transition-colors">← Change</button>
-
-              {errorMsg && (
-                <div className="mb-5 p-3 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start gap-2 text-red-400 text-xs">
-                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                  <p>{errorMsg}</p>
-                </div>
-              )}
-
-              {/* ── Path A: Free / Magic Link ── */}
-              {userType === 'free' && (
-                <form onSubmit={handleSendMagicLink} className="space-y-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-white">Login with Email</h3>
-                    <p className="text-xs text-slate-400 mt-1">We'll send you a secure magic link to log in. No password required!</p>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-400 mb-1">Email Address</label>
-                    <input
-                      type="email" required placeholder="you@example.com"
-                      value={emailInput}
-                      onChange={e => setEmailInput(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none"
-                    />
-                  </div>
-                  <button disabled={loading} type="submit" className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg transition-colors flex items-center justify-center gap-2 mt-2">
-                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Send Magic Link <Mail className="w-4 h-4" /></>}
-                  </button>
-                </form>
-              )}
-
-              {/* ── Path B: Enrolled Student ── */}
-              {userType === 'student' && (
-                <form onSubmit={verifyAccessCode} className="space-y-4">
-                  <div>
-                    <h3 className="text-xl font-bold text-white">Enter Access Code</h3>
-                    <p className="text-xs text-slate-400 mt-1">Your results will be shared with your teacher.</p>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-400 mb-1">Your Student Code</label>
-                    <input
-                      type="text" required placeholder="e.g. GLS-7X2KP"
-                      value={accessCode}
-                      onChange={e => setAccessCode(e.target.value.toUpperCase())}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-white font-mono uppercase tracking-widest focus:outline-none focus:border-emerald-500 text-center text-lg"
-                    />
-                  </div>
-                  <button disabled={loading} type="submit" className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-lg transition-colors flex items-center justify-center gap-2">
-                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (<>Verify & Start Test <ArrowRight className="w-4 h-4" /></>)}
-                  </button>
-                </form>
-              )}
+      {step === 2 && userType === 'student' && (
+        <div className="max-w-md mx-auto animate-fade-in">
+          <button onClick={() => { setUserType(''); setStep(1); }} className="mb-6 text-sm text-slate-400 hover:text-white flex items-center gap-2">
+            &larr; Back to tests
+          </button>
+          <div className="bg-slate-900 border border-slate-800 p-8 rounded-2xl shadow-2xl">
+            <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mb-6">
+              <Key className="w-6 h-6 text-emerald-400" />
             </div>
-          )}
+            <h2 className="text-2xl font-extrabold text-white mb-2">Student Access</h2>
+            <p className="text-slate-400 text-sm mb-6">Enter your batch access code to proceed.</p>
+            {errorMsg && <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-sm text-red-400">{errorMsg}</div>}
+            <form onSubmit={verifyAccessCode} className="space-y-4">
+              <input type="text" required placeholder="e.g. GLS-XXXXX" value={accessCode} onChange={e => setAccessCode(e.target.value.toUpperCase())} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white font-mono text-lg tracking-wider focus:outline-none focus:border-emerald-500 transition-colors" />
+              <button disabled={loading} type="submit" className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl flex justify-center items-center gap-2">
+                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><CheckCircle className="w-5 h-5" /> Verify Code</>}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* STEP 2.5: ENTER STUDENT NAME */}
+      {step === 2.5 && userType === 'student' && (
+        <div className="max-w-md mx-auto animate-fade-in">
+          <button onClick={() => setStep(2)} className="mb-6 text-sm text-slate-400 hover:text-white flex items-center gap-2">&larr; Back to code entry</button>
+          <div className="bg-slate-900 border border-slate-800 p-8 rounded-2xl shadow-2xl">
+            <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mb-6"><User className="w-6 h-6 text-emerald-400" /></div>
+            <h2 className="text-2xl font-extrabold text-white mb-2">Almost there!</h2>
+            <p className="text-slate-400 text-sm mb-6">You are joining <strong className="text-emerald-400">{batchName}</strong>. Please enter your name.</p>
+            <form onSubmit={(e) => { e.preventDefault(); setStep(3); }} className="space-y-4">
+              <input type="text" required placeholder="John Doe" value={studentName} onChange={e => setStudentName(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500" />
+              <button type="submit" className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl flex justify-center items-center gap-2"><PlayCircle className="w-5 h-5" /> Start Test</button>
+            </form>
+          </div>
         </div>
       )}
 

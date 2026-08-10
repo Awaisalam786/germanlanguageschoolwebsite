@@ -21,7 +21,7 @@ export default function PracticeTestManager() {
   
   // Codes State
   const [codes, setCodes] = useState([]);
-  const [codeForm, setCodeForm] = useState({ first_name: '', last_name: '', phone: '', email: '' });
+  const [codeForm, setCodeForm] = useState({ batch_name: '' });
 
   // Results State
   const [attempts, setAttempts] = useState([]);
@@ -174,10 +174,7 @@ export default function PracticeTestManager() {
 
     const { error } = await supabase.from('student_access_codes').insert([{
       access_code: newCode,
-      first_name: codeForm.first_name,
-      last_name: codeForm.last_name,
-      phone: codeForm.phone,
-      email: codeForm.email,
+      batch_name: codeForm.batch_name,
       is_active: true
     }]);
 
@@ -185,7 +182,7 @@ export default function PracticeTestManager() {
       showMessage("Error generating code.", 'error');
     } else {
       showMessage(`Code ${newCode} generated successfully!`);
-      setCodeForm({ first_name: '', last_name: '', phone: '', email: '' });
+      setCodeForm({ batch_name: '' });
       fetchCodes();
     }
     setLoading(false);
@@ -483,34 +480,20 @@ export default function PracticeTestManager() {
           <div className="lg:col-span-1 bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 h-fit sticky top-6">
             <h3 className="text-lg font-bold text-white flex items-center gap-2">
               <Key className="w-5 h-5 text-amber-400" />
-              Generate Student Code
+              Generate Batch Code
             </h3>
             <p className="text-[11px] text-slate-400 leading-relaxed">
-              Generate a unique access code for an existing student. They can use this code to skip the lead capture form on the Practice Tests module.
+              Generate a unique access code for a batch. Students can use this code to skip the lead capture form on the Practice Tests module.
             </p>
             <form onSubmit={handleGenerateStudentCode} className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1">First Name *</label>
-                  <input type="text" required value={codeForm.first_name} onChange={e => setCodeForm({...codeForm, first_name: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500" />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-slate-400 mb-1">Last Name *</label>
-                  <input type="text" required value={codeForm.last_name} onChange={e => setCodeForm({...codeForm, last_name: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500" />
-                </div>
-              </div>
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">Phone (+92 format) *</label>
-                <input type="text" required placeholder="+923001234567" value={codeForm.phone} onChange={e => setCodeForm({...codeForm, phone: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500" />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">Email</label>
-                <input type="email" placeholder="student@email.com" value={codeForm.email} onChange={e => setCodeForm({...codeForm, email: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500" />
+                <label className="block text-xs font-bold text-slate-400 mb-1">Batch / Group Name *</label>
+                <input type="text" required placeholder="e.g. A2 Kapitel 12 Evening" value={codeForm.batch_name} onChange={e => setCodeForm({...codeForm, batch_name: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500" />
               </div>
               
               <button disabled={loading} type="submit" className="w-full py-2 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white font-bold rounded-lg text-sm transition-colors flex items-center justify-center gap-2 shadow-lg disabled:opacity-50">
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-                Generate & Save Code
+                Generate Code
               </button>
             </form>
           </div>
@@ -522,7 +505,7 @@ export default function PracticeTestManager() {
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
                 <input 
                   type="text" 
-                  placeholder="Search students or codes..." 
+                  placeholder="Search batches or codes..." 
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
                 />
               </div>
@@ -550,8 +533,7 @@ export default function PracticeTestManager() {
                   {codes.map(code => (
                     <tr key={code.id} className="hover:bg-slate-800/30 transition-colors">
                       <td className="px-4 py-3">
-                        <div className="font-bold text-white">{code.first_name} {code.last_name}</div>
-                        <div className="text-xs text-slate-500">{code.phone} {code.email && `• ${code.email}`}</div>
+                        <div className="font-bold text-white">{code.batch_name || '—'}</div>
                       </td>
                       <td className="px-4 py-3">
                         <div className="inline-flex items-center gap-2 px-2.5 py-1 bg-amber-500/10 border border-amber-500/20 text-amber-400 font-mono font-bold rounded-md text-xs">
@@ -604,12 +586,28 @@ export default function PracticeTestManager() {
             </div>
           </div>
 
+          {/* Filter + Search Bar */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-900 border border-slate-800 p-4 rounded-xl mb-4">
+            <div className="flex items-center gap-2">
+              <select
+                className="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+                value={resultsFilter}
+                onChange={e => setResultsFilter(e.target.value)}
+              >
+                <option value="all">All Batches</option>
+                {[...new Set(attempts.filter(a => a.user_type === 'student').map(a => a.batch_name).filter(Boolean))].map(batch => (
+                  <option key={batch} value={batch}>{batch}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
           {/* Results Table */}
           <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden overflow-x-auto">
             <table className="w-full text-left text-sm text-slate-300">
               <thead className="bg-slate-950 text-xs uppercase font-bold text-slate-500">
                 <tr>
-                  <th className="px-4 py-3">Student</th>
+                  <th className="px-4 py-3">Student & Batch</th>
                   <th className="px-4 py-3">Test</th>
                   <th className="px-4 py-3">Score</th>
                   <th className="px-4 py-3">%</th>
@@ -624,7 +622,7 @@ export default function PracticeTestManager() {
                   </tr>
                 )}
                 {attempts
-                  .filter(a => a.user_type === 'student' || a.access_code_used)
+                  .filter(a => (a.user_type === 'student' || a.access_code_used) && (resultsFilter === 'all' || a.batch_name === resultsFilter))
                   .map(attempt => {
                     const isStudent = true;
                     const pct = attempt.percentage ?? (attempt.score != null && attempt.total_marks > 0
@@ -634,8 +632,8 @@ export default function PracticeTestManager() {
                       <tr key={attempt.id} className="hover:bg-slate-800/30 transition-colors">
                         <td className="px-4 py-3">
                           <div>
-                            <div className="font-mono text-emerald-400 font-bold text-sm">{attempt.access_code_used || '—'}</div>
-                            <div className="text-[10px] text-slate-500">Access Code</div>
+                            <div className="font-bold text-white">{attempt.student_name || attempt.first_name || 'Unknown Student'}</div>
+                            <div className="text-[10px] text-slate-500">{attempt.batch_name || attempt.access_code_used || '—'}</div>
                           </div>
                         </td>
                         <td className="px-4 py-3">

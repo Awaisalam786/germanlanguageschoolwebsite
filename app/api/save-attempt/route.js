@@ -9,7 +9,8 @@ export async function POST(request) {
       first_name, last_name, phone, email,
       access_code_used, user_id,
       score, total_marks, percentage,
-      answers, country
+      answers, country,
+      student_name, batch_name
     } = body;
 
     console.log('[save-attempt] Received:', { user_type, user_id, first_name, phone, access_code_used, score });
@@ -51,9 +52,11 @@ export async function POST(request) {
     if (percentage != null) fullPayload.percentage = percentage;
     if (answers) fullPayload.answers = answers;
     if (user_id) fullPayload.user_id = user_id;
+    if (student_name) fullPayload.student_name = student_name;
+    if (batch_name) fullPayload.batch_name = batch_name;
 
     // Also try legacy column names the table might have
-    if (first_name || access_code_used) {
+    if (!student_name && (first_name || access_code_used)) {
       fullPayload.student_name = displayName; // legacy column
     }
 
