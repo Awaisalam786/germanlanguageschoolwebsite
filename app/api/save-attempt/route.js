@@ -18,10 +18,11 @@ export async function POST(request) {
       process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     );
 
-    const { data, error } = await supabase.from('practice_attempts').insert([{
-      material_id,
+    // Full payload with all columns
+    const fullPayload = {
+      material_id: material_id || null,
       first_name,
-      last_name,
+      last_name: last_name || null,
       phone,
       email: email || null,
       country: country || 'Pakistan',
@@ -29,7 +30,28 @@ export async function POST(request) {
       total_marks: total_marks ?? null,
       answers: answers || null,
       access_code_used: access_code_used || null
-    }]).select();
+    };
+
+    let { data, error } = await supabase.from('practice_attempts').insert([fullPayload]).select();
+
+    // PGRST204 = column not found in schema cache — gracefully retry with minimal required columns only
+    if (error && (error.code === 'PGRST204' || (error.message && error.message.includes('column')))) {
+      console.warn('[save-attempt] Schema mismatch, retrying with core columns only. Error was:', error.message);
+
+      const corePayload = {
+        first_name,
+        phone,
+        score: score ?? null,
+      };
+      if (last_name) corePayload.last_name = last_name;
+      if (email) corePayload.email = email;
+      if (material_id) corePayload.material_id = material_id;
+      if (total_marks) corePayload.total_marks = total_marks;
+
+      const retryResult = await supabase.from('practice_attempts').insert([corePayload]).select();
+      data = retryResult.data;
+      error = retryResult.error;
+    }
 
     if (error) {
       console.error('[save-attempt] Supabase insert error:', {
