@@ -10,22 +10,20 @@ import {
 import Link from 'next/link';
 
 export default function PracticeTests() {
-  const [step, setStep] = useState(1); // 1: Selection, 2: Identity, 3: Test Runner, 4: Result, 5: Profile Completion, 6: Check Email
+  const [step, setStep] = useState(1); // 1: Selection, 2: Identity, 3: Test Runner, 4: Result
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   
-  // Auth & Profile
-  const [session, setSession] = useState(null);
-  const [profile, setProfile] = useState(null);
-  const [emailInput, setEmailInput] = useState('');
-  const [profileForm, setProfileForm] = useState({ name: '', phone: '' });
+  // Auth & Profile for Free Users
+  const [freeUserForm, setFreeUserForm] = useState({ name: '', phone: '', email: '' });
+  const [storedFreeUser, setStoredFreeUser] = useState(null);
 
   // Step 1
   const [materials, setMaterials] = useState([]);
   const [selectedLevel, setSelectedLevel] = useState('All');
   const [selectedMaterial, setSelectedMaterial] = useState(null);
 
-  // Step 2
+  // Step 2 (Students)
   const [userType, setUserType] = useState(''); // 'free' | 'student'
   const [accessCode, setAccessCode] = useState('');
   const [verifiedCode, setVerifiedCode] = useState(null);
@@ -40,50 +38,17 @@ export default function PracticeTests() {
   const [testResult, setTestResult] = useState(null);
 
   useEffect(() => {
-    checkSession();
     fetchMaterials();
-    
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      if (session) {
-        checkProfile(session.user.id);
-      } else {
-        setProfile(null);
+    // Check local storage for free user
+    const savedUser = localStorage.getItem('gls_free_user');
+    if (savedUser) {
+      try {
+        setStoredFreeUser(JSON.parse(savedUser));
+      } catch (e) {
+        console.error(e);
       }
-    });
-
-    return () => subscription.unsubscribe();
+    }
   }, []);
-
-  const checkSession = async () => {
-    const { data: { session } } = await supabase.auth.getSession();
-    setSession(session);
-    if (session) {
-      checkProfile(session.user.id);
-    }
-  };
-
-  const checkProfile = async (userId) => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
-
-    if (error && error.code !== 'PGRST116') {
-      console.error('Error fetching profile:', error);
-    }
-
-    if (data && data.name && data.phone) {
-      setProfile(data);
-      // If we were waiting for profile, go to tests
-      if (step === 5) setStep(1);
-    } else {
-      // Need to complete profile
-      setStep(5);
-    }
-  };
 
   const fetchMaterials = async () => {
     setLoading(true);
@@ -102,8 +67,9 @@ export default function PracticeTests() {
           const match = data.find(m => m.id === testId);
           if (match) { 
             setSelectedMaterial(match); 
-            // If already logged in and have profile, skip identity step
-            if (session && profile) {
+            // If we have stored user, jump to test
+            const saved = localStorage.getItem('gls_free_user');
+            if (saved) {
               setUserType('free');
               setStep(3);
             } else {
@@ -121,77 +87,33 @@ export default function PracticeTests() {
     setUserType('');
     setErrorMsg('');
     
-    if (session && profile) {
+    if (storedFreeUser) {
       setUserType('free');
       setStep(3);
-    } else if (session && !profile) {
-      setStep(5); // Complete profile first
     } else {
       setStep(2);
     }
   };
 
-  // --- Path A: Free User (Email Magic Link) ---
-  const handleSendMagicLink = async (e) => {
+  // --- Path A: Free User Submit ---
+  const handleFreeUserSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
     setErrorMsg('');
     
-    if (!emailInput) {
-      setErrorMsg('Email is required.');
-      setLoading(false);
+    if (!freeUserForm.name || !freeUserForm.phone || !freeUserForm.email) {
+      setErrorMsg('All fields are required.');
       return;
     }
 
-    const redirectUrl = `${window.location.origin}/auth/callback?next=/practice-tests${selectedMaterial ? `?testId=${selectedMaterial.id}` : ''}`;
-    
-    const { error } = await supabase.auth.signInWithOtp({
-      email: emailInput,
-      options: {
-        emailRedirectTo: redirectUrl,
-      },
-    });
+    const userData = {
+      name: freeUserForm.name,
+      phone: freeUserForm.phone,
+      email: freeUserForm.email
+    };
 
-    if (error) {
-      setErrorMsg(error.message);
-    } else {
-      setStep(6); // Show "Check your email" screen
-    }
-    setLoading(false);
-  };
-
-  const handleSaveProfile = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setErrorMsg('');
-
-    if (!profileForm.name || !profileForm.phone) {
-      setErrorMsg('Name and phone are required.');
-      setLoading(false);
-      return;
-    }
-
-    const { error } = await supabase
-      .from('profiles')
-      .upsert({
-        id: session.user.id,
-        name: profileForm.name,
-        phone: profileForm.phone,
-        email: session.user.email
-      });
-
-    if (error) {
-      setErrorMsg(error.message);
-    } else {
-      setProfile({ name: profileForm.name, phone: profileForm.phone, email: session.user.email });
-      if (selectedMaterial) {
-        setUserType('free');
-        setStep(3);
-      } else {
-        setStep(1);
-      }
-    }
-    setLoading(false);
+    localStorage.setItem('gls_free_user', JSON.stringify(userData));
+    setStoredFreeUser(userData);
+    setStep(3);
   };
 
   // --- Path B: Existing student verifies code ---
@@ -276,10 +198,9 @@ export default function PracticeTests() {
       payload.student_name = studentName;
       payload.first_name = studentName;
     } else {
-      payload.user_id = session?.user?.id;
-      payload.email = session?.user?.email;
-      payload.first_name = profile?.name;
-      payload.phone = profile?.phone;
+      payload.first_name = storedFreeUser?.name;
+      payload.phone = storedFreeUser?.phone;
+      payload.email = storedFreeUser?.email;
     }
 
     try {
@@ -317,6 +238,14 @@ export default function PracticeTests() {
     setErrorMsg('');
   };
 
+  const handleLogout = () => {
+    if (userType === 'free') {
+      localStorage.removeItem('gls_free_user');
+      setStoredFreeUser(null);
+    }
+    resetAll();
+  };
+
   const filteredMaterials = selectedLevel === 'All'
     ? materials
     : materials.filter(m => m.level === selectedLevel);
@@ -326,84 +255,20 @@ export default function PracticeTests() {
     <div className="min-h-screen bg-slate-950 py-12 px-4 sm:px-6 lg:px-8">
 
       {/* Top Right Navigation for logged-in users & students */}
-      {((session && step !== 3 && step !== 5) || (userType === 'student' && step !== 3)) && (
+      {((storedFreeUser && step !== 3) || (userType === 'student' && step !== 3)) && (
         <div className="absolute top-4 right-4 sm:top-8 sm:right-8 flex items-center gap-4 z-50">
-          {session && (
+          {storedFreeUser && (
             <Link href="/dashboard" className="flex items-center gap-2 text-sm text-slate-300 hover:text-white transition-colors bg-slate-900 border border-slate-800 px-4 py-2 rounded-lg shadow-lg">
               <LayoutDashboard className="w-4 h-4 text-amber-500" />
               My Progress
             </Link>
           )}
           <button 
-            onClick={async () => { 
-              if (session) await supabase.auth.signOut(); 
-              resetAll(); 
-            }}
+            onClick={handleLogout}
             className="flex items-center gap-2 text-sm text-slate-400 hover:text-red-400 transition-colors bg-slate-900 border border-slate-800 px-4 py-2 rounded-lg"
           >
             <LogOut className="w-4 h-4" />
-            Logout {userType === 'student' ? '(Student)' : ''}
-          </button>
-        </div>
-      )}
-
-      {/* ───── STEP 5: Profile Completion ───── */}
-      {step === 5 && (
-        <div className="max-w-md mx-auto space-y-8 animate-fade-in pt-12">
-          <div className="text-center space-y-2">
-            <h2 className="text-3xl font-extrabold text-white">Complete Your Profile</h2>
-            <p className="text-sm text-slate-400">Just one more step before you can take practice tests.</p>
-          </div>
-          
-          <form onSubmit={handleSaveProfile} className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl space-y-4">
-            {errorMsg && (
-              <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start gap-2 text-red-400 text-xs">
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                <p>{errorMsg}</p>
-              </div>
-            )}
-            <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1">Full Name *</label>
-              <input
-                type="text" required
-                value={profileForm.name}
-                onChange={e => setProfileForm({ ...profileForm, name: e.target.value })}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1">Phone Number *</label>
-              <input
-                type="text" required placeholder="+923001234567"
-                value={profileForm.phone}
-                onChange={e => setProfileForm({ ...profileForm, phone: e.target.value })}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none"
-              />
-            </div>
-            <button disabled={loading} type="submit" className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg transition-colors flex items-center justify-center gap-2 mt-2">
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Profile'}
-            </button>
-          </form>
-        </div>
-      )}
-
-      {/* ───── STEP 6: Check Email ───── */}
-      {step === 6 && (
-        <div className="max-w-md mx-auto text-center space-y-8 animate-fade-in pt-12">
-          <div className="w-24 h-24 mx-auto bg-blue-500/10 rounded-full flex items-center justify-center border-4 border-blue-500/20">
-            <Mail className="w-12 h-12 text-blue-400" />
-          </div>
-          <div className="space-y-4">
-            <h2 className="text-3xl font-extrabold text-white">Check Your Email</h2>
-            <p className="text-slate-400">
-              We've sent a magic login link to <strong className="text-white">{emailInput}</strong>.
-            </p>
-            <p className="text-sm text-slate-500">
-              Click the link in the email to log in and continue to your test. You can close this window.
-            </p>
-          </div>
-          <button onClick={() => setStep(2)} className="text-sm text-slate-400 hover:text-white underline">
-            Try a different email
+            Logout {userType === 'student' ? '(Student)' : '(Free User)'}
           </button>
         </div>
       )}
@@ -490,8 +355,8 @@ export default function PracticeTests() {
               <div className="w-16 h-16 mx-auto bg-amber-500/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform border border-amber-500/20">
                 <User className="w-8 h-8 text-amber-400" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">Free Signup / Login</h3>
-              <p className="text-xs text-slate-400">Track your progress and see your scores instantly.</p>
+              <h3 className="text-lg font-bold text-white mb-2">Free Practice</h3>
+              <p className="text-xs text-slate-400">Enter your details to track your scores.</p>
             </button>
 
             <button
@@ -508,22 +373,43 @@ export default function PracticeTests() {
         </div>
       )}
 
+      {/* Free User Details Form */}
       {step === 2 && userType === 'free' && (
-        <div className="max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-xl relative">
+        <div className="max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-xl relative animate-fade-in">
           <button onClick={() => { setUserType(''); setErrorMsg(''); }} className="absolute top-4 right-4 text-xs text-slate-500 hover:text-white">← Change</button>
-          <form onSubmit={handleSendMagicLink} className="space-y-4">
-            <h3 className="text-xl font-bold text-white">Login with Email</h3>
-            <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1">Email Address</label>
-              <input type="email" required placeholder="you@example.com" value={emailInput} onChange={e => setEmailInput(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white" />
+          <form onSubmit={handleFreeUserSubmit} className="space-y-4">
+            <div className="text-center mb-6">
+              <h3 className="text-2xl font-extrabold text-white">Your Details</h3>
+              <p className="text-sm text-slate-400">We'll save your scores to this email.</p>
             </div>
-            <button disabled={loading} type="submit" className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg flex items-center justify-center gap-2">
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Send Magic Link <Mail className="w-4 h-4" /></>}
+            
+            {errorMsg && (
+              <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start gap-2 text-red-400 text-xs">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                <p>{errorMsg}</p>
+              </div>
+            )}
+            
+            <div>
+              <label className="block text-xs font-medium text-slate-400 mb-1">Full Name *</label>
+              <input type="text" required placeholder="John Doe" value={freeUserForm.name} onChange={e => setFreeUserForm({...freeUserForm, name: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-400 mb-1">Email Address *</label>
+              <input type="email" required placeholder="you@example.com" value={freeUserForm.email} onChange={e => setFreeUserForm({...freeUserForm, email: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none" />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-400 mb-1">Phone Number *</label>
+              <input type="text" required placeholder="+923001234567" value={freeUserForm.phone} onChange={e => setFreeUserForm({...freeUserForm, phone: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none" />
+            </div>
+            <button type="submit" className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg flex items-center justify-center gap-2 mt-4">
+              Continue to Test <ArrowRight className="w-4 h-4" />
             </button>
           </form>
         </div>
       )}
 
+      {/* Student Details Form */}
       {step === 2 && userType === 'student' && (
         <div className="max-w-md mx-auto animate-fade-in">
           <button onClick={() => { setUserType(''); setStep(1); }} className="mb-6 text-sm text-slate-400 hover:text-white flex items-center gap-2">
@@ -575,7 +461,7 @@ export default function PracticeTests() {
             <div className="flex items-center gap-3">
               <div className="text-xs text-slate-400 hidden sm:block">
                 {userType === 'free'
-                  ? <>Logged in as: <strong className="text-white">{profile?.name || session?.user?.email}</strong></>
+                  ? <>Logged in as: <strong className="text-white">{storedFreeUser?.name || storedFreeUser?.email}</strong></>
                   : <>Code: <strong className="text-emerald-400">{verifiedCode}</strong></>
                 }
               </div>
@@ -627,7 +513,7 @@ export default function PracticeTests() {
             <h2 className="text-4xl font-extrabold text-white">Your Result</h2>
             <p className="text-slate-400 text-sm">
               {testResult.userType === 'free'
-                ? `Great job, ${profile?.name || 'Student'}!`
+                ? `Great job, ${storedFreeUser?.name || 'Student'}!`
                 : `Test completed! Great work.`}
             </p>
           </div>
