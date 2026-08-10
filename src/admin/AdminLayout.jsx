@@ -28,7 +28,8 @@ import {
   ShoppingCart,
   Ticket,
   Megaphone,
-  FileCode2
+  FileCode2,
+  Trophy
 } from 'lucide-react';
 import { translations } from '../i18n/translations';
 
