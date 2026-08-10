@@ -41,8 +41,73 @@ export async function GET(request, { params }) {
       return new NextResponse('Failed to load test file', { status: 502 });
     }
 
-    const htmlContent = await response.text();
+    let htmlContent = await response.text();
     console.log('[serve-test] HTML loaded, length:', htmlContent.length);
+
+    // Auto-inject the score submission script so the user doesn't have to edit HTML manually
+    const autoSubmitScript = `
+    <script>
+      // Auto-submit script injected by German Learning School platform
+      (function() {
+        let scoreSent = false;
+
+        function sendScoreToPlatform() {
+          if (scoreSent) return;
+          try {
+             const finalScoreEl = document.getElementById('finalScore');
+             if (finalScoreEl && window.parent) {
+                 const scoreText = finalScoreEl.textContent; // e.g., "45 / 50"
+                 const parts = scoreText.split('/');
+                 if (parts.length === 2) {
+                     const score = parseInt(parts[0].trim());
+                     const total = parseInt(parts[1].trim());
+                     if (!isNaN(score) && !isNaN(total)) {
+                       window.parent.postMessage({
+                           type: 'PRACTICE_TEST_COMPLETE',
+                           score: score,
+                           totalMarks: total,
+                           answers: null
+                       }, '*');
+                       scoreSent = true;
+                       console.log('Score automatically sent to platform:', score, '/', total);
+                     }
+                 }
+             }
+          } catch(e) {
+             console.error('Error auto-submitting score:', e);
+          }
+        }
+
+        // Method 1: Intercept finishTest if it exists (Standard template)
+        if (typeof window.finishTest === 'function') {
+          const originalFinishTest = window.finishTest;
+          window.finishTest = function() {
+            originalFinishTest.apply(this, arguments);
+            sendScoreToPlatform();
+          };
+        }
+
+        // Method 2: Watch the DOM for the result screen to appear as a fallback
+        window.addEventListener('load', () => {
+          const observer = new MutationObserver(() => {
+            const resultScreen = document.getElementById('resultScreen');
+            if (resultScreen && !resultScreen.classList.contains('hidden')) {
+               sendScoreToPlatform();
+            }
+          });
+          observer.observe(document.body, { childList: true, subtree: true, attributes: true });
+        });
+      })();
+    </script>
+    </body>
+    `;
+    
+    // Inject before </body> if it exists, otherwise just append
+    if (htmlContent.includes('</body>')) {
+      htmlContent = htmlContent.replace('</body>', autoSubmitScript);
+    } else {
+      htmlContent += autoSubmitScript;
+    }
 
     // 3. Serve with correct Content-Type — browser renders quiz UI, not raw code
     return new NextResponse(htmlContent, {
