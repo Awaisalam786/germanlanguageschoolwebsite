@@ -3,38 +3,45 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import {
-  CheckSquare, BookOpen, Key, User, Phone, Mail,
-  ArrowRight, Loader2, PlayCircle, CheckCircle, AlertCircle, Trophy, Star,
-  LogOut, LayoutDashboard
+  CheckSquare, BookOpen, Key, User,
+  ArrowRight, Loader2, PlayCircle, CheckCircle, AlertCircle, Trophy,
+  LogOut, LayoutDashboard, Languages, MessageCircle
 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function PracticeTests() {
-  const [step, setStep] = useState(1); // 1: Selection, 2: Identity, 3: Test Runner, 4: Result
+  // Navigation Steps:
+  // 1 = Identity Choice
+  // 1.1 = Free Form
+  // 1.2 = Student Code
+  // 1.3 = Student Name
+  // 2 = Level Selection
+  // 3 = Category Selection
+  // 4 = Content (Test List or Placeholder)
+  // 5 = Test Runner
+  // 6 = Result
+  const [step, setStep] = useState(1); 
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   
-  // Auth & Profile for Free Users
+  // Auth & Profile
+  const [userType, setUserType] = useState(''); // 'free' | 'student'
   const [freeUserForm, setFreeUserForm] = useState({ name: '', phone: '', email: '' });
   const [storedFreeUser, setStoredFreeUser] = useState(null);
-
-  // Step 1
-  const [materials, setMaterials] = useState([]);
-  const [selectedLevel, setSelectedLevel] = useState('All');
-  const [selectedMaterial, setSelectedMaterial] = useState(null);
-
-  // Step 2 (Students)
-  const [userType, setUserType] = useState(''); // 'free' | 'student'
   const [accessCode, setAccessCode] = useState('');
   const [verifiedCode, setVerifiedCode] = useState(null);
   const [studentName, setStudentName] = useState('');
   const [batchName, setBatchName] = useState('');
 
-  // Step 3
+  // Practice Test Navigation
+  const [materials, setMaterials] = useState([]);
+  const [selectedLevel, setSelectedLevel] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null); // 'Vocab Test', 'Grammar Test', 'Reading Test', 'Speaking Test'
+  const [selectedMaterial, setSelectedMaterial] = useState(null);
+
+  // Test Runner State
   const [htmlContent, setHtmlContent] = useState('');
   const [htmlLoading, setHtmlLoading] = useState(false);
-
-  // Step 4
   const [testResult, setTestResult] = useState(null);
 
   useEffect(() => {
@@ -44,6 +51,8 @@ export default function PracticeTests() {
     if (savedUser) {
       try {
         setStoredFreeUser(JSON.parse(savedUser));
+        setUserType('free');
+        setStep(2); // Skip straight to level selection if logged in
       } catch (e) {
         console.error(e);
       }
@@ -60,42 +69,20 @@ export default function PracticeTests() {
 
     if (!error && data) {
       setMaterials(data);
-      if (typeof window !== 'undefined') {
-        const params = new URLSearchParams(window.location.search);
-        const testId = params.get('testId');
-        if (testId) {
-          const match = data.find(m => m.id === testId);
-          if (match) { 
-            setSelectedMaterial(match); 
-            // If we have stored user, jump to test
-            const saved = localStorage.getItem('gls_free_user');
-            if (saved) {
-              setUserType('free');
-              setStep(3);
-            } else {
-              setStep(2); 
-            }
-          }
-        }
-      }
     }
     setLoading(false);
   };
 
-  const handleSelectMaterial = (mat) => {
-    setSelectedMaterial(mat);
-    setUserType('');
+  // --- Session Reset (CRITICAL) ---
+  const resetTestSession = () => {
+    setSelectedMaterial(null);
+    setHtmlContent('');
+    setTestResult(null);
+    setHtmlLoading(false);
     setErrorMsg('');
-    
-    if (storedFreeUser) {
-      setUserType('free');
-      setStep(3);
-    } else {
-      setStep(2);
-    }
   };
 
-  // --- Path A: Free User Submit ---
+  // --- Auth Handlers ---
   const handleFreeUserSubmit = (e) => {
     e.preventDefault();
     setErrorMsg('');
@@ -113,10 +100,10 @@ export default function PracticeTests() {
 
     localStorage.setItem('gls_free_user', JSON.stringify(userData));
     setStoredFreeUser(userData);
-    setStep(3);
+    setUserType('free');
+    setStep(2); // Go to level selection
   };
 
-  // --- Path B: Existing student verifies code ---
   const verifyAccessCode = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -127,7 +114,7 @@ export default function PracticeTests() {
       if (data && data.length > 0) {
         setVerifiedCode(accessCode.trim());
         setBatchName(data[0].batch_name);
-        setStep(2.5);
+        setStep(1.3);
       } else {
         setErrorMsg('Batch code not recognized or inactive. Please check with admin.');
       }
@@ -138,9 +125,58 @@ export default function PracticeTests() {
     setLoading(false);
   };
 
-  // --- Step 3: Load HTML + listen for postMessage ---
+  const handleStudentNameSubmit = (e) => {
+    e.preventDefault();
+    setStep(2); // Go to level selection
+  };
+
+  const handleLogout = () => {
+    if (userType === 'free') {
+      localStorage.removeItem('gls_free_user');
+      setStoredFreeUser(null);
+    }
+    setStep(1);
+    setUserType('');
+    setAccessCode('');
+    setVerifiedCode(null);
+    setStudentName('');
+    resetTestSession();
+  };
+
+  // --- Navigation Handlers ---
+  const navigateToCategorySelection = (level) => {
+    setSelectedLevel(level);
+    resetTestSession();
+    setStep(3);
+  };
+
+  const navigateToContent = (category) => {
+    setSelectedCategory(category);
+    resetTestSession();
+    setStep(4);
+  };
+
+  const navigateToTest = (mat) => {
+    resetTestSession();
+    setSelectedMaterial(mat);
+    setStep(5);
+  };
+
+  const goBackToLevel = () => {
+    resetTestSession();
+    setSelectedLevel(null);
+    setStep(2);
+  };
+
+  const goBackToCategory = () => {
+    resetTestSession();
+    setSelectedCategory(null);
+    setStep(3);
+  };
+
+  // --- Test Runner ---
   useEffect(() => {
-    if (step !== 3 || !selectedMaterial) return;
+    if (step !== 5 || !selectedMaterial) return;
 
     const loadHtml = async () => {
       setHtmlLoading(true);
@@ -157,7 +193,7 @@ export default function PracticeTests() {
       } catch (err) {
         console.error('[loadHtml] Error:', err);
         alert(`Could not load test: ${err.message}`);
-        setStep(1);
+        setStep(4); // Fallback to list
       } finally {
         setHtmlLoading(false);
       }
@@ -176,7 +212,7 @@ export default function PracticeTests() {
     return () => window.removeEventListener('message', handleMessage);
   }, [step, selectedMaterial]);
 
-  // --- Save attempt via server API ---
+  // --- Save Attempt ---
   const saveAttempt = async (score, totalMarks, answers, isFallback) => {
     setLoading(true);
     const isComplete = !isFallback && totalMarks > 0;
@@ -214,7 +250,7 @@ export default function PracticeTests() {
       if (!res.ok) throw new Error(result.error || 'Save failed');
 
       setTestResult({ score, totalMarks, percentage, isFallback, userType });
-      setStep(4);
+      setStep(6);
     } catch (err) {
       console.error('[saveAttempt] Error:', err);
       alert(`Error saving result: ${err.message}\n\nPlease screenshot your result and contact admin.`);
@@ -222,37 +258,24 @@ export default function PracticeTests() {
     setLoading(false);
   };
 
-
-  const resetAll = () => {
-    setStep(1);
-    setUserType('');
-    setAccessCode('');
-    setVerifiedCode(null);
-    setTestResult(null);
-    setHtmlContent('');
-    setErrorMsg('');
+  // --- Data Selectors ---
+  const getLevels = () => {
+    // Return explicit base levels, plus any other custom levels found in materials
+    const defaultLevels = ['A1', 'A2', 'B1', 'B2'];
+    const activeLevels = new Set(materials.map(m => m.level));
+    defaultLevels.forEach(l => activeLevels.add(l));
+    return Array.from(activeLevels).sort();
   };
 
-  const handleLogout = () => {
-    if (userType === 'free') {
-      localStorage.removeItem('gls_free_user');
-      setStoredFreeUser(null);
-    }
-    resetAll();
-  };
-
-  const filteredMaterials = selectedLevel === 'All'
-    ? materials
-    : materials.filter(m => m.level === selectedLevel);
-  const uniqueLevels = ['All', ...new Set(materials.map(m => m.level))];
+  const filteredTests = materials.filter(m => m.level === selectedLevel && m.test_type === selectedCategory);
 
   return (
-    <div className="min-h-screen bg-slate-950 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-slate-950 py-12 px-4 sm:px-6 lg:px-8 flex flex-col">
 
       {/* Top Right Navigation for logged-in users & students */}
-      {((storedFreeUser && step !== 3) || (userType === 'student' && step !== 3)) && (
-        <div className="absolute top-4 right-4 sm:top-8 sm:right-8 flex items-center gap-4 z-50">
-          {storedFreeUser && (
+      {step >= 2 && step !== 5 && (
+        <div className="absolute top-4 right-4 sm:top-8 sm:right-8 flex items-center gap-4 z-40">
+          {userType === 'free' && (
             <Link href="/dashboard" className="flex items-center gap-2 text-sm text-slate-300 hover:text-white transition-colors bg-slate-900 border border-slate-800 px-4 py-2 rounded-lg shadow-lg">
               <LayoutDashboard className="w-4 h-4 text-amber-500" />
               My Progress
@@ -268,84 +291,21 @@ export default function PracticeTests() {
         </div>
       )}
 
-      {/* ───── STEP 1: Test Selection ───── */}
+      {/* ───── STEP 1: Identity Choice ───── */}
       {step === 1 && (
-        <div className="max-w-5xl mx-auto space-y-8 animate-fade-in">
+        <div className="max-w-3xl mx-auto space-y-8 animate-fade-in mt-12">
           <div className="text-center space-y-3">
             <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/30">
-              Free Practice Materials
+              Interactive Practice Tests
             </span>
-            <h1 className="text-4xl font-extrabold text-white">Interactive Practice Tests</h1>
-            <p className="text-sm text-slate-300">Test your German skills with our live grading system.</p>
-          </div>
-
-          {loading ? (
-            <div className="text-center py-12">
-              <Loader2 className="w-8 h-8 text-amber-500 animate-spin mx-auto" />
-            </div>
-          ) : (
-            <div className="space-y-6">
-              {/* Level Filter */}
-              <div className="flex flex-wrap justify-center gap-3">
-                {uniqueLevels.map(lvl => (
-                  <button
-                    key={lvl}
-                    onClick={() => setSelectedLevel(lvl)}
-                    className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${
-                      selectedLevel === lvl
-                        ? 'bg-amber-500 text-slate-950 shadow-lg'
-                        : 'bg-slate-900 text-slate-400 border border-slate-800 hover:text-white hover:border-slate-600'
-                    }`}
-                  >
-                    {lvl === 'All' ? 'All Levels' : `Level ${lvl}`}
-                  </button>
-                ))}
-              </div>
-
-              {/* Materials Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredMaterials.length === 0 ? (
-                  <div className="col-span-full text-center text-slate-500 py-12 bg-slate-900/50 rounded-2xl border border-slate-800 border-dashed">
-                    No active tests found for this level.
-                  </div>
-                ) : (
-                  filteredMaterials.map(mat => (
-                    <div key={mat.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between group hover:border-amber-500/50 transition-colors shadow-lg">
-                      <div>
-                        <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 font-extrabold flex items-center justify-center text-lg mb-4 border border-amber-500/20">
-                          {mat.level}
-                        </div>
-                        <h3 className="text-lg font-bold text-white mb-2 group-hover:text-amber-400 transition-colors">{mat.title}</h3>
-                        <p className="text-xs text-slate-400 flex items-center gap-1.5"><BookOpen className="w-3.5 h-3.5" /> {mat.test_type}</p>
-                      </div>
-                      <button
-                        onClick={() => handleSelectMaterial(mat)}
-                        className="mt-6 w-full py-2.5 rounded-xl bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-slate-300 font-bold text-sm transition-all flex items-center justify-center gap-2 group-hover:shadow-gold-glow"
-                      >
-                        Start Test <PlayCircle className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* ───── STEP 2: Identity Choice ───── */}
-      {step === 2 && !userType && (
-        <div className="max-w-3xl mx-auto space-y-8 animate-fade-in">
-          <div className="text-center space-y-2">
-            <button onClick={() => { setStep(1); setUserType(''); }} className="text-xs text-slate-400 hover:text-amber-400 mb-4 inline-block">← Back to tests</button>
-            <h2 className="text-3xl font-extrabold text-white">Before You Begin</h2>
-            <p className="text-sm text-slate-400">Selected: <strong className="text-white">{selectedMaterial?.title}</strong></p>
+            <h1 className="text-4xl font-extrabold text-white">Before You Begin</h1>
+            <p className="text-sm text-slate-300">Choose how you want to track your progress.</p>
           </div>
 
           <div className="grid sm:grid-cols-2 gap-6">
             <button
-              onClick={() => { setUserType('free'); setErrorMsg(''); }}
-              className="p-8 bg-slate-900 border border-slate-800 rounded-2xl text-center hover:border-amber-500 hover:bg-amber-500/5 transition-all group"
+              onClick={() => { setUserType('free'); setErrorMsg(''); setStep(1.1); }}
+              className="p-8 bg-slate-900 border border-slate-800 rounded-2xl text-center hover:border-amber-500 hover:bg-amber-500/5 transition-all group shadow-lg hover:shadow-amber-500/10"
             >
               <div className="w-16 h-16 mx-auto bg-amber-500/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform border border-amber-500/20">
                 <User className="w-8 h-8 text-amber-400" />
@@ -355,8 +315,8 @@ export default function PracticeTests() {
             </button>
 
             <button
-              onClick={() => { setUserType('student'); setErrorMsg(''); }}
-              className="p-8 bg-slate-900 border border-slate-800 rounded-2xl text-center hover:border-emerald-500 hover:bg-emerald-500/5 transition-all group"
+              onClick={() => { setUserType('student'); setErrorMsg(''); setStep(1.2); }}
+              className="p-8 bg-slate-900 border border-slate-800 rounded-2xl text-center hover:border-emerald-500 hover:bg-emerald-500/5 transition-all group shadow-lg hover:shadow-emerald-500/10"
             >
               <div className="w-16 h-16 mx-auto bg-emerald-500/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform border border-emerald-500/20">
                 <Key className="w-8 h-8 text-emerald-400" />
@@ -368,10 +328,10 @@ export default function PracticeTests() {
         </div>
       )}
 
-      {/* Free User Details Form */}
-      {step === 2 && userType === 'free' && (
-        <div className="max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-xl relative animate-fade-in">
-          <button onClick={() => { setUserType(''); setErrorMsg(''); }} className="absolute top-4 right-4 text-xs text-slate-500 hover:text-white">← Change</button>
+      {/* STEP 1.1: Free User Details Form */}
+      {step === 1.1 && (
+        <div className="max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-xl relative animate-fade-in mt-12">
+          <button onClick={() => { setUserType(''); setErrorMsg(''); setStep(1); }} className="absolute top-4 right-4 text-xs text-slate-500 hover:text-white">← Change</button>
           <form onSubmit={handleFreeUserSubmit} className="space-y-4">
             <div className="text-center mb-6">
               <h3 className="text-2xl font-extrabold text-white">Your Details</h3>
@@ -397,18 +357,18 @@ export default function PracticeTests() {
               <label className="block text-xs font-medium text-slate-400 mb-1">Phone Number *</label>
               <input type="text" required placeholder="+923001234567" value={freeUserForm.phone} onChange={e => setFreeUserForm({...freeUserForm, phone: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none" />
             </div>
-            <button type="submit" className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg flex items-center justify-center gap-2 mt-4">
-              Continue to Test <ArrowRight className="w-4 h-4" />
+            <button type="submit" className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg flex items-center justify-center gap-2 mt-4 transition-colors">
+              Continue to Level Selection <ArrowRight className="w-4 h-4" />
             </button>
           </form>
         </div>
       )}
 
-      {/* Student Details Form */}
-      {step === 2 && userType === 'student' && (
-        <div className="max-w-md mx-auto animate-fade-in">
+      {/* STEP 1.2: Student Details Form */}
+      {step === 1.2 && (
+        <div className="max-w-md mx-auto animate-fade-in mt-12">
           <button onClick={() => { setUserType(''); setStep(1); }} className="mb-6 text-sm text-slate-400 hover:text-white flex items-center gap-2">
-            &larr; Back to tests
+            &larr; Change User Type
           </button>
           <div className="bg-slate-900 border border-slate-800 p-8 rounded-2xl shadow-2xl">
             <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mb-6">
@@ -427,24 +387,203 @@ export default function PracticeTests() {
         </div>
       )}
 
-      {/* STEP 2.5: ENTER STUDENT NAME */}
-      {step === 2.5 && userType === 'student' && (
-        <div className="max-w-md mx-auto animate-fade-in">
-          <button onClick={() => setStep(2)} className="mb-6 text-sm text-slate-400 hover:text-white flex items-center gap-2">&larr; Back to code entry</button>
+      {/* STEP 1.3: ENTER STUDENT NAME */}
+      {step === 1.3 && (
+        <div className="max-w-md mx-auto animate-fade-in mt-12">
+          <button onClick={() => setStep(1.2)} className="mb-6 text-sm text-slate-400 hover:text-white flex items-center gap-2">&larr; Back to code entry</button>
           <div className="bg-slate-900 border border-slate-800 p-8 rounded-2xl shadow-2xl">
             <div className="w-12 h-12 bg-emerald-500/10 rounded-xl flex items-center justify-center mb-6"><User className="w-6 h-6 text-emerald-400" /></div>
             <h2 className="text-2xl font-extrabold text-white mb-2">Almost there!</h2>
             <p className="text-slate-400 text-sm mb-6">You are joining <strong className="text-emerald-400">{batchName}</strong>. Please enter your name.</p>
-            <form onSubmit={(e) => { e.preventDefault(); setStep(3); }} className="space-y-4">
+            <form onSubmit={handleStudentNameSubmit} className="space-y-4">
               <input type="text" required placeholder="John Doe" value={studentName} onChange={e => setStudentName(e.target.value)} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500" />
-              <button type="submit" className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl flex justify-center items-center gap-2"><PlayCircle className="w-5 h-5" /> Start Test</button>
+              <button type="submit" className="w-full py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl flex justify-center items-center gap-2">Continue to Level Selection <ArrowRight className="w-4 h-4" /></button>
             </form>
           </div>
         </div>
       )}
 
-      {/* ───── STEP 3: Test Runner ───── */}
+      {/* ───── STEP 2: Level Selection ───── */}
+      {step === 2 && (
+        <div className="max-w-5xl mx-auto space-y-8 animate-fade-in w-full mt-4 flex-1">
+          <div className="text-center space-y-3 mb-10">
+            <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/30">
+              Welcome, {userType === 'student' ? studentName : storedFreeUser?.name}!
+            </span>
+            <h1 className="text-4xl font-extrabold text-white">Select Your Level</h1>
+            <p className="text-sm text-slate-300">Choose the German level you want to practice.</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {getLevels().map(lvl => (
+              <button
+                key={lvl}
+                onClick={() => navigateToCategorySelection(lvl)}
+                className="group relative p-8 bg-slate-900 border border-slate-800 rounded-2xl text-center hover:border-amber-500 transition-all shadow-lg hover:-translate-y-1 hover:shadow-amber-500/20 overflow-hidden"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                <h2 className="text-5xl font-extrabold text-white mb-3 group-hover:text-amber-400 transition-colors">{lvl}</h2>
+                <p className="text-sm text-slate-400 group-hover:text-slate-300">View tests for Level {lvl}</p>
+                <div className="mt-6 flex justify-center text-amber-500 opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-2">
+                  <ArrowRight className="w-6 h-6" />
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ───── STEP 3: Category Selection ───── */}
       {step === 3 && (
+        <div className="max-w-5xl mx-auto space-y-8 animate-fade-in w-full mt-4 flex-1">
+          <div className="mb-4">
+             <button onClick={goBackToLevel} className="text-sm text-slate-400 hover:text-white flex items-center gap-2 transition-colors">
+              &larr; Back to Levels
+            </button>
+          </div>
+          <div className="text-center space-y-3 mb-10">
+            <h1 className="text-4xl font-extrabold text-white">
+              Level <span className="text-amber-500">{selectedLevel}</span> Tests
+            </h1>
+            <p className="text-sm text-slate-300">What would you like to practice today?</p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <button
+              onClick={() => navigateToContent('Vocab Test')}
+              className="p-6 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-6 hover:border-amber-500 transition-all group shadow-lg hover:shadow-amber-500/10 text-left"
+            >
+              <div className="w-16 h-16 shrink-0 bg-amber-500/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform border border-amber-500/20">
+                <Languages className="w-8 h-8 text-amber-400" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-1 group-hover:text-amber-400 transition-colors">Vocab Test</h3>
+                <p className="text-sm text-slate-400">Test your vocabulary and word meaning skills.</p>
+              </div>
+            </button>
+
+            <button
+              onClick={() => navigateToContent('Grammar Test')}
+              className="p-6 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-6 hover:border-emerald-500 transition-all group shadow-lg hover:shadow-emerald-500/10 text-left"
+            >
+              <div className="w-16 h-16 shrink-0 bg-emerald-500/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform border border-emerald-500/20">
+                <BookOpen className="w-8 h-8 text-emerald-400" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors">Grammar Test</h3>
+                <p className="text-sm text-slate-400">Practice grammar rules, sentence structure, and forms.</p>
+              </div>
+            </button>
+
+            <button
+              onClick={() => navigateToContent('Reading Test')}
+              className="p-6 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-6 hover:border-blue-500 transition-all group shadow-lg hover:shadow-blue-500/10 text-left"
+            >
+              <div className="w-16 h-16 shrink-0 bg-blue-500/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform border border-blue-500/20">
+                <BookOpen className="w-8 h-8 text-blue-400" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-1 group-hover:text-blue-400 transition-colors">Reading Test</h3>
+                <p className="text-sm text-slate-400">Improve your reading comprehension with short passages.</p>
+              </div>
+            </button>
+
+            <button
+              onClick={() => navigateToContent('Speaking Test')}
+              className="p-6 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-6 hover:border-pink-500 transition-all group shadow-lg hover:shadow-pink-500/10 text-left"
+            >
+              <div className="w-16 h-16 shrink-0 bg-pink-500/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform border border-pink-500/20">
+                <MessageCircle className="w-8 h-8 text-pink-400" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-1 group-hover:text-pink-400 transition-colors">Speaking Test</h3>
+                <p className="text-sm text-slate-400">Join our community to practice speaking with others.</p>
+              </div>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ───── STEP 4: Content (Test List, Placeholder, or WhatsApp) ───── */}
+      {step === 4 && (
+        <div className="max-w-5xl mx-auto space-y-8 animate-fade-in w-full mt-4 flex-1">
+          <div className="mb-4">
+             <button onClick={goBackToCategory} className="text-sm text-slate-400 hover:text-white flex items-center gap-2 transition-colors">
+              &larr; Back to Categories
+            </button>
+          </div>
+          <div className="text-center space-y-3 mb-10">
+            <h1 className="text-4xl font-extrabold text-white">
+              {selectedLevel} <span className="text-amber-500">{selectedCategory}</span>
+            </h1>
+          </div>
+
+          {/* Reading Test Placeholder */}
+          {selectedCategory === 'Reading Test' && (
+            <div className="text-center py-24 bg-slate-900 border border-slate-800 rounded-3xl max-w-2xl mx-auto shadow-xl">
+              <div className="w-20 h-20 mx-auto bg-blue-500/10 rounded-full flex items-center justify-center mb-6">
+                <BookOpen className="w-10 h-10 text-blue-400" />
+              </div>
+              <h2 className="text-3xl font-extrabold text-white mb-3">Coming Soon!</h2>
+              <p className="text-slate-400 max-w-md mx-auto">We are currently preparing high-quality reading materials for you. Check back later!</p>
+            </div>
+          )}
+
+          {/* Speaking Test WhatsApp Link */}
+          {selectedCategory === 'Speaking Test' && (
+            <div className="text-center py-16 bg-slate-900 border border-slate-800 rounded-3xl max-w-2xl mx-auto shadow-xl">
+              <div className="w-20 h-20 mx-auto bg-emerald-500/10 rounded-full flex items-center justify-center mb-6">
+                <MessageCircle className="w-10 h-10 text-emerald-400" />
+              </div>
+              <h2 className="text-3xl font-extrabold text-white mb-3">Practice Speaking</h2>
+              <p className="text-slate-400 max-w-md mx-auto mb-8">Ready to practice your spoken German? Join our dedicated WhatsApp group to interact with other students and teachers.</p>
+              <button 
+                onClick={() => window.open('https://chat.whatsapp.com/IfPPrtHgGxQ29Xz2Boyekd', '_blank')}
+                className="px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl flex items-center justify-center gap-3 transition shadow-lg mx-auto hover:-translate-y-1"
+              >
+                <MessageCircle className="w-5 h-5" />
+                Join Speaking Practice Group
+              </button>
+            </div>
+          )}
+
+          {/* Test List (Vocab or Grammar) */}
+          {(selectedCategory === 'Vocab Test' || selectedCategory === 'Grammar Test') && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {loading ? (
+                <div className="col-span-full text-center py-12">
+                  <Loader2 className="w-8 h-8 text-amber-500 animate-spin mx-auto" />
+                </div>
+              ) : filteredTests.length === 0 ? (
+                <div className="col-span-full text-center text-slate-500 py-12 bg-slate-900/50 rounded-2xl border border-slate-800 border-dashed">
+                  No {selectedCategory.toLowerCase()}s uploaded yet for Level {selectedLevel}.
+                </div>
+              ) : (
+                filteredTests.map(mat => (
+                  <div key={mat.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between group hover:border-amber-500/50 transition-colors shadow-lg">
+                    <div>
+                      <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 font-extrabold flex items-center justify-center text-lg mb-4 border border-amber-500/20">
+                        {mat.level}
+                      </div>
+                      <h3 className="text-lg font-bold text-white mb-2 group-hover:text-amber-400 transition-colors">{mat.title}</h3>
+                      <p className="text-xs text-slate-400 flex items-center gap-1.5"><BookOpen className="w-3.5 h-3.5" /> {mat.test_type}</p>
+                    </div>
+                    <button
+                      onClick={() => navigateToTest(mat)}
+                      className="mt-6 w-full py-2.5 rounded-xl bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-slate-300 font-bold text-sm transition-all flex items-center justify-center gap-2 group-hover:shadow-gold-glow"
+                    >
+                      Start Test <PlayCircle className="w-4 h-4" />
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ───── STEP 5: Test Runner ───── */}
+      {step === 5 && (
         <div className="fixed inset-0 z-50 bg-slate-950 flex flex-col animate-fade-in">
           {/* Top Bar */}
           <div className="h-16 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-6 shrink-0">
@@ -454,13 +593,18 @@ export default function PracticeTests() {
               <div className="px-2 py-0.5 bg-slate-800 rounded text-[10px] text-slate-400 hidden sm:block">Level {selectedMaterial?.level}</div>
             </div>
             <div className="flex items-center gap-3">
+              <button 
+                onClick={() => setStep(4)} 
+                className="px-4 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-lg border border-slate-700 transition-colors mr-4"
+              >
+                Quit Test
+              </button>
               <div className="text-xs text-slate-400 hidden sm:block">
                 {userType === 'free'
                   ? <>Logged in as: <strong className="text-white">{storedFreeUser?.name || storedFreeUser?.email}</strong></>
                   : <>Code: <strong className="text-emerald-400">{verifiedCode}</strong></>
                 }
               </div>
-
             </div>
           </div>
 
@@ -485,9 +629,9 @@ export default function PracticeTests() {
         </div>
       )}
 
-      {/* ───── STEP 4: Result Screen ───── */}
-      {step === 4 && testResult && (
-        <div className="max-w-2xl mx-auto text-center space-y-8 animate-fade-in py-12">
+      {/* ───── STEP 6: Result Screen ───── */}
+      {step === 6 && testResult && (
+        <div className="max-w-2xl mx-auto text-center space-y-8 animate-fade-in py-12 flex-1 mt-12">
 
           {/* Score card — shown to ALL users */}
           <div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center border-4 ${
@@ -517,7 +661,7 @@ export default function PracticeTests() {
                   {testResult.score} <span className="text-3xl text-slate-500">/ {testResult.totalMarks}</span>
                 </div>
                 {testResult.percentage !== null && (
-                  <div className="space-y-2">
+                  <div className="space-y-2 mt-4">
                     <div className={`text-2xl font-bold ${testResult.percentage >= 70 ? 'text-emerald-400' : testResult.percentage >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
                       {testResult.percentage}% Accuracy
                     </div>
@@ -527,7 +671,7 @@ export default function PracticeTests() {
                         style={{ width: `${testResult.percentage}%` }}
                       />
                     </div>
-                    <p className="text-xs text-slate-400">
+                    <p className="text-xs text-slate-400 pt-2">
                       {testResult.percentage >= 70 ? '🎉 Excellent! You\'re ready for the next level.' : testResult.percentage >= 50 ? '👍 Good effort! Keep practicing.' : '📚 Keep studying — you\'ll get there!'}
                     </p>
                   </div>
@@ -549,7 +693,7 @@ export default function PracticeTests() {
                 View My Progress
               </Link>
             )}
-            <button onClick={resetAll} className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-colors">
+            <button onClick={() => { resetTestSession(); setStep(4); }} className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-colors">
               Take Another Test
             </button>
           </div>

@@ -15,9 +15,13 @@ export default function PracticeTestManager() {
 
   // Materials State
   const [materials, setMaterials] = useState([]);
-  const [uploadForm, setUploadForm] = useState({ level: 'A1', title: '', test_type: 'Full Exam', is_active: true });
+  const [uploadForm, setUploadForm] = useState({ level: 'A1', title: '', test_type: 'Vocab Test', is_active: true });
   const [uploadFile, setUploadFile] = useState(null);
   const [fixingIds, setFixingIds] = useState(new Set()); // tracks which files are being fixed
+  
+  // Material Filters
+  const [matLevelFilter, setMatLevelFilter] = useState('All');
+  const [matCatFilter, setMatCatFilter] = useState('All');
   
   // Codes State
   const [codes, setCodes] = useState([]);
@@ -358,17 +362,19 @@ export default function PracticeTestManager() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-400 mb-1">Test Type</label>
+                <label className="block text-xs font-medium text-slate-400 mb-1">Category (Test Type)</label>
                 <select 
                   value={uploadForm.test_type} 
                   onChange={e => setUploadForm({...uploadForm, test_type: e.target.value})}
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
                 >
+                  <option value="Vocab Test">Vocab Test</option>
+                  <option value="Grammar Test">Grammar Test</option>
+                  <option value="Reading Test">Reading Test</option>
+                  <option value="Speaking Test">Speaking Test</option>
+                  <option value="Listening">Listening</option>
+                  <option value="Writing">Writing</option>
                   <option value="Full Exam">Full Exam</option>
-                  <option value="Reading">Reading (Lesen)</option>
-                  <option value="Listening">Listening (Hören)</option>
-                  <option value="Writing">Writing (Schreiben)</option>
-                  <option value="Grammar">Grammar / Vocab</option>
                 </select>
               </div>
               <div>
@@ -392,6 +398,31 @@ export default function PracticeTestManager() {
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-white">Uploaded Materials</h3>
               <div className="flex items-center gap-2">
+                <select
+                  value={matLevelFilter}
+                  onChange={e => setMatLevelFilter(e.target.value)}
+                  className="bg-slate-950 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                >
+                  <option value="All">All Levels</option>
+                  <option value="A1">A1</option>
+                  <option value="A2">A2</option>
+                  <option value="B1">B1</option>
+                  <option value="B2">B2</option>
+                </select>
+                <select
+                  value={matCatFilter}
+                  onChange={e => setMatCatFilter(e.target.value)}
+                  className="bg-slate-950 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500"
+                >
+                  <option value="All">All Categories</option>
+                  <option value="Vocab Test">Vocab Test</option>
+                  <option value="Grammar Test">Grammar Test</option>
+                  <option value="Reading Test">Reading Test</option>
+                  <option value="Speaking Test">Speaking Test</option>
+                  <option value="Listening">Listening</option>
+                  <option value="Writing">Writing</option>
+                  <option value="Full Exam">Full Exam</option>
+                </select>
                 <button
                   onClick={fixAllContentTypes}
                   disabled={loading || materials.length === 0}
@@ -413,18 +444,27 @@ export default function PracticeTestManager() {
                   No practice tests uploaded yet.
                 </div>
               )}
-              {materials.map(mat => (
-                <div key={mat.id} className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex items-center justify-between group">
+              {materials
+                .filter(mat => (matLevelFilter === 'All' || mat.level === matLevelFilter) && (matCatFilter === 'All' || mat.test_type === matCatFilter))
+                .map(mat => (
+                <div key={mat.id} className="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between group gap-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center font-bold text-amber-400 border border-amber-500/20">
+                    <div className="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center font-bold text-amber-400 border border-amber-500/20 shrink-0">
                       {mat.level}
                     </div>
                     <div>
                       <h4 className="font-bold text-white text-sm">{mat.title}</h4>
-                      <p className="text-xs text-slate-400">{mat.test_type} • Added {new Date(mat.created_at).toLocaleDateString()}</p>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="px-2 py-0.5 bg-slate-800 text-slate-300 text-[10px] font-bold rounded">
+                          {mat.test_type}
+                        </span>
+                        <span className="text-[10px] text-slate-500">
+                          Added {new Date(mat.created_at).toLocaleDateString()}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <button 
                       onClick={() => {
                         const link = `${window.location.origin}/practice-tests?testId=${mat.id}`;
@@ -454,7 +494,7 @@ export default function PracticeTestManager() {
                     </button>
                     <button 
                       onClick={() => toggleMaterialStatus(mat.id, mat.is_active)}
-                      className={`px-3 py-1 text-xs font-bold rounded-full border ${mat.is_active ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-slate-800 text-slate-400 border-slate-700'}`}
+                      className={`px-3 py-1 text-[10px] font-bold rounded-full border ${mat.is_active ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' : 'bg-slate-800 text-slate-400 border-slate-700'}`}
                     >
                       {mat.is_active ? 'Active' : 'Inactive'}
                     </button>
