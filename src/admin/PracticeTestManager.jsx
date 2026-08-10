@@ -25,6 +25,7 @@ export default function PracticeTestManager() {
 
   // Results State
   const [attempts, setAttempts] = useState([]);
+  const [resultsFilter, setResultsFilter] = useState('all'); // 'all' | 'anonymous' | 'student'
 
   useEffect(() => {
     if (activeTab === 'materials') fetchMaterials();
@@ -231,17 +232,22 @@ export default function PracticeTestManager() {
   };
 
   const exportMetaCSV = () => {
-    // exact Meta format: email, phone, fn, ln, country
+    // Only export anonymous users — they have name/phone/email for Meta Custom Audiences
+    const leads = attempts.filter(a => a.user_type === 'anonymous' || (!a.access_code_used && a.phone));
+    if (leads.length === 0) {
+      showMessage('No anonymous leads to export yet.', 'error');
+      return;
+    }
     let csv = 'email,phone,fn,ln,country\n';
-    attempts.forEach(a => {
-      csv += `"${a.email || ''}","${a.phone}","${a.first_name}","${a.last_name}","${a.country || 'Pakistan'}"\n`;
+    leads.forEach(a => {
+      csv += `"${a.email || ''}","${a.phone || ''}","${a.first_name || ''}","${a.last_name || ''}","${a.country || 'Pakistan'}"\n`;
     });
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `meta_custom_audience_leads_${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
+    const el = document.createElement('a');
+    el.href = url;
+    el.download = `meta_leads_${new Date().toISOString().split('T')[0]}.csv`;
+    el.click();
     window.URL.revokeObjectURL(url);
   };
 
@@ -573,88 +579,140 @@ export default function PracticeTestManager() {
       {/* --- RESULTS & LEADS TAB --- */}
       {activeTab === 'results' && (
         <div className="space-y-4 animate-fade-in">
-          <div className="flex items-center justify-between bg-slate-900 border border-slate-800 p-4 rounded-xl">
-            <div className="flex items-center gap-3">
-              <div className="relative w-64">
-                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-                <input 
-                  type="text" 
-                  placeholder="Search students..." 
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-3 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
-                />
-              </div>
+
+          {/* Filter + Search Bar */}
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-900 border border-slate-800 p-4 rounded-xl">
+            <div className="flex items-center gap-2">
+              {/* Filter Toggle */}
+              {[
+                { key: 'all', label: 'All Results' },
+                { key: 'anonymous', label: '🌐 New Leads' },
+                { key: 'student', label: '🎓 Internal Students' },
+              ].map(f => (
+                <button
+                  key={f.key}
+                  onClick={() => setResultsFilter(f.key)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                    resultsFilter === f.key
+                      ? 'bg-amber-500 text-slate-950'
+                      : 'bg-slate-800 text-slate-400 hover:text-white'
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
             </div>
             <button onClick={fetchAttempts} className="p-2 bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors text-slate-300">
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
             </button>
           </div>
 
+          {/* Stats Summary */}
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { label: 'Total Attempts', value: attempts.length, color: 'text-white' },
+              { label: 'Anonymous Leads', value: attempts.filter(a => a.user_type === 'anonymous' || (!a.access_code_used && a.phone)).length, color: 'text-blue-400' },
+              { label: 'Internal Students', value: attempts.filter(a => a.user_type === 'student' || a.access_code_used).length, color: 'text-emerald-400' },
+            ].map(s => (
+              <div key={s.label} className="bg-slate-900 border border-slate-800 rounded-xl p-3 text-center">
+                <div className={`text-2xl font-extrabold ${s.color}`}>{s.value}</div>
+                <div className="text-[10px] text-slate-500 mt-0.5">{s.label}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Results Table */}
           <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden overflow-x-auto">
             <table className="w-full text-left text-sm text-slate-300">
               <thead className="bg-slate-950 text-xs uppercase font-bold text-slate-500">
                 <tr>
-                  <th className="px-4 py-3">Student Info</th>
-                  <th className="px-4 py-3">Test Taken</th>
+                  <th className="px-4 py-3">Student</th>
+                  <th className="px-4 py-3">Test</th>
                   <th className="px-4 py-3">Score</th>
-                  <th className="px-4 py-3">Lead Type</th>
+                  <th className="px-4 py-3">%</th>
+                  <th className="px-4 py-3">Type</th>
                   <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800/50">
                 {attempts.length === 0 && !loading && (
                   <tr>
-                    <td colSpan="5" className="px-4 py-8 text-center text-slate-500">No practice tests have been taken yet.</td>
+                    <td colSpan="6" className="px-4 py-8 text-center text-slate-500">No practice tests taken yet.</td>
                   </tr>
                 )}
-                {attempts.map(attempt => (
-                  <tr key={attempt.id} className="hover:bg-slate-800/30 transition-colors">
-                    <td className="px-4 py-3">
-                      <div className="font-bold text-white">{attempt.first_name} {attempt.last_name}</div>
-                      <div className="text-xs text-slate-500">{attempt.phone} {attempt.email && `• ${attempt.email}`}</div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="text-sm font-bold text-white">
-                        {attempt.practice_materials ? attempt.practice_materials.title : 'Unknown Test'}
-                      </div>
-                      <div className="text-xs text-slate-500">
-                        Level {attempt.practice_materials?.level} • {new Date(attempt.created_at).toLocaleDateString()}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      {attempt.score === null ? (
-                        <span className="px-2 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded text-[10px] font-bold">
-                          Pending Review
-                        </span>
-                      ) : (
-                        <div className="font-bold text-white text-lg">
-                          {attempt.score} <span className="text-sm text-slate-500">/ {attempt.total_marks}</span>
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      {attempt.access_code_used ? (
-                        <span className="px-2 py-1 bg-slate-800 text-slate-400 rounded text-[10px] font-bold flex items-center gap-1 w-max">
-                          <Key className="w-3 h-3" /> Existing Student
-                        </span>
-                      ) : (
-                        <span className="px-2 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/30 rounded text-[10px] font-bold flex items-center gap-1 w-max">
-                          <Users className="w-3 h-3" /> New Lead
-                        </span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      {attempt.score === null && (
-                        <button 
-                          onClick={() => updateScore(attempt.id)}
-                          className="p-1.5 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 rounded-md transition-colors inline-flex"
-                          title="Update Score"
-                        >
-                          <Edit3 className="w-4 h-4" />
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                ))}
+                {attempts
+                  .filter(a => {
+                    if (resultsFilter === 'anonymous') return a.user_type === 'anonymous' || (!a.access_code_used && a.phone);
+                    if (resultsFilter === 'student') return a.user_type === 'student' || a.access_code_used;
+                    return true;
+                  })
+                  .map(attempt => {
+                    const isStudent = attempt.user_type === 'student' || attempt.access_code_used;
+                    const pct = attempt.percentage ?? (attempt.score != null && attempt.total_marks > 0
+                      ? Math.round((attempt.score / attempt.total_marks) * 100)
+                      : null);
+                    return (
+                      <tr key={attempt.id} className="hover:bg-slate-800/30 transition-colors">
+                        <td className="px-4 py-3">
+                          {isStudent ? (
+                            <div>
+                              <div className="font-mono text-emerald-400 font-bold text-sm">{attempt.access_code_used || '—'}</div>
+                              <div className="text-[10px] text-slate-500">Access Code</div>
+                            </div>
+                          ) : (
+                            <div>
+                              <div className="font-bold text-white">{attempt.first_name} {attempt.last_name}</div>
+                              <div className="text-xs text-slate-500">{attempt.phone}{attempt.email && ` • ${attempt.email}`}</div>
+                            </div>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="text-sm font-bold text-white">
+                            {attempt.practice_materials ? attempt.practice_materials.title : 'Unknown Test'}
+                          </div>
+                          <div className="text-xs text-slate-500">
+                            Level {attempt.practice_materials?.level} • {new Date(attempt.created_at).toLocaleDateString()}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3">
+                          {attempt.score === null ? (
+                            <span className="px-2 py-1 bg-amber-500/10 text-amber-400 border border-amber-500/30 rounded text-[10px] font-bold">Pending</span>
+                          ) : (
+                            <div className="font-bold text-white">{attempt.score} <span className="text-slate-500 font-normal">/ {attempt.total_marks}</span></div>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          {pct !== null ? (
+                            <span className={`font-bold text-sm ${
+                              pct >= 70 ? 'text-emerald-400' : pct >= 50 ? 'text-amber-400' : 'text-red-400'
+                            }`}>{pct}%</span>
+                          ) : <span className="text-slate-600">—</span>}
+                        </td>
+                        <td className="px-4 py-3">
+                          {isStudent ? (
+                            <span className="px-2 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded text-[10px] font-bold flex items-center gap-1 w-max">
+                              <Key className="w-3 h-3" /> Internal
+                            </span>
+                          ) : (
+                            <span className="px-2 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/30 rounded text-[10px] font-bold flex items-center gap-1 w-max">
+                              <Users className="w-3 h-3" /> Lead
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          {attempt.score === null && (
+                            <button
+                              onClick={() => updateScore(attempt.id)}
+                              className="p-1.5 bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 rounded-md transition-colors inline-flex"
+                              title="Update Score"
+                            >
+                              <Edit3 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
               </tbody>
             </table>
           </div>

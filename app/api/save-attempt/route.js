@@ -4,66 +4,68 @@ import { createClient } from '@supabase/supabase-js';
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { material_id, first_name, last_name, phone, email, country, score, total_marks, answers, access_code_used } = body;
+    const {
+      material_id, user_type,
+      first_name, last_name, phone, email,
+      access_code_used,
+      score, total_marks, percentage,
+      answers, country
+    } = body;
 
-    console.log('[save-attempt] Received payload:', body);
+    console.log('[save-attempt] Received:', { user_type, first_name, phone, access_code_used, score });
 
-    if (!first_name || !phone) {
-      return NextResponse.json({ error: 'first_name and phone are required' }, { status: 400 });
+    // Validate based on user_type
+    if (user_type === 'anonymous' && (!first_name || !phone)) {
+      return NextResponse.json({ error: 'first_name and phone are required for anonymous users' }, { status: 400 });
+    }
+    if (user_type === 'student' && !access_code_used) {
+      return NextResponse.json({ error: 'access_code_used is required for student users' }, { status: 400 });
     }
 
-    // Use service role to bypass RLS — students are not authenticated
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
     );
 
-    // Full payload with all columns
-    const fullPayload = {
+    const payload = {
       material_id: material_id || null,
-      first_name,
+      user_type: user_type || 'anonymous',
+      first_name: first_name || null,
       last_name: last_name || null,
-      phone,
+      phone: phone || null,
       email: email || null,
-      country: country || 'Pakistan',
+      access_code_used: access_code_used || null,
       score: score ?? null,
       total_marks: total_marks ?? null,
+      percentage: percentage ?? null,
       answers: answers || null,
-      access_code_used: access_code_used || null
+      country: country || 'Pakistan',
     };
 
-    let { data, error } = await supabase.from('practice_attempts').insert([fullPayload]).select();
+    let { data, error } = await supabase.from('practice_attempts').insert([payload]).select();
 
-    // PGRST204 = column not found in schema cache — gracefully retry with minimal required columns only
+    // PGRST204 = column missing — retry with reduced payload
     if (error && (error.code === 'PGRST204' || (error.message && error.message.includes('column')))) {
-      console.warn('[save-attempt] Schema mismatch, retrying with core columns only. Error was:', error.message);
-
+      console.warn('[save-attempt] Column missing, retrying with core fields. Error:', error.message);
       const corePayload = {
-        first_name,
-        phone,
+        user_type: user_type || 'anonymous',
         score: score ?? null,
+        ...(first_name && { first_name }),
+        ...(phone && { phone }),
+        ...(access_code_used && { access_code_used }),
+        ...(material_id && { material_id }),
       };
-      if (last_name) corePayload.last_name = last_name;
-      if (email) corePayload.email = email;
-      if (material_id) corePayload.material_id = material_id;
-      if (total_marks) corePayload.total_marks = total_marks;
-
-      const retryResult = await supabase.from('practice_attempts').insert([corePayload]).select();
-      data = retryResult.data;
-      error = retryResult.error;
+      const retry = await supabase.from('practice_attempts').insert([corePayload]).select();
+      data = retry.data;
+      error = retry.error;
     }
 
     if (error) {
-      console.error('[save-attempt] Supabase insert error:', {
-        message: error.message,
-        code: error.code,
-        details: error.details,
-        hint: error.hint
-      });
+      console.error('[save-attempt] Insert error:', { message: error.message, code: error.code, details: error.details });
       return NextResponse.json({ error: error.message, code: error.code, details: error.details }, { status: 500 });
     }
 
-    console.log('[save-attempt] Saved successfully:', data);
+    console.log('[save-attempt] Saved:', data);
     return NextResponse.json({ success: true, data });
 
   } catch (err) {

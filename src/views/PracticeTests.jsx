@@ -2,56 +2,54 @@
 
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { 
-  CheckSquare, BookOpen, Key, User, Phone, Mail, 
-  ArrowRight, Loader2, PlayCircle, CheckCircle, AlertCircle
+import {
+  CheckSquare, BookOpen, Key, User, Phone, Mail,
+  ArrowRight, Loader2, PlayCircle, CheckCircle, AlertCircle, Trophy, Star
 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function PracticeTests() {
-  const [step, setStep] = useState(1); // 1: Selection, 2: Access Check, 3: Test Runner, 4: Result
+  const [step, setStep] = useState(1); // 1: Selection, 2: Identity, 3: Test Runner, 4: Result
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
 
-  // Step 1: Materials
+  // Step 1
   const [materials, setMaterials] = useState([]);
   const [selectedLevel, setSelectedLevel] = useState('All');
   const [selectedMaterial, setSelectedMaterial] = useState(null);
 
-  // Step 2: Access Check
-  const [accessType, setAccessType] = useState(''); // 'new' or 'existing'
+  // Step 2
+  const [userType, setUserType] = useState(''); // 'anonymous' | 'student'
   const [accessCode, setAccessCode] = useState('');
-  const [studentInfo, setStudentInfo] = useState({ first_name: '', last_name: '', phone: '', email: '' });
-  const [verifiedCode, setVerifiedCode] = useState(null); // stores code if successfully verified
+  const [anonInfo, setAnonInfo] = useState({ first_name: '', last_name: '', phone: '', email: '' });
+  const [verifiedCode, setVerifiedCode] = useState(null);
+  const [studentName, setStudentName] = useState(''); // pulled from access code lookup
 
-  // Step 3: Test HTML content
+  // Step 3
   const [htmlContent, setHtmlContent] = useState('');
   const [htmlLoading, setHtmlLoading] = useState(false);
 
-  // Step 4: Result
-  const [testResult, setTestResult] = useState(null); // { score, totalMarks, isFallback }
+  // Step 4
+  const [testResult, setTestResult] = useState(null); // { score, totalMarks, percentage, userType }
 
-  useEffect(() => {
-    fetchMaterials();
-  }, []);
+  useEffect(() => { fetchMaterials(); }, []);
 
   const fetchMaterials = async () => {
     setLoading(true);
-    const { data, error } = await supabase.from('practice_materials').select('*').eq('is_active', true).order('created_at', { ascending: false });
+    const { data, error } = await supabase
+      .from('practice_materials')
+      .select('*')
+      .eq('is_active', true)
+      .order('created_at', { ascending: false });
+
     if (!error && data) {
       setMaterials(data);
-      
-      // Check if a specific testId was provided in the URL
       if (typeof window !== 'undefined') {
         const params = new URLSearchParams(window.location.search);
         const testId = params.get('testId');
         if (testId) {
           const match = data.find(m => m.id === testId);
-          if (match) {
-            setSelectedMaterial(match);
-            setAccessType('');
-            setStep(2);
-          }
+          if (match) { setSelectedMaterial(match); setStep(2); }
         }
       }
     }
@@ -60,10 +58,23 @@ export default function PracticeTests() {
 
   const handleSelectMaterial = (mat) => {
     setSelectedMaterial(mat);
-    setAccessType('');
+    setUserType('');
+    setErrorMsg('');
     setStep(2);
   };
 
+  // --- Path A: Anonymous user submits form ---
+  const startTestAsAnonymous = (e) => {
+    e.preventDefault();
+    setErrorMsg('');
+    if (!anonInfo.first_name || !anonInfo.last_name || !anonInfo.phone || !anonInfo.email) {
+      setErrorMsg('All fields are required to proceed.');
+      return;
+    }
+    setStep(3);
+  };
+
+  // --- Path B: Existing student verifies code ---
   const verifyAccessCode = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -73,71 +84,39 @@ export default function PracticeTests() {
       if (error) throw error;
       if (data && data.length > 0) {
         const student = data[0];
-        setStudentInfo({
-          first_name: student.first_name,
-          last_name: student.last_name,
-          phone: student.phone,
-          email: student.email
-        });
         setVerifiedCode(accessCode.trim());
-        setStep(3); // Start test
+        setStudentName(student.first_name || 'Student');
+        setStep(3);
       } else {
-        setErrorMsg("Code not recognized or inactive. Please check with admin.");
+        setErrorMsg('Code not recognized or inactive. Please check with admin.');
       }
     } catch (err) {
       console.error(err);
-      setErrorMsg("Error verifying code.");
+      setErrorMsg('Error verifying code. Please try again.');
     }
     setLoading(false);
   };
 
-  const startTestAsNewStudent = (e) => {
-    e.preventDefault();
-    if (!studentInfo.first_name || !studentInfo.last_name || !studentInfo.phone) {
-      setErrorMsg("Please fill in all required fields.");
-      return;
-    }
-    setVerifiedCode(null);
-    setStep(3);
-  };
-
-  // --- Step 3: Fetch HTML content + listen for postMessage ---
+  // --- Step 3: Load HTML + listen for postMessage ---
   useEffect(() => {
     if (step !== 3 || !selectedMaterial) return;
 
-    // Fetch the HTML file content and inject into iframe via srcDoc
     const loadHtml = async () => {
       setHtmlLoading(true);
       setHtmlContent('');
       try {
-        console.log('[PracticeTests] Loading test via proxy. Material ID:', selectedMaterial.id);
-        
         const res = await fetch(`/api/serve-test/${selectedMaterial.id}`);
-        
-        console.log('[PracticeTests] API response status:', res.status);
-        
         if (!res.ok) {
-          const errText = await res.text();
-          console.error('[PracticeTests] API error body:', errText);
-          
-          // Fallback: fetch directly from Supabase storage URL
-          console.log('[PracticeTests] Trying direct file_url fallback:', selectedMaterial.file_url);
+          // Fallback to direct URL
           const fallbackRes = await fetch(selectedMaterial.file_url);
-          if (!fallbackRes.ok) {
-            throw new Error(`Both proxy and direct fetch failed. Proxy: ${res.status} ${errText}. Direct: ${fallbackRes.status}`);
-          }
-          const fallbackText = await fallbackRes.text();
-          console.log('[PracticeTests] Fallback succeeded, HTML length:', fallbackText.length);
-          setHtmlContent(fallbackText);
+          if (!fallbackRes.ok) throw new Error('Failed to load test file');
+          setHtmlContent(await fallbackRes.text());
           return;
         }
-        
-        const text = await res.text();
-        console.log('[PracticeTests] Proxy succeeded, HTML length:', text.length);
-        setHtmlContent(text);
+        setHtmlContent(await res.text());
       } catch (err) {
-        console.error('[PracticeTests] Full error loading HTML test:', err);
-        alert(`Could not load the test: ${err.message}\n\nPlease check the browser console for details.`);
+        console.error('[loadHtml] Error:', err);
+        alert(`Could not load test: ${err.message}`);
         setStep(2);
       } finally {
         setHtmlLoading(false);
@@ -157,23 +136,33 @@ export default function PracticeTests() {
     return () => window.removeEventListener('message', handleMessage);
   }, [step, selectedMaterial]);
 
+  // --- Save attempt via server API (bypasses RLS) ---
   const saveAttempt = async (score, totalMarks, answers, isFallback) => {
     setLoading(true);
-    try {
-      const payload = {
-        material_id: selectedMaterial.id,
-        first_name: studentInfo.first_name,
-        last_name: studentInfo.last_name,
-        phone: studentInfo.phone,
-        email: studentInfo.email,
-        country: 'Pakistan',
-        score: isFallback ? null : score,
-        total_marks: isFallback ? null : totalMarks,
-        answers: answers || null,
-        access_code_used: verifiedCode || null
-      };
+    const percentage = (!isFallback && totalMarks > 0)
+      ? Math.round((score / totalMarks) * 100)
+      : null;
 
-      console.log('[saveAttempt] Sending payload to API:', payload);
+    const payload = {
+      material_id: selectedMaterial?.id || null,
+      user_type: userType, // 'anonymous' or 'student'
+      // Anonymous fields
+      first_name: userType === 'anonymous' ? anonInfo.first_name : null,
+      last_name: userType === 'anonymous' ? anonInfo.last_name : null,
+      phone: userType === 'anonymous' ? anonInfo.phone : null,
+      email: userType === 'anonymous' ? anonInfo.email : null,
+      // Student fields
+      access_code_used: userType === 'student' ? verifiedCode : null,
+      // Scores
+      score: isFallback ? null : score,
+      total_marks: isFallback ? null : totalMarks,
+      percentage: isFallback ? null : percentage,
+      answers: answers || null,
+      country: 'Pakistan',
+    };
+
+    try {
+      console.log('[saveAttempt] Payload:', payload);
 
       const res = await fetch('/api/save-attempt', {
         method: 'POST',
@@ -182,35 +171,46 @@ export default function PracticeTests() {
       });
 
       const result = await res.json();
-      console.log('[saveAttempt] API response:', res.status, result);
+      console.log('[saveAttempt] Response:', res.status, result);
 
-      if (!res.ok) {
-        throw new Error(`${result.error || 'Unknown error'} (code: ${result.code || res.status}, details: ${result.details || 'N/A'})`);
-      }
+      if (!res.ok) throw new Error(result.error || 'Save failed');
 
-      setTestResult({ score, totalMarks, isFallback });
+      setTestResult({ score, totalMarks, percentage, isFallback, userType });
       setStep(4);
     } catch (err) {
-      console.error('[saveAttempt] Failed:', err);
-      alert(`Error saving score:\n${err.message}\n\nPlease screenshot your result and contact admin.`);
+      console.error('[saveAttempt] Error:', err);
+      alert(`Error saving result: ${err.message}\n\nPlease screenshot your result and contact admin.`);
     }
     setLoading(false);
   };
 
-  const handleManualFallbackSubmit = () => {
-    if (window.confirm("Only click this if you have completely finished the test. Proceed?")) {
+  const handleManualSubmit = () => {
+    if (window.confirm('Submit the test now? Make sure you have finished all questions.')) {
       saveAttempt(null, null, null, true);
     }
   };
 
-  // --- Render Helpers ---
-  const filteredMaterials = selectedLevel === 'All' ? materials : materials.filter(m => m.level === selectedLevel);
+  const resetAll = () => {
+    setStep(1);
+    setUserType('');
+    setAccessCode('');
+    setAnonInfo({ first_name: '', last_name: '', phone: '', email: '' });
+    setVerifiedCode(null);
+    setStudentName('');
+    setTestResult(null);
+    setHtmlContent('');
+    setErrorMsg('');
+  };
+
+  const filteredMaterials = selectedLevel === 'All'
+    ? materials
+    : materials.filter(m => m.level === selectedLevel);
   const uniqueLevels = ['All', ...new Set(materials.map(m => m.level))];
 
   return (
     <div className="min-h-screen bg-slate-950 py-12 px-4 sm:px-6 lg:px-8">
-      
-      {/* STEP 1: Selection */}
+
+      {/* ───── STEP 1: Test Selection ───── */}
       {step === 1 && (
         <div className="max-w-5xl mx-auto space-y-8 animate-fade-in">
           <div className="text-center space-y-3">
@@ -222,9 +222,9 @@ export default function PracticeTests() {
           </div>
 
           {loading ? (
-             <div className="text-center py-12">
-               <Loader2 className="w-8 h-8 text-amber-500 animate-spin mx-auto" />
-             </div>
+            <div className="text-center py-12">
+              <Loader2 className="w-8 h-8 text-amber-500 animate-spin mx-auto" />
+            </div>
           ) : (
             <div className="space-y-6">
               {/* Level Filter */}
@@ -234,7 +234,9 @@ export default function PracticeTests() {
                     key={lvl}
                     onClick={() => setSelectedLevel(lvl)}
                     className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${
-                      selectedLevel === lvl ? 'bg-amber-500 text-slate-950 shadow-lg' : 'bg-slate-900 text-slate-400 border border-slate-800 hover:text-white hover:border-slate-600'
+                      selectedLevel === lvl
+                        ? 'bg-amber-500 text-slate-950 shadow-lg'
+                        : 'bg-slate-900 text-slate-400 border border-slate-800 hover:text-white hover:border-slate-600'
                     }`}
                   >
                     {lvl === 'All' ? 'All Levels' : `Level ${lvl}`}
@@ -258,7 +260,7 @@ export default function PracticeTests() {
                         <h3 className="text-lg font-bold text-white mb-2 group-hover:text-amber-400 transition-colors">{mat.title}</h3>
                         <p className="text-xs text-slate-400 flex items-center gap-1.5"><BookOpen className="w-3.5 h-3.5" /> {mat.test_type}</p>
                       </div>
-                      <button 
+                      <button
                         onClick={() => handleSelectMaterial(mat)}
                         className="mt-6 w-full py-2.5 rounded-xl bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-slate-300 font-bold text-sm transition-all flex items-center justify-center gap-2 group-hover:shadow-gold-glow"
                       >
@@ -273,82 +275,131 @@ export default function PracticeTests() {
         </div>
       )}
 
-      {/* STEP 2: Access Check (The Fork) */}
+      {/* ───── STEP 2: Identity Choice ───── */}
       {step === 2 && (
         <div className="max-w-3xl mx-auto space-y-8 animate-fade-in">
           <div className="text-center space-y-2">
-             <button onClick={() => { setStep(1); setAccessType(''); }} className="text-xs text-slate-400 hover:text-amber-400 mb-4 inline-block">&larr; Back to tests</button>
-             <h2 className="text-3xl font-extrabold text-white">Access Verification</h2>
-             <p className="text-sm text-slate-400">Selected Test: <strong className="text-white">{selectedMaterial?.title}</strong></p>
+            <button onClick={() => { setStep(1); setUserType(''); }} className="text-xs text-slate-400 hover:text-amber-400 mb-4 inline-block">← Back to tests</button>
+            <h2 className="text-3xl font-extrabold text-white">Before You Begin</h2>
+            <p className="text-sm text-slate-400">Selected: <strong className="text-white">{selectedMaterial?.title}</strong></p>
           </div>
 
-          {!accessType ? (
+          {/* Fork: choose path */}
+          {!userType && (
             <div className="grid sm:grid-cols-2 gap-6">
-              <button onClick={() => setAccessType('existing')} className="p-8 bg-slate-900 border border-slate-800 rounded-2xl text-center hover:border-emerald-500 hover:bg-emerald-500/5 transition-all group">
-                <div className="w-16 h-16 mx-auto bg-emerald-500/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                  <Key className="w-8 h-8 text-emerald-400" />
-                </div>
-                <h3 className="text-lg font-bold text-white mb-2">I have a Student Code</h3>
-                <p className="text-xs text-slate-400">For existing students with an access code.</p>
-              </button>
-
-              <button onClick={() => setAccessType('new')} className="p-8 bg-slate-900 border border-slate-800 rounded-2xl text-center hover:border-amber-500 hover:bg-amber-500/5 transition-all group">
-                <div className="w-16 h-16 mx-auto bg-amber-500/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              {/* New / Anonymous */}
+              <button
+                onClick={() => { setUserType('anonymous'); setErrorMsg(''); }}
+                className="p-8 bg-slate-900 border border-slate-800 rounded-2xl text-center hover:border-amber-500 hover:bg-amber-500/5 transition-all group"
+              >
+                <div className="w-16 h-16 mx-auto bg-amber-500/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform border border-amber-500/20">
                   <User className="w-8 h-8 text-amber-400" />
                 </div>
-                <h3 className="text-lg font-bold text-white mb-2">I am a New Student</h3>
-                <p className="text-xs text-slate-400">Register to take this free practice test.</p>
+                <h3 className="text-lg font-bold text-white mb-2">I'm a New Student</h3>
+                <p className="text-xs text-slate-400">Take a free practice test and see your score instantly.</p>
+                <div className="mt-4 text-xs text-amber-400 font-bold flex items-center justify-center gap-1">
+                  <Trophy className="w-3.5 h-3.5" /> Score shown after test
+                </div>
+              </button>
+
+              {/* Existing / Student with code */}
+              <button
+                onClick={() => { setUserType('student'); setErrorMsg(''); }}
+                className="p-8 bg-slate-900 border border-slate-800 rounded-2xl text-center hover:border-emerald-500 hover:bg-emerald-500/5 transition-all group"
+              >
+                <div className="w-16 h-16 mx-auto bg-emerald-500/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform border border-emerald-500/20">
+                  <Key className="w-8 h-8 text-emerald-400" />
+                </div>
+                <h3 className="text-lg font-bold text-white mb-2">I'm an Enrolled Student</h3>
+                <p className="text-xs text-slate-400">Use your student access code to begin.</p>
+                <div className="mt-4 text-xs text-emerald-400 font-bold flex items-center justify-center gap-1">
+                  <Star className="w-3.5 h-3.5" /> Results sent to teacher
+                </div>
               </button>
             </div>
-          ) : (
+          )}
+
+          {/* Forms */}
+          {userType && (
             <div className="max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl relative">
-              <button onClick={() => setAccessType('')} className="absolute top-4 right-4 text-xs text-slate-500 hover:text-white">Change</button>
-              
+              <button onClick={() => { setUserType(''); setErrorMsg(''); }} className="absolute top-4 right-4 text-xs text-slate-500 hover:text-white transition-colors">← Change</button>
+
               {errorMsg && (
-                <div className="mb-6 p-3 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start gap-2 text-red-400 text-xs">
+                <div className="mb-5 p-3 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start gap-2 text-red-400 text-xs">
                   <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                   <p>{errorMsg}</p>
                 </div>
               )}
 
-              {accessType === 'existing' ? (
-                <form onSubmit={verifyAccessCode} className="space-y-4">
-                  <h3 className="text-xl font-bold text-white mb-6">Enter Access Code</h3>
+              {/* ── Path A: Anonymous ── */}
+              {userType === 'anonymous' && (
+                <form onSubmit={startTestAsAnonymous} className="space-y-4">
                   <div>
-                    <label className="block text-xs font-medium text-slate-400 mb-1">Your Code</label>
-                    <input 
-                      type="text" required placeholder="e.g. GLS-7X2K"
-                      value={accessCode} onChange={e => setAccessCode(e.target.value.toUpperCase())}
+                    <h3 className="text-xl font-bold text-white">Your Details</h3>
+                    <p className="text-xs text-slate-400 mt-1">We'll show your score right after the test.</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-medium text-slate-400 mb-1">First Name *</label>
+                      <input
+                        type="text" required
+                        value={anonInfo.first_name}
+                        onChange={e => setAnonInfo({ ...anonInfo, first_name: e.target.value })}
+                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-slate-400 mb-1">Last Name *</label>
+                      <input
+                        type="text" required
+                        value={anonInfo.last_name}
+                        onChange={e => setAnonInfo({ ...anonInfo, last_name: e.target.value })}
+                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-400 mb-1">Phone Number * (+92...)</label>
+                    <input
+                      type="text" required placeholder="+923001234567"
+                      value={anonInfo.phone}
+                      onChange={e => setAnonInfo({ ...anonInfo, phone: e.target.value })}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-400 mb-1">Email Address *</label>
+                    <input
+                      type="email" required placeholder="you@example.com"
+                      value={anonInfo.email}
+                      onChange={e => setAnonInfo({ ...anonInfo, email: e.target.value })}
+                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none"
+                    />
+                  </div>
+                  <button type="submit" className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg transition-colors flex items-center justify-center gap-2 mt-2">
+                    Start Test Now <ArrowRight className="w-4 h-4" />
+                  </button>
+                </form>
+              )}
+
+              {/* ── Path B: Enrolled Student ── */}
+              {userType === 'student' && (
+                <form onSubmit={verifyAccessCode} className="space-y-4">
+                  <div>
+                    <h3 className="text-xl font-bold text-white">Enter Access Code</h3>
+                    <p className="text-xs text-slate-400 mt-1">Your results will be shared with your teacher.</p>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-slate-400 mb-1">Your Student Code</label>
+                    <input
+                      type="text" required placeholder="e.g. GLS-7X2KP"
+                      value={accessCode}
+                      onChange={e => setAccessCode(e.target.value.toUpperCase())}
                       className="w-full bg-slate-950 border border-slate-800 rounded-lg px-4 py-3 text-white font-mono uppercase tracking-widest focus:outline-none focus:border-emerald-500 text-center text-lg"
                     />
                   </div>
                   <button disabled={loading} type="submit" className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-lg transition-colors flex items-center justify-center gap-2">
-                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Verify & Start Test'}
-                  </button>
-                </form>
-              ) : (
-                <form onSubmit={startTestAsNewStudent} className="space-y-4">
-                  <h3 className="text-xl font-bold text-white mb-6">Student Details</h3>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-medium text-slate-400 mb-1">First Name *</label>
-                      <input type="text" required value={studentInfo.first_name} onChange={e => setStudentInfo({...studentInfo, first_name: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none" />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-slate-400 mb-1">Last Name *</label>
-                      <input type="text" required value={studentInfo.last_name} onChange={e => setStudentInfo({...studentInfo, last_name: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none" />
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-400 mb-1">Phone (+92 format) *</label>
-                    <input type="text" required placeholder="+923001234567" value={studentInfo.phone} onChange={e => setStudentInfo({...studentInfo, phone: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none" />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-400 mb-1">Email</label>
-                    <input type="email" placeholder="student@email.com" value={studentInfo.email} onChange={e => setStudentInfo({...studentInfo, email: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none" />
-                  </div>
-                  <button disabled={loading} type="submit" className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg transition-colors flex items-center justify-center gap-2 mt-4">
-                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Start Test Now'}
+                    {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : (<>Verify & Start Test <ArrowRight className="w-4 h-4" /></>)}
                   </button>
                 </form>
               )}
@@ -357,7 +408,7 @@ export default function PracticeTests() {
         </div>
       )}
 
-      {/* STEP 3: Test Runner (Iframe) */}
+      {/* ───── STEP 3: Test Runner ───── */}
       {step === 3 && (
         <div className="fixed inset-0 z-50 bg-slate-950 flex flex-col animate-fade-in">
           {/* Top Bar */}
@@ -369,10 +420,13 @@ export default function PracticeTests() {
             </div>
             <div className="flex items-center gap-3">
               <div className="text-xs text-slate-400 hidden sm:block">
-                Logged in as: <strong className="text-white">{studentInfo.first_name}</strong>
+                {userType === 'anonymous'
+                  ? <>Student: <strong className="text-white">{anonInfo.first_name}</strong></>
+                  : <>Code: <strong className="text-emerald-400">{verifiedCode}</strong></>
+                }
               </div>
-              <button 
-                onClick={handleManualFallbackSubmit}
+              <button
+                onClick={handleManualSubmit}
                 disabled={loading}
                 className="px-4 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold rounded-lg border border-red-500/30 transition-colors flex items-center gap-2"
               >
@@ -380,8 +434,8 @@ export default function PracticeTests() {
               </button>
             </div>
           </div>
-          
-          {/* Sandbox Iframe - uses srcDoc so full HTML document renders correctly in its own isolated context */}
+
+          {/* iframe */}
           <div className="flex-1 bg-white relative">
             {htmlLoading ? (
               <div className="absolute inset-0 flex items-center justify-center bg-slate-950">
@@ -402,55 +456,72 @@ export default function PracticeTests() {
         </div>
       )}
 
-      {/* STEP 4: Result Screen */}
+      {/* ───── STEP 4: Result Screen ───── */}
       {step === 4 && testResult && (
         <div className="max-w-2xl mx-auto text-center space-y-8 animate-fade-in py-12">
-          
-          <div className="w-24 h-24 mx-auto bg-emerald-500/10 rounded-full flex items-center justify-center border-4 border-emerald-500/20">
-            <CheckCircle className="w-12 h-12 text-emerald-400" />
-          </div>
 
-          <div className="space-y-4">
-            <h2 className="text-4xl font-extrabold text-white">Test Completed!</h2>
-            
-            {testResult.isFallback ? (
-              <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
-                <p className="text-slate-300">Your test attempt has been successfully submitted.</p>
-                <p className="text-sm text-slate-400 mt-2">Your score will be reviewed and updated by our team shortly.</p>
+          {/* ── Anonymous: Show full score ── */}
+          {testResult.userType === 'anonymous' && !testResult.isFallback ? (
+            <>
+              <div className="w-24 h-24 mx-auto bg-amber-500/10 rounded-full flex items-center justify-center border-4 border-amber-500/20">
+                <Trophy className="w-12 h-12 text-amber-400" />
               </div>
-            ) : (
-              <div className="p-8 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl space-y-2">
-                <p className="text-sm text-slate-400 uppercase tracking-widest font-bold">Your Score</p>
-                <div className="text-6xl font-extrabold text-amber-400 font-mono">
-                  {testResult.score} <span className="text-2xl text-slate-500">/ {testResult.totalMarks}</span>
+              <div className="space-y-2">
+                <h2 className="text-4xl font-extrabold text-white">Your Result</h2>
+                <p className="text-slate-400 text-sm">Great job completing the test, {testResult.userType === 'anonymous' ? anonInfo.first_name : ''}!</p>
+              </div>
+              <div className="p-8 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl space-y-4">
+                <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">Your Score</p>
+                <div className="text-7xl font-extrabold text-amber-400 font-mono">
+                  {testResult.score} <span className="text-3xl text-slate-500">/ {testResult.totalMarks}</span>
                 </div>
-                {testResult.totalMarks > 0 && (
-                  <div className="text-lg text-white font-bold mt-4">
-                    {Math.round((testResult.score / testResult.totalMarks) * 100)}% Accuracy
+                {testResult.percentage !== null && (
+                  <div className="space-y-2">
+                    <div className={`text-2xl font-bold ${testResult.percentage >= 70 ? 'text-emerald-400' : testResult.percentage >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
+                      {testResult.percentage}% Accuracy
+                    </div>
+                    <div className="w-full bg-slate-800 rounded-full h-3">
+                      <div
+                        className={`h-3 rounded-full transition-all duration-1000 ${testResult.percentage >= 70 ? 'bg-emerald-500' : testResult.percentage >= 50 ? 'bg-amber-500' : 'bg-red-500'}`}
+                        style={{ width: `${testResult.percentage}%` }}
+                      />
+                    </div>
+                    <p className="text-xs text-slate-400">
+                      {testResult.percentage >= 70 ? '🎉 Excellent! You\'re ready for the next level.' : testResult.percentage >= 50 ? '👍 Good effort! Keep practicing.' : '📚 Keep studying — you\'ll get there!'}
+                    </p>
                   </div>
                 )}
               </div>
-            )}
-          </div>
+            </>
+          ) : testResult.userType === 'student' || testResult.isFallback ? (
+            /* ── Student / fallback: Show success only, no score ── */
+            <>
+              <div className="w-24 h-24 mx-auto bg-emerald-500/10 rounded-full flex items-center justify-center border-4 border-emerald-500/20">
+                <CheckCircle className="w-12 h-12 text-emerald-400" />
+              </div>
+              <div className="space-y-4">
+                <h2 className="text-4xl font-extrabold text-white">Test Submitted!</h2>
+                <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
+                  <p className="text-slate-300 font-medium">Your test has been successfully submitted.</p>
+                  <p className="text-sm text-slate-400">Your teacher will review your results in the admin panel.</p>
+                  <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 rounded-full text-emerald-400 text-xs font-bold">
+                    <CheckCircle className="w-3.5 h-3.5" /> Score saved for teacher review
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : null}
 
-          <div className="flex flex-col sm:flex-row justify-center gap-4 pt-6">
-            <button 
-              onClick={() => { setStep(1); setAccessType(''); setAccessCode(''); }}
-              className="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl transition-colors"
-            >
+          <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
+            <button onClick={resetAll} className="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl transition-colors">
               Take Another Test
             </button>
-            <Link 
-              href="/"
-              className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-colors"
-            >
+            <Link href="/" className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-colors">
               Back to Homepage
             </Link>
           </div>
-          
         </div>
       )}
-
     </div>
   );
 }
