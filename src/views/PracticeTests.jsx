@@ -160,7 +160,7 @@ export default function PracticeTests() {
   const saveAttempt = async (score, totalMarks, answers, isFallback) => {
     setLoading(true);
     try {
-      const { error } = await supabase.from('practice_attempts').insert([{
+      const payload = {
         material_id: selectedMaterial.id,
         first_name: studentInfo.first_name,
         last_name: studentInfo.last_name,
@@ -171,13 +171,28 @@ export default function PracticeTests() {
         total_marks: isFallback ? null : totalMarks,
         answers: answers || null,
         access_code_used: verifiedCode || null
-      }]);
-      if (error) throw error;
+      };
+
+      console.log('[saveAttempt] Sending payload to API:', payload);
+
+      const res = await fetch('/api/save-attempt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const result = await res.json();
+      console.log('[saveAttempt] API response:', res.status, result);
+
+      if (!res.ok) {
+        throw new Error(`${result.error || 'Unknown error'} (code: ${result.code || res.status}, details: ${result.details || 'N/A'})`);
+      }
+
       setTestResult({ score, totalMarks, isFallback });
       setStep(4);
     } catch (err) {
-      console.error("Error saving attempt:", err);
-      alert("There was an error saving your score. Please take a screenshot of your result and contact admin.");
+      console.error('[saveAttempt] Failed:', err);
+      alert(`Error saving score:\n${err.message}\n\nPlease screenshot your result and contact admin.`);
     }
     setLoading(false);
   };
