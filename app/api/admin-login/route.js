@@ -26,8 +26,15 @@ export async function POST(request) {
     // 2. If valid, authenticate with the hidden system Supabase account to generate a valid RLS session
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-    const systemEmail = process.env.SYSTEM_SUPABASE_EMAIL || 'awaisalam506@gmail.com';
-    const systemPassword = process.env.SYSTEM_SUPABASE_PASSWORD || 'ranaawaisalam12345';
+    const systemEmail = process.env.SYSTEM_SUPABASE_EMAIL;
+    const systemPassword = process.env.SYSTEM_SUPABASE_PASSWORD;
+
+    if (!systemEmail || !systemPassword) {
+      return NextResponse.json(
+        { error: 'Server configuration error: SYSTEM_SUPABASE_EMAIL or SYSTEM_SUPABASE_PASSWORD not set in environment.' },
+        { status: 500 }
+      );
+    }
 
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
