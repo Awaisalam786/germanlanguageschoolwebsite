@@ -1,3 +1,4 @@
 {"timestamp":"00:00:38.307","source":"Server","level":"LOG","message":""}
 {"timestamp":"00:36:21.786","source":"Server","level":"LOG","message":"✓ Finished filesystem cache database compaction in 72s"}
 {"timestamp":"02:18:08.962","source":"Server","level":"LOG","message":"✓ Finished writing to filesystem cache in 10.2s"}
+{"timestamp":"03:38:31.739","source":"Server","level":"LOG","message":"✓ Finished filesystem cache database compaction in 34.9s"}

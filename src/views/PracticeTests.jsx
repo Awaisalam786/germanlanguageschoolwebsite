@@ -524,7 +524,14 @@ export default function PracticeTests() {
       {/* ───── STEP: Chapter Vocab Engine ───── */}
       {step === 'vocab_engine' && (
         <div className="w-full mt-4 flex-1">
-          <ChapterVocabEngine level={selectedLevel} onBack={() => setStep(3)} />
+          <ChapterVocabEngine 
+            level={selectedLevel} 
+            onBack={() => setStep(3)} 
+            userType={userType}
+            storedFreeUser={storedFreeUser}
+            studentName={studentName}
+            verifiedCode={verifiedCode}
+          />
         </div>
       )}
 

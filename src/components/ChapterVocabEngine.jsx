@@ -20,7 +20,14 @@ const UmlautKeyboard = ({ onInsert }) => {
   );
 };
 
-export default function ChapterVocabEngine({ level, onBack }) {
+export default function ChapterVocabEngine({ 
+  level, 
+  onBack, 
+  userType, 
+  storedFreeUser, 
+  studentName, 
+  verifiedCode 
+}) {
   const [chapters, setChapters] = useState([]);
   const [loading, setLoading] = useState(true);
   
@@ -34,6 +41,8 @@ export default function ChapterVocabEngine({ level, onBack }) {
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [wordResults, setWordResults] = useState([]);
 
   // Interaction State
   const [userAnswer, setUserAnswer] = useState('');
@@ -91,6 +100,7 @@ export default function ChapterVocabEngine({ level, onBack }) {
     setFinished(false);
     setFeedback(null);
     setUserAnswer('');
+    setWordResults([]);
     
     if (testMode === 'mcq') {
       generateMcqOptions(combined[0], combined);
@@ -118,6 +128,15 @@ export default function ChapterVocabEngine({ level, onBack }) {
     setFeedback(isCorrect ? 'correct' : 'incorrect');
     if (isCorrect) setScore(s => s + 1);
     
+    // Save word result
+    const currentWord = questions[currentQIndex];
+    setWordResults(prev => [...prev, {
+      german: currentWord.german,
+      english: currentWord.english,
+      userAnswer: option,
+      isCorrect
+    }]);
+
     setTimeout(() => {
       nextQuestion();
     }, 1500);
@@ -135,13 +154,23 @@ export default function ChapterVocabEngine({ level, onBack }) {
     setFeedback(isCorrect ? 'correct' : 'incorrect');
     if (isCorrect) setScore(s => s + 1);
 
+    // Save word result
+    const currentWord = questions[currentQIndex];
+    setWordResults(prev => [...prev, {
+      german: currentWord.german,
+      english: currentWord.english,
+      userAnswer: userAnswer.trim(),
+      isCorrect
+    }]);
+
     setTimeout(() => {
       nextQuestion();
     }, 2000);
   };
 
-  const nextQuestion = () => {
+  const nextQuestion = async () => {
     if (currentQIndex + 1 >= questions.length) {
+      await submitAttempt();
       setFinished(true);
     } else {
       const nextIdx = currentQIndex + 1;
@@ -152,6 +181,55 @@ export default function ChapterVocabEngine({ level, onBack }) {
         generateMcqOptions(questions[nextIdx], questions);
       }
     }
+  };
+
+  const submitAttempt = async () => {
+    setSaving(true);
+    try {
+      // Need to capture the very last result from state, but state updates might be async.
+      // We will compute final score locally if needed, but wordResults might be 1 element behind.
+      // Wait, since we update wordResults before setTimeout, it should be fully updated when nextQuestion runs.
+      
+      const totalQuestions = questions.length;
+      // Re-calculate based on actual array to avoid stale state in async flow just in case
+      let finalCorrect = 0;
+      let finalWrong = 0;
+      // We must grab from the latest state, but nextQuestion is inside a closure.
+      // Let's rely on functional updates or just use the current score state + the last question (handled by wordResults).
+      
+      // Let's let React finish state updates
+      const currentWordResults = wordResults.length === questions.length ? wordResults : [
+        ...wordResults
+      ]; // Just in case, it should be fully populated because nextQuestion runs 1.5s later.
+
+      const finalCorrectCount = currentWordResults.filter(w => w.isCorrect).length;
+      const finalPercentage = Math.round((finalCorrectCount / totalQuestions) * 100);
+
+      const payload = {
+        user_type: userType || 'free',
+        name: userType === 'student' ? studentName : storedFreeUser?.name,
+        email: userType === 'free' ? storedFreeUser?.email : null,
+        phone: userType === 'free' ? storedFreeUser?.phone : null,
+        access_code_used: userType === 'student' ? verifiedCode : null,
+        level: level,
+        chapters_selected: Array.from(selectedChapterIds),
+        test_mode: testMode,
+        total_questions: totalQuestions,
+        correct_count: finalCorrectCount,
+        wrong_count: totalQuestions - finalCorrectCount,
+        percentage: finalPercentage,
+        word_results: currentWordResults
+      };
+
+      await fetch('/api/save-vocab-attempt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    } catch (e) {
+      console.error("Failed to save attempt", e);
+    }
+    setSaving(false);
   };
 
   const handleInsertUmlaut = (char) => {
@@ -282,15 +360,47 @@ export default function ChapterVocabEngine({ level, onBack }) {
 
   // --- RESULT VIEW ---
   if (finished) {
+    if (saving) {
+      return (
+        <div className="py-24 text-center">
+          <Loader2 className="w-10 h-10 text-emerald-500 animate-spin mx-auto mb-4" />
+          <p className="text-slate-400">Saving your results...</p>
+        </div>
+      );
+    }
+
+    if (userType === 'student') {
+      return (
+        <div className="animate-fade-in max-w-2xl mx-auto space-y-8 text-center py-12">
+          <div className="w-24 h-24 mx-auto bg-emerald-500/10 border-4 border-emerald-500/20 rounded-full flex items-center justify-center">
+            <CheckCircle className="w-12 h-12 text-emerald-400" />
+          </div>
+          <h2 className="text-4xl font-extrabold text-white">Test Complete!</h2>
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-xl">
+            <p className="text-slate-300">Your score and detailed word review have been securely saved.</p>
+            <p className="text-slate-500 text-sm mt-2">Your teacher will review your performance on the admin portal.</p>
+          </div>
+          <div className="flex justify-center gap-4">
+            <button onClick={resetEngine} className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl flex items-center gap-2 transition">
+              <RotateCcw className="w-4 h-4" /> Try Again
+            </button>
+            <button onClick={onBack} className="px-6 py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl transition">
+              Exit to Menu
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     const percentage = Math.round((score / questions.length) * 100);
     return (
-      <div className="animate-fade-in max-w-2xl mx-auto space-y-8 text-center py-12">
+      <div className="animate-fade-in max-w-3xl mx-auto space-y-8 text-center py-12">
         <div className="w-24 h-24 mx-auto bg-amber-500/10 border-4 border-amber-500/20 rounded-full flex items-center justify-center">
           <Trophy className="w-12 h-12 text-amber-400" />
         </div>
         <h2 className="text-4xl font-extrabold text-white">Test Complete!</h2>
         
-        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-xl">
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-xl max-w-2xl mx-auto">
           <p className="text-sm text-slate-500 uppercase tracking-widest font-bold mb-2">Final Score</p>
           <div className="text-7xl font-mono font-extrabold text-amber-400 mb-6">
             {score} <span className="text-3xl text-slate-500">/ {questions.length}</span>
@@ -305,7 +415,26 @@ export default function ChapterVocabEngine({ level, onBack }) {
           <p className="text-slate-400 text-sm">{percentage}% Accuracy</p>
         </div>
 
-        <div className="flex justify-center gap-4">
+        {/* Detailed Review for Free Users */}
+        <div className="text-left bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl max-w-2xl mx-auto">
+          <h3 className="text-xl font-bold text-white mb-4 border-b border-slate-800 pb-2">Detailed Review</h3>
+          <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+            {wordResults.map((word, idx) => (
+              <div key={idx} className={`p-4 rounded-xl border flex items-center justify-between ${word.isCorrect ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-red-500/10 border-red-500/30'}`}>
+                <div>
+                  <p className="text-sm text-slate-400 font-bold mb-0.5">{word.english}</p>
+                  <p className="text-lg font-extrabold text-white">{word.german}</p>
+                  {!word.isCorrect && (
+                    <p className="text-xs text-red-400 mt-1">You answered: {word.userAnswer}</p>
+                  )}
+                </div>
+                {word.isCorrect ? <CheckCircle className="w-6 h-6 text-emerald-500 shrink-0" /> : <XCircle className="w-6 h-6 text-red-500 shrink-0" />}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex justify-center gap-4 pt-4">
           <button onClick={resetEngine} className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl flex items-center gap-2 transition">
             <RotateCcw className="w-4 h-4" /> Try Again
           </button>
