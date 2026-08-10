@@ -325,19 +325,24 @@ export default function PracticeTests() {
   return (
     <div className="min-h-screen bg-slate-950 py-12 px-4 sm:px-6 lg:px-8">
 
-      {/* Top Right Navigation for logged-in users */}
-      {session && step !== 3 && step !== 5 && (
-        <div className="absolute top-4 right-4 sm:top-8 sm:right-8 flex items-center gap-4">
-          <Link href="/dashboard" className="flex items-center gap-2 text-sm text-slate-300 hover:text-white transition-colors bg-slate-900 border border-slate-800 px-4 py-2 rounded-lg shadow-lg">
-            <LayoutDashboard className="w-4 h-4 text-amber-500" />
-            My Progress
-          </Link>
+      {/* Top Right Navigation for logged-in users & students */}
+      {((session && step !== 3 && step !== 5) || (userType === 'student' && step !== 3)) && (
+        <div className="absolute top-4 right-4 sm:top-8 sm:right-8 flex items-center gap-4 z-50">
+          {session && (
+            <Link href="/dashboard" className="flex items-center gap-2 text-sm text-slate-300 hover:text-white transition-colors bg-slate-900 border border-slate-800 px-4 py-2 rounded-lg shadow-lg">
+              <LayoutDashboard className="w-4 h-4 text-amber-500" />
+              My Progress
+            </Link>
+          )}
           <button 
-            onClick={async () => { await supabase.auth.signOut(); resetAll(); }}
+            onClick={async () => { 
+              if (session) await supabase.auth.signOut(); 
+              resetAll(); 
+            }}
             className="flex items-center gap-2 text-sm text-slate-400 hover:text-red-400 transition-colors bg-slate-900 border border-slate-800 px-4 py-2 rounded-lg"
           >
             <LogOut className="w-4 h-4" />
-            Logout
+            Logout {userType === 'student' ? '(Student)' : ''}
           </button>
         </div>
       )}
