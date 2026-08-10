@@ -222,11 +222,6 @@ export default function PracticeTests() {
     setLoading(false);
   };
 
-  const handleManualSubmit = () => {
-    if (window.confirm('Submit the test now? Make sure you have finished all questions.')) {
-      saveAttempt(null, null, null, true);
-    }
-  };
 
   const resetAll = () => {
     setStep(1);
@@ -465,13 +460,7 @@ export default function PracticeTests() {
                   : <>Code: <strong className="text-emerald-400">{verifiedCode}</strong></>
                 }
               </div>
-              <button
-                onClick={handleManualSubmit}
-                disabled={loading}
-                className="px-4 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs font-bold rounded-lg border border-red-500/30 transition-colors flex items-center gap-2"
-              >
-                {loading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Finish & Submit'}
-              </button>
+
             </div>
           </div>
 
