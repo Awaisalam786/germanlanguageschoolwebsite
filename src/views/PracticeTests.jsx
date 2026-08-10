@@ -24,6 +24,10 @@ export default function PracticeTests() {
   const [studentInfo, setStudentInfo] = useState({ first_name: '', last_name: '', phone: '', email: '' });
   const [verifiedCode, setVerifiedCode] = useState(null); // stores code if successfully verified
 
+  // Step 3: Test HTML content
+  const [htmlContent, setHtmlContent] = useState('');
+  const [htmlLoading, setHtmlLoading] = useState(false);
+
   // Step 4: Result
   const [testResult, setTestResult] = useState(null); // { score, totalMarks, isFallback }
 
@@ -97,12 +101,31 @@ export default function PracticeTests() {
     setStep(3);
   };
 
-  // --- Step 3: Test Runner ---
+  // --- Step 3: Fetch HTML content + listen for postMessage ---
   useEffect(() => {
-    if (step !== 3) return;
+    if (step !== 3 || !selectedMaterial) return;
+
+    // Fetch the HTML file content and inject into iframe via srcDoc
+    const loadHtml = async () => {
+      setHtmlLoading(true);
+      setHtmlContent('');
+      try {
+        const res = await fetch(`/api/serve-test/${selectedMaterial.id}`);
+        if (!res.ok) throw new Error('Failed to load test file');
+        const text = await res.text();
+        setHtmlContent(text);
+      } catch (err) {
+        console.error('Error loading HTML test:', err);
+        alert('Could not load the test. Please try again.');
+        setStep(2);
+      } finally {
+        setHtmlLoading(false);
+      }
+    };
+
+    loadHtml();
 
     const handleMessage = async (event) => {
-      // Allow any origin since HTML bundles might be hosted on Supabase Storage which has a different domain
       const data = event.data;
       if (data && data.type === 'PRACTICE_TEST_COMPLETE') {
         await saveAttempt(data.score, data.totalMarks, data.answers, false);
@@ -111,7 +134,7 @@ export default function PracticeTests() {
 
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
-  }, [step]);
+  }, [step, selectedMaterial]);
 
   const saveAttempt = async (score, totalMarks, answers, isFallback) => {
     setLoading(true);
@@ -322,14 +345,23 @@ export default function PracticeTests() {
             </div>
           </div>
           
-          {/* Sandbox Iframe */}
+          {/* Sandbox Iframe - uses srcDoc so full HTML document renders correctly in its own isolated context */}
           <div className="flex-1 bg-white relative">
-            <iframe 
-              src={selectedMaterial ? `/api/serve-test/${selectedMaterial.id}` : ''}
-              className="w-full h-full border-0"
-              sandbox="allow-scripts allow-same-origin allow-forms"
-              title="Practice Test"
-            />
+            {htmlLoading ? (
+              <div className="absolute inset-0 flex items-center justify-center bg-slate-950">
+                <div className="text-center space-y-3">
+                  <Loader2 className="w-10 h-10 text-amber-500 animate-spin mx-auto" />
+                  <p className="text-slate-400 text-sm">Loading test...</p>
+                </div>
+              </div>
+            ) : htmlContent ? (
+              <iframe
+                srcDoc={htmlContent}
+                style={{ width: '100%', height: '100%', border: 'none' }}
+                sandbox="allow-scripts allow-same-origin allow-forms"
+                title="Practice Test"
+              />
+            ) : null}
           </div>
         </div>
       )}

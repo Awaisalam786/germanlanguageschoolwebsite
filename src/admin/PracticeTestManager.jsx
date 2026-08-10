@@ -17,6 +17,7 @@ export default function PracticeTestManager() {
   const [materials, setMaterials] = useState([]);
   const [uploadForm, setUploadForm] = useState({ level: 'A1', title: '', test_type: 'Full Exam', is_active: true });
   const [uploadFile, setUploadFile] = useState(null);
+  const [fixingIds, setFixingIds] = useState(new Set()); // tracks which files are being fixed
   
   // Codes State
   const [codes, setCodes] = useState([]);
@@ -107,6 +108,43 @@ export default function PracticeTestManager() {
       showMessage("Material deleted");
       fetchMaterials();
     }
+  };
+
+  // Fix content-type of an already-uploaded file by re-uploading its content with text/html
+  const fixContentType = async (mat) => {
+    setFixingIds(prev => new Set([...prev, mat.id]));
+    try {
+      // 1. Extract storage file path from the public URL
+      const pathSegments = mat.file_url.split('/practice_tests/');
+      if (pathSegments.length < 2) throw new Error('Cannot extract file path from URL');
+      const filePath = pathSegments[1].split('?')[0]; // strip any query params
+
+      // 2. Fetch the raw HTML content
+      const res = await fetch(mat.file_url);
+      if (!res.ok) throw new Error('Failed to fetch file content');
+      const htmlText = await res.text();
+
+      // 3. Re-upload to same path with correct content-type (upsert overwrites)
+      const blob = new Blob([htmlText], { type: 'text/html; charset=utf-8' });
+      const { error: uploadError } = await supabase.storage
+        .from('practice_tests')
+        .upload(filePath, blob, { contentType: 'text/html; charset=utf-8', upsert: true });
+      if (uploadError) throw uploadError;
+
+      showMessage(`✅ Fixed content-type for "${mat.title}"`);
+    } catch (err) {
+      console.error(err);
+      showMessage(`❌ Failed to fix "${mat.title}": ${err.message}`, 'error');
+    }
+    setFixingIds(prev => { const n = new Set(prev); n.delete(mat.id); return n; });
+  };
+
+  const fixAllContentTypes = async () => {
+    if (!window.confirm(`Fix content-type for all ${materials.length} uploaded files? This is safe and non-destructive.`)) return;
+    for (const mat of materials) {
+      await fixContentType(mat);
+    }
+    showMessage('✅ All files fixed! Raw Supabase URLs will now render correctly in browser.');
   };
 
   // --- ACCESS CODES MANAGEMENT ---
@@ -340,9 +378,20 @@ export default function PracticeTestManager() {
           <div className="lg:col-span-2 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-lg font-bold text-white">Uploaded Materials</h3>
-              <button onClick={fetchMaterials} className="p-2 bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors text-slate-300">
-                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={fixAllContentTypes}
+                  disabled={loading || materials.length === 0}
+                  className="px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 text-xs font-bold rounded-lg border border-blue-500/30 transition-colors flex items-center gap-1.5 disabled:opacity-40"
+                  title="Re-upload existing files with correct text/html content-type so browser renders them properly"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  Fix All Content-Types
+                </button>
+                <button onClick={fetchMaterials} className="p-2 bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors text-slate-300">
+                  <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                </button>
+              </div>
             </div>
             
             <div className="grid gap-3">
@@ -381,6 +430,14 @@ export default function PracticeTestManager() {
                       title="Preview Student Experience on Website"
                     >
                       <ExternalLink className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => fixContentType(mat)}
+                      disabled={fixingIds.has(mat.id)}
+                      className="p-1.5 text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 rounded-md transition disabled:opacity-50"
+                      title="Fix Content-Type (re-uploads with text/html so raw URL renders correctly)"
+                    >
+                      {fixingIds.has(mat.id) ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
                     </button>
                     <button 
                       onClick={() => toggleMaterialStatus(mat.id, mat.is_active)}
