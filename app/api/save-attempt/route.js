@@ -7,12 +7,12 @@ export async function POST(request) {
     const {
       material_id, user_type,
       first_name, last_name, phone, email,
-      access_code_used,
+      access_code_used, user_id,
       score, total_marks, percentage,
       answers, country
     } = body;
 
-    console.log('[save-attempt] Received:', { user_type, first_name, phone, access_code_used, score });
+    console.log('[save-attempt] Received:', { user_type, user_id, first_name, phone, access_code_used, score });
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -50,6 +50,7 @@ export async function POST(request) {
     if (total_marks != null) fullPayload.total_marks = total_marks;
     if (percentage != null) fullPayload.percentage = percentage;
     if (answers) fullPayload.answers = answers;
+    if (user_id) fullPayload.user_id = user_id;
 
     // Also try legacy column names the table might have
     if (first_name || access_code_used) {

@@ -4,14 +4,21 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import {
   CheckSquare, BookOpen, Key, User, Phone, Mail,
-  ArrowRight, Loader2, PlayCircle, CheckCircle, AlertCircle, Trophy, Star
+  ArrowRight, Loader2, PlayCircle, CheckCircle, AlertCircle, Trophy, Star,
+  LogOut, LayoutDashboard
 } from 'lucide-react';
 import Link from 'next/link';
 
 export default function PracticeTests() {
-  const [step, setStep] = useState(1); // 1: Selection, 2: Identity, 3: Test Runner, 4: Result
+  const [step, setStep] = useState(1); // 1: Selection, 2: Identity, 3: Test Runner, 4: Result, 5: Profile Completion, 6: Check Email
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  
+  // Auth & Profile
+  const [session, setSession] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [emailInput, setEmailInput] = useState('');
+  const [profileForm, setProfileForm] = useState({ name: '', phone: '' });
 
   // Step 1
   const [materials, setMaterials] = useState([]);
@@ -19,20 +26,62 @@ export default function PracticeTests() {
   const [selectedMaterial, setSelectedMaterial] = useState(null);
 
   // Step 2
-  const [userType, setUserType] = useState(''); // 'anonymous' | 'student'
+  const [userType, setUserType] = useState(''); // 'free' | 'student'
   const [accessCode, setAccessCode] = useState('');
-  const [anonInfo, setAnonInfo] = useState({ first_name: '', last_name: '', phone: '', email: '' });
   const [verifiedCode, setVerifiedCode] = useState(null);
-  const [studentName, setStudentName] = useState(''); // pulled from access code lookup
 
   // Step 3
   const [htmlContent, setHtmlContent] = useState('');
   const [htmlLoading, setHtmlLoading] = useState(false);
 
   // Step 4
-  const [testResult, setTestResult] = useState(null); // { score, totalMarks, percentage, userType }
+  const [testResult, setTestResult] = useState(null);
 
-  useEffect(() => { fetchMaterials(); }, []);
+  useEffect(() => {
+    checkSession();
+    fetchMaterials();
+    
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session) {
+        checkProfile(session.user.id);
+      } else {
+        setProfile(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const checkSession = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    setSession(session);
+    if (session) {
+      checkProfile(session.user.id);
+    }
+  };
+
+  const checkProfile = async (userId) => {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', userId)
+      .single();
+
+    if (error && error.code !== 'PGRST116') {
+      console.error('Error fetching profile:', error);
+    }
+
+    if (data && data.name && data.phone) {
+      setProfile(data);
+      // If we were waiting for profile, go to tests
+      if (step === 5) setStep(1);
+    } else {
+      // Need to complete profile
+      setStep(5);
+    }
+  };
 
   const fetchMaterials = async () => {
     setLoading(true);
@@ -49,7 +98,16 @@ export default function PracticeTests() {
         const testId = params.get('testId');
         if (testId) {
           const match = data.find(m => m.id === testId);
-          if (match) { setSelectedMaterial(match); setStep(2); }
+          if (match) { 
+            setSelectedMaterial(match); 
+            // If already logged in and have profile, skip identity step
+            if (session && profile) {
+              setUserType('free');
+              setStep(3);
+            } else {
+              setStep(2); 
+            }
+          }
         }
       }
     }
@@ -60,18 +118,78 @@ export default function PracticeTests() {
     setSelectedMaterial(mat);
     setUserType('');
     setErrorMsg('');
-    setStep(2);
+    
+    if (session && profile) {
+      setUserType('free');
+      setStep(3);
+    } else if (session && !profile) {
+      setStep(5); // Complete profile first
+    } else {
+      setStep(2);
+    }
   };
 
-  // --- Path A: Anonymous user submits form ---
-  const startTestAsAnonymous = (e) => {
+  // --- Path A: Free User (Email Magic Link) ---
+  const handleSendMagicLink = async (e) => {
     e.preventDefault();
+    setLoading(true);
     setErrorMsg('');
-    if (!anonInfo.first_name || !anonInfo.last_name || !anonInfo.phone || !anonInfo.email) {
-      setErrorMsg('All fields are required to proceed.');
+    
+    if (!emailInput) {
+      setErrorMsg('Email is required.');
+      setLoading(false);
       return;
     }
-    setStep(3);
+
+    const redirectUrl = `${window.location.origin}/auth/callback?next=/practice-tests${selectedMaterial ? `?testId=${selectedMaterial.id}` : ''}`;
+    
+    const { error } = await supabase.auth.signInWithOtp({
+      email: emailInput,
+      options: {
+        emailRedirectTo: redirectUrl,
+      },
+    });
+
+    if (error) {
+      setErrorMsg(error.message);
+    } else {
+      setStep(6); // Show "Check your email" screen
+    }
+    setLoading(false);
+  };
+
+  const handleSaveProfile = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setErrorMsg('');
+
+    if (!profileForm.name || !profileForm.phone) {
+      setErrorMsg('Name and phone are required.');
+      setLoading(false);
+      return;
+    }
+
+    const { error } = await supabase
+      .from('profiles')
+      .upsert({
+        id: session.user.id,
+        name: profileForm.name,
+        phone: profileForm.phone,
+        email: session.user.email
+      });
+
+    if (error) {
+      setErrorMsg(error.message);
+    } else {
+      setProfile({ name: profileForm.name, phone: profileForm.phone, email: session.user.email });
+      if (selectedMaterial) {
+        setUserType('free');
+        setStep(3);
+      } else {
+        setStep(1);
+      }
+    }
+    setLoading(false);
   };
 
   // --- Path B: Existing student verifies code ---
@@ -83,9 +201,7 @@ export default function PracticeTests() {
       const { data, error } = await supabase.rpc('check_access_code', { code_input: accessCode.trim() });
       if (error) throw error;
       if (data && data.length > 0) {
-        const student = data[0];
         setVerifiedCode(accessCode.trim());
-        setStudentName(student.first_name || 'Student');
         setStep(3);
       } else {
         setErrorMsg('Code not recognized or inactive. Please check with admin.');
@@ -107,7 +223,6 @@ export default function PracticeTests() {
       try {
         const res = await fetch(`/api/serve-test/${selectedMaterial.id}`);
         if (!res.ok) {
-          // Fallback to direct URL
           const fallbackRes = await fetch(selectedMaterial.file_url);
           if (!fallbackRes.ok) throw new Error('Failed to load test file');
           setHtmlContent(await fallbackRes.text());
@@ -117,7 +232,7 @@ export default function PracticeTests() {
       } catch (err) {
         console.error('[loadHtml] Error:', err);
         alert(`Could not load test: ${err.message}`);
-        setStep(2);
+        setStep(1);
       } finally {
         setHtmlLoading(false);
       }
@@ -136,7 +251,7 @@ export default function PracticeTests() {
     return () => window.removeEventListener('message', handleMessage);
   }, [step, selectedMaterial]);
 
-  // --- Save attempt via server API (bypasses RLS) ---
+  // --- Save attempt via server API ---
   const saveAttempt = async (score, totalMarks, answers, isFallback) => {
     setLoading(true);
     const percentage = (!isFallback && totalMarks > 0)
@@ -145,14 +260,16 @@ export default function PracticeTests() {
 
     const payload = {
       material_id: selectedMaterial?.id || null,
-      user_type: userType, // 'anonymous' or 'student'
-      // Anonymous fields
-      first_name: userType === 'anonymous' ? anonInfo.first_name : null,
-      last_name: userType === 'anonymous' ? anonInfo.last_name : null,
-      phone: userType === 'anonymous' ? anonInfo.phone : null,
-      email: userType === 'anonymous' ? anonInfo.email : null,
+      user_type: userType, // 'free' or 'student'
+      // Free User fields (server API handles using session user_id)
+      // but we pass it anyway
+      user_id: userType === 'free' ? session?.user?.id : null,
+      
+      // We don't send name/phone anymore! Profiles table handles it.
+      
       // Student fields
       access_code_used: userType === 'student' ? verifiedCode : null,
+      
       // Scores
       score: isFallback ? null : score,
       total_marks: isFallback ? null : totalMarks,
@@ -162,8 +279,6 @@ export default function PracticeTests() {
     };
 
     try {
-      console.log('[saveAttempt] Payload:', payload);
-
       const res = await fetch('/api/save-attempt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -171,8 +286,6 @@ export default function PracticeTests() {
       });
 
       const result = await res.json();
-      console.log('[saveAttempt] Response:', res.status, result);
-
       if (!res.ok) throw new Error(result.error || 'Save failed');
 
       setTestResult({ score, totalMarks, percentage, isFallback, userType });
@@ -194,9 +307,7 @@ export default function PracticeTests() {
     setStep(1);
     setUserType('');
     setAccessCode('');
-    setAnonInfo({ first_name: '', last_name: '', phone: '', email: '' });
     setVerifiedCode(null);
-    setStudentName('');
     setTestResult(null);
     setHtmlContent('');
     setErrorMsg('');
@@ -209,6 +320,84 @@ export default function PracticeTests() {
 
   return (
     <div className="min-h-screen bg-slate-950 py-12 px-4 sm:px-6 lg:px-8">
+
+      {/* Top Right Navigation for logged-in users */}
+      {session && step !== 3 && step !== 5 && (
+        <div className="absolute top-4 right-4 sm:top-8 sm:right-8 flex items-center gap-4">
+          <Link href="/dashboard" className="flex items-center gap-2 text-sm text-slate-300 hover:text-white transition-colors bg-slate-900 border border-slate-800 px-4 py-2 rounded-lg shadow-lg">
+            <LayoutDashboard className="w-4 h-4 text-amber-500" />
+            My Progress
+          </Link>
+          <button 
+            onClick={async () => { await supabase.auth.signOut(); resetAll(); }}
+            className="flex items-center gap-2 text-sm text-slate-400 hover:text-red-400 transition-colors bg-slate-900 border border-slate-800 px-4 py-2 rounded-lg"
+          >
+            <LogOut className="w-4 h-4" />
+            Logout
+          </button>
+        </div>
+      )}
+
+      {/* ───── STEP 5: Profile Completion ───── */}
+      {step === 5 && (
+        <div className="max-w-md mx-auto space-y-8 animate-fade-in pt-12">
+          <div className="text-center space-y-2">
+            <h2 className="text-3xl font-extrabold text-white">Complete Your Profile</h2>
+            <p className="text-sm text-slate-400">Just one more step before you can take practice tests.</p>
+          </div>
+          
+          <form onSubmit={handleSaveProfile} className="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 shadow-xl space-y-4">
+            {errorMsg && (
+              <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start gap-2 text-red-400 text-xs">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                <p>{errorMsg}</p>
+              </div>
+            )}
+            <div>
+              <label className="block text-xs font-medium text-slate-400 mb-1">Full Name *</label>
+              <input
+                type="text" required
+                value={profileForm.name}
+                onChange={e => setProfileForm({ ...profileForm, name: e.target.value })}
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-slate-400 mb-1">Phone Number *</label>
+              <input
+                type="text" required placeholder="+923001234567"
+                value={profileForm.phone}
+                onChange={e => setProfileForm({ ...profileForm, phone: e.target.value })}
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none"
+              />
+            </div>
+            <button disabled={loading} type="submit" className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg transition-colors flex items-center justify-center gap-2 mt-2">
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Save Profile'}
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* ───── STEP 6: Check Email ───── */}
+      {step === 6 && (
+        <div className="max-w-md mx-auto text-center space-y-8 animate-fade-in pt-12">
+          <div className="w-24 h-24 mx-auto bg-blue-500/10 rounded-full flex items-center justify-center border-4 border-blue-500/20">
+            <Mail className="w-12 h-12 text-blue-400" />
+          </div>
+          <div className="space-y-4">
+            <h2 className="text-3xl font-extrabold text-white">Check Your Email</h2>
+            <p className="text-slate-400">
+              We've sent a magic login link to <strong className="text-white">{emailInput}</strong>.
+            </p>
+            <p className="text-sm text-slate-500">
+              Click the link in the email to log in and continue to your test. You can close this window.
+            </p>
+          </div>
+          <button onClick={() => setStep(2)} className="text-sm text-slate-400 hover:text-white underline">
+            Try a different email
+          </button>
+        </div>
+      )}
 
       {/* ───── STEP 1: Test Selection ───── */}
       {step === 1 && (
@@ -284,21 +473,20 @@ export default function PracticeTests() {
             <p className="text-sm text-slate-400">Selected: <strong className="text-white">{selectedMaterial?.title}</strong></p>
           </div>
 
-          {/* Fork: choose path */}
           {!userType && (
             <div className="grid sm:grid-cols-2 gap-6">
-              {/* New / Anonymous */}
+              {/* Free / Magic Link */}
               <button
-                onClick={() => { setUserType('anonymous'); setErrorMsg(''); }}
+                onClick={() => { setUserType('free'); setErrorMsg(''); }}
                 className="p-8 bg-slate-900 border border-slate-800 rounded-2xl text-center hover:border-amber-500 hover:bg-amber-500/5 transition-all group"
               >
                 <div className="w-16 h-16 mx-auto bg-amber-500/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform border border-amber-500/20">
                   <User className="w-8 h-8 text-amber-400" />
                 </div>
-                <h3 className="text-lg font-bold text-white mb-2">I'm a New Student</h3>
-                <p className="text-xs text-slate-400">Take a free practice test and see your score instantly.</p>
+                <h3 className="text-lg font-bold text-white mb-2">Free Signup / Login</h3>
+                <p className="text-xs text-slate-400">Track your progress and see your scores instantly.</p>
                 <div className="mt-4 text-xs text-amber-400 font-bold flex items-center justify-center gap-1">
-                  <Trophy className="w-3.5 h-3.5" /> Score shown after test
+                  <Trophy className="w-3.5 h-3.5" /> My Progress Dashboard
                 </div>
               </button>
 
@@ -331,53 +519,24 @@ export default function PracticeTests() {
                 </div>
               )}
 
-              {/* ── Path A: Anonymous ── */}
-              {userType === 'anonymous' && (
-                <form onSubmit={startTestAsAnonymous} className="space-y-4">
+              {/* ── Path A: Free / Magic Link ── */}
+              {userType === 'free' && (
+                <form onSubmit={handleSendMagicLink} className="space-y-4">
                   <div>
-                    <h3 className="text-xl font-bold text-white">Your Details</h3>
-                    <p className="text-xs text-slate-400 mt-1">We'll show your score right after the test.</p>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block text-xs font-medium text-slate-400 mb-1">First Name *</label>
-                      <input
-                        type="text" required
-                        value={anonInfo.first_name}
-                        onChange={e => setAnonInfo({ ...anonInfo, first_name: e.target.value })}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-medium text-slate-400 mb-1">Last Name *</label>
-                      <input
-                        type="text" required
-                        value={anonInfo.last_name}
-                        onChange={e => setAnonInfo({ ...anonInfo, last_name: e.target.value })}
-                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none"
-                      />
-                    </div>
+                    <h3 className="text-xl font-bold text-white">Login with Email</h3>
+                    <p className="text-xs text-slate-400 mt-1">We'll send you a secure magic link to log in. No password required!</p>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-400 mb-1">Phone Number * (+92...)</label>
-                    <input
-                      type="text" required placeholder="+923001234567"
-                      value={anonInfo.phone}
-                      onChange={e => setAnonInfo({ ...anonInfo, phone: e.target.value })}
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs font-medium text-slate-400 mb-1">Email Address *</label>
+                    <label className="block text-xs font-medium text-slate-400 mb-1">Email Address</label>
                     <input
                       type="email" required placeholder="you@example.com"
-                      value={anonInfo.email}
-                      onChange={e => setAnonInfo({ ...anonInfo, email: e.target.value })}
+                      value={emailInput}
+                      onChange={e => setEmailInput(e.target.value)}
                       className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none"
                     />
                   </div>
-                  <button type="submit" className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg transition-colors flex items-center justify-center gap-2 mt-2">
-                    Start Test Now <ArrowRight className="w-4 h-4" />
+                  <button disabled={loading} type="submit" className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg transition-colors flex items-center justify-center gap-2 mt-2">
+                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Send Magic Link <Mail className="w-4 h-4" /></>}
                   </button>
                 </form>
               )}
@@ -420,8 +579,8 @@ export default function PracticeTests() {
             </div>
             <div className="flex items-center gap-3">
               <div className="text-xs text-slate-400 hidden sm:block">
-                {userType === 'anonymous'
-                  ? <>Student: <strong className="text-white">{anonInfo.first_name}</strong></>
+                {userType === 'free'
+                  ? <>Logged in as: <strong className="text-white">{profile?.name || session?.user?.email}</strong></>
                   : <>Code: <strong className="text-emerald-400">{verifiedCode}</strong></>
                 }
               </div>
@@ -472,8 +631,8 @@ export default function PracticeTests() {
           <div className="space-y-2">
             <h2 className="text-4xl font-extrabold text-white">Your Result</h2>
             <p className="text-slate-400 text-sm">
-              {testResult.userType === 'anonymous'
-                ? `Great job, ${anonInfo.first_name}!`
+              {testResult.userType === 'free'
+                ? `Great job, ${profile?.name || 'Student'}!`
                 : `Test completed! Great work.`}
             </p>
           </div>
@@ -515,12 +674,14 @@ export default function PracticeTests() {
           </div>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
-            <button onClick={resetAll} className="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl transition-colors">
+            {testResult.userType === 'free' && (
+              <Link href="/dashboard" className="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl transition-colors">
+                View My Progress
+              </Link>
+            )}
+            <button onClick={resetAll} className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-colors">
               Take Another Test
             </button>
-            <Link href="/" className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-colors">
-              Back to Homepage
-            </Link>
           </div>
         </div>
       )}

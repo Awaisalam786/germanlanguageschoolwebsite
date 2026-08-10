@@ -589,46 +589,19 @@ export default function PracticeTestManager() {
       {/* --- RESULTS & LEADS TAB --- */}
       {activeTab === 'results' && (
         <div className="space-y-4 animate-fade-in">
-
-          {/* Filter + Search Bar */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-900 border border-slate-800 p-4 rounded-xl">
-            <div className="flex items-center gap-2">
-              {/* Filter Toggle */}
-              {[
-                { key: 'all', label: 'All Results' },
-                { key: 'anonymous', label: '🌐 New Leads' },
-                { key: 'student', label: '🎓 Internal Students' },
-              ].map(f => (
-                <button
-                  key={f.key}
-                  onClick={() => setResultsFilter(f.key)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                    resultsFilter === f.key
-                      ? 'bg-amber-500 text-slate-950'
-                      : 'bg-slate-800 text-slate-400 hover:text-white'
-                  }`}
-                >
-                  {f.label}
-                </button>
-              ))}
-            </div>
-            <button onClick={fetchAttempts} className="p-2 bg-slate-800 rounded-lg hover:bg-slate-700 transition-colors text-slate-300">
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-            </button>
-          </div>
-
-          {/* Stats Summary */}
-          <div className="grid grid-cols-3 gap-3">
-            {[
-              { label: 'Total Attempts', value: attempts.length, color: 'text-white' },
-              { label: 'Anonymous Leads', value: attempts.filter(a => a.user_type === 'anonymous' || (!a.access_code_used && a.phone)).length, color: 'text-blue-400' },
-              { label: 'Internal Students', value: attempts.filter(a => a.user_type === 'student' || a.access_code_used).length, color: 'text-emerald-400' },
-            ].map(s => (
-              <div key={s.label} className="bg-slate-900 border border-slate-800 rounded-xl p-3 text-center">
-                <div className={`text-2xl font-extrabold ${s.color}`}>{s.value}</div>
-                <div className="text-[10px] text-slate-500 mt-0.5">{s.label}</div>
+          <div className="grid grid-cols-2 gap-3 mb-4">
+            <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 text-center">
+              <div className="text-2xl font-extrabold text-emerald-400">
+                {attempts.filter(a => a.user_type === 'student' || a.access_code_used).length}
               </div>
-            ))}
+              <div className="text-[10px] text-slate-500 mt-0.5">Internal Students</div>
+            </div>
+            <div className="bg-slate-900 border border-slate-800 rounded-xl p-3 text-center">
+              <div className="text-2xl font-extrabold text-white">
+                {attempts.length}
+              </div>
+              <div className="text-[10px] text-slate-500 mt-0.5">Total Attempts (All Types)</div>
+            </div>
           </div>
 
           {/* Results Table */}
@@ -651,30 +624,19 @@ export default function PracticeTestManager() {
                   </tr>
                 )}
                 {attempts
-                  .filter(a => {
-                    if (resultsFilter === 'anonymous') return a.user_type === 'anonymous' || (!a.access_code_used && a.phone);
-                    if (resultsFilter === 'student') return a.user_type === 'student' || a.access_code_used;
-                    return true;
-                  })
+                  .filter(a => a.user_type === 'student' || a.access_code_used)
                   .map(attempt => {
-                    const isStudent = attempt.user_type === 'student' || attempt.access_code_used;
+                    const isStudent = true;
                     const pct = attempt.percentage ?? (attempt.score != null && attempt.total_marks > 0
                       ? Math.round((attempt.score / attempt.total_marks) * 100)
                       : null);
                     return (
                       <tr key={attempt.id} className="hover:bg-slate-800/30 transition-colors">
                         <td className="px-4 py-3">
-                          {isStudent ? (
-                            <div>
-                              <div className="font-mono text-emerald-400 font-bold text-sm">{attempt.access_code_used || '—'}</div>
-                              <div className="text-[10px] text-slate-500">Access Code</div>
-                            </div>
-                          ) : (
-                            <div>
-                              <div className="font-bold text-white">{attempt.first_name} {attempt.last_name}</div>
-                              <div className="text-xs text-slate-500">{attempt.phone}{attempt.email && ` • ${attempt.email}`}</div>
-                            </div>
-                          )}
+                          <div>
+                            <div className="font-mono text-emerald-400 font-bold text-sm">{attempt.access_code_used || '—'}</div>
+                            <div className="text-[10px] text-slate-500">Access Code</div>
+                          </div>
                         </td>
                         <td className="px-4 py-3">
                           <div className="text-sm font-bold text-white">
@@ -699,15 +661,9 @@ export default function PracticeTestManager() {
                           ) : <span className="text-slate-600">—</span>}
                         </td>
                         <td className="px-4 py-3">
-                          {isStudent ? (
-                            <span className="px-2 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded text-[10px] font-bold flex items-center gap-1 w-max">
-                              <Key className="w-3 h-3" /> Internal
-                            </span>
-                          ) : (
-                            <span className="px-2 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/30 rounded text-[10px] font-bold flex items-center gap-1 w-max">
-                              <Users className="w-3 h-3" /> Lead
-                            </span>
-                          )}
+                          <span className="px-2 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded text-[10px] font-bold flex items-center gap-1 w-max">
+                            <Key className="w-3 h-3" /> Internal
+                          </span>
                         </td>
                         <td className="px-4 py-3 text-right">
                           {attempt.score === null && (

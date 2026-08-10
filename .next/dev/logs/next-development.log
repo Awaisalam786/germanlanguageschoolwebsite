@@ -16,3 +16,9 @@
 {"timestamp":"00:11:28.889","source":"Server","level":"LOG","message":"✓ Compiled in 6.6s"}
 {"timestamp":"00:11:58.248","source":"Server","level":"LOG","message":"✓ Compiled in 2.6s"}
 {"timestamp":"00:12:33.322","source":"Server","level":"LOG","message":"✓ Compiled in 1522ms"}
+{"timestamp":"00:21:38.635","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
+{"timestamp":"00:21:41.827","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
+{"timestamp":"00:21:42.105","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
+{"timestamp":"00:21:45.969","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
+{"timestamp":"00:21:46.299","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
+{"timestamp":"00:29:37.901","source":"Server","level":"LOG","message":"✓ Finished filesystem cache database compaction in 45s"}
