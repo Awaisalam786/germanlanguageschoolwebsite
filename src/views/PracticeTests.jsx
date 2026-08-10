@@ -460,19 +460,31 @@ export default function PracticeTests() {
       {step === 4 && testResult && (
         <div className="max-w-2xl mx-auto text-center space-y-8 animate-fade-in py-12">
 
-          {/* ── Anonymous: Show full score ── */}
-          {testResult.userType === 'anonymous' && !testResult.isFallback ? (
-            <>
-              <div className="w-24 h-24 mx-auto bg-amber-500/10 rounded-full flex items-center justify-center border-4 border-amber-500/20">
-                <Trophy className="w-12 h-12 text-amber-400" />
-              </div>
-              <div className="space-y-2">
-                <h2 className="text-4xl font-extrabold text-white">Your Result</h2>
-                <p className="text-slate-400 text-sm">Great job completing the test, {testResult.userType === 'anonymous' ? anonInfo.first_name : ''}!</p>
-              </div>
-              <div className="p-8 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl space-y-4">
+          {/* Score card — shown to ALL users */}
+          <div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center border-4 ${
+            testResult.userType === 'student'
+              ? 'bg-emerald-500/10 border-emerald-500/20'
+              : 'bg-amber-500/10 border-amber-500/20'
+          }`}>
+            <Trophy className={`w-12 h-12 ${testResult.userType === 'student' ? 'text-emerald-400' : 'text-amber-400'}`} />
+          </div>
+
+          <div className="space-y-2">
+            <h2 className="text-4xl font-extrabold text-white">Your Result</h2>
+            <p className="text-slate-400 text-sm">
+              {testResult.userType === 'anonymous'
+                ? `Great job, ${anonInfo.first_name}!`
+                : `Test completed! Great work.`}
+            </p>
+          </div>
+
+          <div className="p-8 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl space-y-4">
+            {testResult.isFallback || testResult.score === null ? (
+              <p className="text-slate-300">Your test has been submitted. Your score will be reviewed shortly.</p>
+            ) : (
+              <>
                 <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">Your Score</p>
-                <div className="text-7xl font-extrabold text-amber-400 font-mono">
+                <div className={`text-7xl font-extrabold font-mono ${testResult.userType === 'student' ? 'text-emerald-400' : 'text-amber-400'}`}>
                   {testResult.score} <span className="text-3xl text-slate-500">/ {testResult.totalMarks}</span>
                 </div>
                 {testResult.percentage !== null && (
@@ -491,26 +503,16 @@ export default function PracticeTests() {
                     </p>
                   </div>
                 )}
+              </>
+            )}
+
+            {/* Internal student: show teacher note below score */}
+            {testResult.userType === 'student' && (
+              <div className="mt-2 inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 rounded-full text-emerald-400 text-xs font-bold">
+                <CheckCircle className="w-3.5 h-3.5" /> Results saved — your teacher can view your score
               </div>
-            </>
-          ) : testResult.userType === 'student' || testResult.isFallback ? (
-            /* ── Student / fallback: Show success only, no score ── */
-            <>
-              <div className="w-24 h-24 mx-auto bg-emerald-500/10 rounded-full flex items-center justify-center border-4 border-emerald-500/20">
-                <CheckCircle className="w-12 h-12 text-emerald-400" />
-              </div>
-              <div className="space-y-4">
-                <h2 className="text-4xl font-extrabold text-white">Test Submitted!</h2>
-                <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
-                  <p className="text-slate-300 font-medium">Your test has been successfully submitted.</p>
-                  <p className="text-sm text-slate-400">Your teacher will review your results in the admin panel.</p>
-                  <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 rounded-full text-emerald-400 text-xs font-bold">
-                    <CheckCircle className="w-3.5 h-3.5" /> Score saved for teacher review
-                  </div>
-                </div>
-              </div>
-            </>
-          ) : null}
+            )}
+          </div>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
             <button onClick={resetAll} className="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl transition-colors">

@@ -31,6 +31,7 @@ export default function PracticeTestManager() {
     if (activeTab === 'materials') fetchMaterials();
     if (activeTab === 'codes') fetchCodes();
     if (activeTab === 'results') fetchAttempts();
+    if (activeTab === 'leads') fetchAttempts(); // same data, filtered differently
   }, [activeTab]);
 
   const showMessage = (text, type = 'success') => {
@@ -265,13 +266,13 @@ export default function PracticeTestManager() {
             Manage materials, access codes, and Meta-ready leads.
           </p>
         </div>
-        {activeTab === 'results' && (
+        {(activeTab === 'results' || activeTab === 'leads') && (
           <button 
             onClick={exportMetaCSV}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg text-sm transition-colors flex items-center gap-2 shadow-lg"
           >
             <Download className="w-4 h-4" />
-            Export for Meta Ads (CSV)
+            Export Leads for Meta (CSV)
           </button>
         )}
       </div>
@@ -308,11 +309,20 @@ export default function PracticeTestManager() {
         <button
           onClick={() => setActiveTab('results')}
           className={`px-4 py-2 text-sm font-bold flex items-center gap-2 border-b-2 transition-colors whitespace-nowrap ${
-            activeTab === 'results' ? 'border-amber-500 text-amber-400' : 'border-transparent text-slate-400 hover:text-white'
+            activeTab === 'results' ? 'border-emerald-500 text-emerald-400' : 'border-transparent text-slate-400 hover:text-white'
           }`}
         >
           <ClipboardList className="w-4 h-4" />
-          Student Results & Leads
+          🎓 Student Results
+        </button>
+        <button
+          onClick={() => setActiveTab('leads')}
+          className={`px-4 py-2 text-sm font-bold flex items-center gap-2 border-b-2 transition-colors whitespace-nowrap ${
+            activeTab === 'leads' ? 'border-blue-500 text-blue-400' : 'border-transparent text-slate-400 hover:text-white'
+          }`}
+        >
+          <Users className="w-4 h-4" />
+          🌐 Anonymous Leads
         </button>
       </div>
 
@@ -713,6 +723,61 @@ export default function PracticeTestManager() {
                       </tr>
                     );
                   })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* --- ANONYMOUS LEADS TAB --- */}
+      {activeTab === 'leads' && (
+        <div className="space-y-4 animate-fade-in">
+          <div className="p-4 bg-blue-500/10 border border-blue-500/30 rounded-xl text-blue-300 text-sm flex items-start gap-2">
+            <Users className="w-4 h-4 mt-0.5 shrink-0" />
+            <p>These are <strong>anonymous users</strong> who took a practice test without a student code. Use this data for <strong>Facebook/Meta retargeting</strong>. No scores are shown here — only contact info.</p>
+          </div>
+
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden overflow-x-auto">
+            <table className="w-full text-left text-sm text-slate-300">
+              <thead className="bg-slate-950 text-xs uppercase font-bold text-slate-500">
+                <tr>
+                  <th className="px-4 py-3">#</th>
+                  <th className="px-4 py-3">Full Name</th>
+                  <th className="px-4 py-3">Phone</th>
+                  <th className="px-4 py-3">Email</th>
+                  <th className="px-4 py-3">Test Taken</th>
+                  <th className="px-4 py-3">Date</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/50">
+                {attempts.filter(a => a.user_type === 'anonymous' || (!a.access_code_used && a.phone)).length === 0 && !loading && (
+                  <tr>
+                    <td colSpan="6" className="px-4 py-8 text-center text-slate-500">No anonymous leads yet.</td>
+                  </tr>
+                )}
+                {attempts
+                  .filter(a => a.user_type === 'anonymous' || (!a.access_code_used && a.phone))
+                  .map((lead, idx) => (
+                    <tr key={lead.id} className="hover:bg-slate-800/30 transition-colors">
+                      <td className="px-4 py-3 text-slate-500 text-xs">{idx + 1}</td>
+                      <td className="px-4 py-3">
+                        <div className="font-bold text-white">{lead.first_name} {lead.last_name}</div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="text-slate-300">{lead.phone || '—'}</div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="text-slate-300">{lead.email || '—'}</div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="text-sm text-white">{lead.practice_materials?.title || 'Unknown'}</div>
+                        <div className="text-xs text-slate-500">Level {lead.practice_materials?.level}</div>
+                      </td>
+                      <td className="px-4 py-3 text-slate-400 text-xs whitespace-nowrap">
+                        {new Date(lead.created_at).toLocaleDateString()}
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>

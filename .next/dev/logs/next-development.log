@@ -1,8 +1,18 @@
-{"timestamp":"00:00:59.583","source":"Server","level":"LOG","message":""}
-{"timestamp":"00:01:02.760","source":"Server","level":"LOG","message":"○ Compiling /practice-tests ..."}
-{"timestamp":"00:02:41.916","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
-{"timestamp":"00:03:03.796","source":"Server","level":"LOG","message":"✓ Finished filesystem cache database compaction in 17.5s"}
-{"timestamp":"00:03:40.696","source":"Server","level":"LOG","message":"✓ Finished filesystem cache database compaction in 37.0s"}
-{"timestamp":"00:07:31.194","source":"Server","level":"LOG","message":"✓ Compiled in 9.6s"}
-{"timestamp":"00:07:59.279","source":"Server","level":"LOG","message":"✓ Compiled in 946ms"}
-{"timestamp":"07:25:26.847","source":"Server","level":"LOG","message":"✓ Compiled in 13.8s"}
+{"timestamp":"00:00:46.028","source":"Server","level":"LOG","message":""}
+{"timestamp":"00:01:09.753","source":"Server","level":"LOG","message":"○ Compiling /practice-tests ..."}
+{"timestamp":"00:02:13.743","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
+{"timestamp":"00:02:14.447","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
+{"timestamp":"00:02:14.619","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
+{"timestamp":"00:02:40.063","source":"Server","level":"LOG","message":"[serve-test] Received ID: \"db0e346f-253e-4caa-90b1-727fc50cfe28\""}
+{"timestamp":"00:02:41.000","source":"Server","level":"LOG","message":"[serve-test] DB result: {} \"Error:\" null"}
+{"timestamp":"00:02:41.003","source":"Server","level":"LOG","message":"[serve-test] Fetching file from URL: \"https://owczimivgmivvmsqxpko.supabase.co/storage/v1/object/public/practice_tests/A1/1786321446395_4fq1c.html\""}
+{"timestamp":"00:02:41.283","source":"Server","level":"LOG","message":"[serve-test] HTML loaded, length: 784443"}
+{"timestamp":"00:03:06.927","source":"Browser","level":"LOG","message":"[saveAttempt] Payload: {\"access_code_used\":null,\"answers\":null,\"country\":\"Pakistan\",\"email\":\"aw@gmail.com\",\"first_name\":\"12\",\"last_name\":\"12\",\"material_id\":\"db0e346f-253e-4caa-90b1-727fc50cfe28\",\"percentage\":null,\"phone\":\"12\",\"score\":null,\"total_marks\":null,\"user_type\":\"anonymous\"}"}
+{"timestamp":"00:03:07.085","source":"Server","level":"LOG","message":"[save-attempt] Received: {}"}
+{"timestamp":"00:03:07.964","source":"Server","level":"WARN","message":"[save-attempt] Full insert failed: \"null value in column \\\"student_phone\\\" of relation \\\"practice_attempts\\\" violates not-null constraint\" \"— stripping unknown columns...\""}
+{"timestamp":"00:03:07.965","source":"Server","level":"LOG","message":"[save-attempt] Filling required NOT NULL col: \"student_phone\" \"=\" \"12 12\""}
+{"timestamp":"00:03:08.195","source":"Server","level":"LOG","message":"[save-attempt] Saved successfully"}
+{"timestamp":"00:03:08.237","source":"Browser","level":"LOG","message":"[saveAttempt] Response: 200 {\"data\":[{\"access_code_used\":null,\"answers\":null,\"country\":\"Pakistan\",\"created_at\":\"2026-08-10T08:34:52.526438+00:00\",\"email\":\"aw@gmail.com\",\"first_name\":\"12\",\"id\":\"b852eb5c-edab-465e-bdec-db0120abb75e\",\"last_name\":\"12\",\"material_id\":\"db0e346f-253e-4caa-90b1-727fc50cfe28\",\"percentage\":null,\"phone\":\"12\",\"score\":null,\"student_email\":null,\"student_name\":\"12 12\",\"student_phone\":\"12 12\",\"total_marks\":null,\"user_type\":\"anonymous\"}],\"success\":true}"}
+{"timestamp":"00:11:28.889","source":"Server","level":"LOG","message":"✓ Compiled in 6.6s"}
+{"timestamp":"00:11:58.248","source":"Server","level":"LOG","message":"✓ Compiled in 2.6s"}
+{"timestamp":"00:12:33.322","source":"Server","level":"LOG","message":"✓ Compiled in 1522ms"}
