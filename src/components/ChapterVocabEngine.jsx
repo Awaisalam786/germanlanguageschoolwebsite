@@ -179,15 +179,19 @@ export default function ChapterVocabEngine({
     e.preventDefault();
     if (feedback || !userAnswer.trim()) return;
 
-    // Check with basic normalization (case insensitive, trim spaces)
-    const normalizedUser = userAnswer.trim().toLowerCase();
+    // Helper to normalize strings: lowercases, trims space, removes trailing punctuation (.,;!?)
+    const normalizeAnswer = (str) => {
+      return str.trim().toLowerCase().replace(/[.,;!?]+$/, '');
+    };
+
+    const normalizedUser = normalizeAnswer(userAnswer);
     
     // For type_en, the correct answer is the english field, for type_de it's the german field
     const correctStr = questions[currentQIndex].testFormat === 'type_en' 
       ? questions[currentQIndex].english 
       : questions[currentQIndex].german;
       
-    const normalizedCorrect = correctStr.trim().toLowerCase();
+    const normalizedCorrect = normalizeAnswer(correctStr);
     
     const isCorrect = normalizedUser === normalizedCorrect;
     setFeedback(isCorrect ? 'correct' : 'incorrect');
