@@ -33,6 +33,7 @@ export default function ChapterVocabEngine({
   
   // Setup Mode State
   const [selectedChapterCount, setSelectedChapterCount] = useState(1);
+  const [sessionTime, setSessionTime] = useState(10); // 10, 20, 30 minutes
   
   // Test Run State
   const [testStarted, setTestStarted] = useState(false);
@@ -42,6 +43,7 @@ export default function ChapterVocabEngine({
   const [finished, setFinished] = useState(false);
   const [saving, setSaving] = useState(false);
   const [wordResults, setWordResults] = useState([]);
+  const [timeLeft, setTimeLeft] = useState(null); // seconds remaining
 
   // Interaction State
   const [userAnswer, setUserAnswer] = useState('');
@@ -74,6 +76,18 @@ export default function ChapterVocabEngine({
     }
     setLoading(false);
   };
+  
+  // Timer Countdown Effect
+  useEffect(() => {
+    if (testStarted && !finished && timeLeft !== null && timeLeft > 0) {
+      const timerId = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
+      return () => clearInterval(timerId);
+    } else if (timeLeft === 0 && !finished && !saving) {
+      // Time's up! Auto-submit
+      submitAttempt();
+      setFinished(true);
+    }
+  }, [testStarted, finished, timeLeft, saving]);
 
 
   const startTest = () => {
@@ -93,6 +107,9 @@ export default function ChapterVocabEngine({
       return;
     }
 
+    // Determine target question count based on session time (avg 20s per question)
+    const targetQCount = sessionTime === 10 ? 30 : sessionTime === 20 ? 60 : 90;
+
     // Distribute randomly across the 3 formats (mcq, type_de, type_en)
     const formats = ['mcq', 'type_de', 'type_en'];
     let fIdx = 0;
@@ -105,6 +122,9 @@ export default function ChapterVocabEngine({
     // Shuffle again to randomize the format sequence
     combined = combined.sort(() => Math.random() - 0.5);
     
+    // Trim to the target count
+    combined = combined.slice(0, targetQCount);
+    
     setQuestions(combined);
     setTestStarted(true);
     setCurrentQIndex(0);
@@ -113,6 +133,7 @@ export default function ChapterVocabEngine({
     setFeedback(null);
     setUserAnswer('');
     setWordResults([]);
+    setTimeLeft(sessionTime * 60); // Set timer in seconds
     
     if (combined[0].testFormat === 'mcq') {
       generateMcqOptions(combined[0], combined);
@@ -257,6 +278,7 @@ export default function ChapterVocabEngine({
   const resetEngine = () => {
     setTestStarted(false);
     setFinished(false);
+    setTimeLeft(null);
   };
 
   if (loading) {
@@ -331,31 +353,46 @@ export default function ChapterVocabEngine({
               </div>
             </div>
 
-            {/* Right: Info Box */}
+            {/* Right: Info & Settings */}
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col">
               <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                <List className="w-5 h-5 text-emerald-400" /> Mixed Format Test
+                <List className="w-5 h-5 text-emerald-400" /> Session Settings
               </h2>
               
-              <div className="space-y-4 mb-auto text-slate-400 text-sm">
-                <p>To maximize your retention, this test automatically mixes three formats:</p>
+              <div className="mb-6">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Session Timer</label>
+                <div className="grid grid-cols-3 gap-3">
+                  {[10, 20, 30].map(time => (
+                    <button
+                      key={time}
+                      onClick={() => setSessionTime(time)}
+                      className={`py-3 rounded-xl border text-sm font-bold transition-all ${
+                        sessionTime === time
+                          ? 'bg-amber-500 text-slate-900 border-amber-500'
+                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-600'
+                      }`}
+                    >
+                      {time} min
+                    </button>
+                  ))}
+                </div>
+                <p className="text-xs text-slate-500 mt-2">
+                  This determines the length of the timer and automatically pulls {sessionTime === 10 ? '30' : sessionTime === 20 ? '60' : '90'} random questions from your selected pool to fit the time limit.
+                </p>
+              </div>
+              
+              <div className="space-y-4 mb-auto text-slate-400 text-sm border-t border-slate-800 pt-4">
+                <p>This test automatically mixes three formats:</p>
                 <ul className="space-y-3 mt-4">
                   <li className="flex items-start gap-3">
-                    <CheckSquare className="w-5 h-5 text-amber-500 shrink-0" />
+                    <CheckSquare className="w-5 h-5 text-emerald-500 shrink-0" />
                     <span><strong>Multiple Choice:</strong> Select correct German word.</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <Type className="w-5 h-5 text-emerald-500 shrink-0" />
-                    <span><strong>Typing (German):</strong> Translate English to German.</span>
-                  </li>
-                  <li className="flex items-start gap-3">
                     <Type className="w-5 h-5 text-blue-500 shrink-0" />
-                    <span><strong>Typing (English):</strong> Translate German to English.</span>
+                    <span><strong>Typing:</strong> Translate in both directions.</span>
                   </li>
                 </ul>
-                <p className="mt-4 pt-4 border-t border-slate-800 text-xs text-slate-500">
-                  Every selected word will appear exactly once, assigned randomly to one of these formats.
-                </p>
               </div>
 
               <button
@@ -494,17 +531,34 @@ export default function ChapterVocabEngine({
   // --- TEST RUNNER VIEW ---
   const currentQ = questions[currentQIndex];
   
+  const formatTime = (seconds) => {
+    if (seconds === null) return "00:00";
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+  };
+
   return (
     <div className="animate-fade-in max-w-3xl mx-auto flex flex-col min-h-[60vh]">
       <div className="flex items-center justify-between mb-8">
-        <button onClick={resetEngine} className="text-xs text-slate-400 hover:text-white px-3 py-1.5 bg-slate-900 rounded-lg border border-slate-800">
+        <button onClick={resetEngine} className="text-xs text-slate-400 hover:text-white px-3 py-1.5 bg-slate-900 rounded-lg border border-slate-800 transition">
           Quit
         </button>
         <div className="text-sm font-bold text-slate-300">
           Question {currentQIndex + 1} of {questions.length}
         </div>
-        <div className="text-xs font-mono bg-amber-500/10 text-amber-400 px-3 py-1.5 rounded-lg border border-amber-500/20">
-          Score: {score}
+        <div className="flex items-center gap-3">
+          {/* Countdown Timer Badge */}
+          <div className={`text-xs font-mono px-3 py-1.5 rounded-lg border ${
+            timeLeft !== null && timeLeft <= 60 
+              ? 'bg-red-500/10 text-red-400 border-red-500/20 animate-pulse' 
+              : 'bg-slate-800 text-slate-300 border-slate-700'
+          }`}>
+            Time: {formatTime(timeLeft)}
+          </div>
+          <div className="text-xs font-mono bg-amber-500/10 text-amber-400 px-3 py-1.5 rounded-lg border border-amber-500/20">
+            Score: {score}
+          </div>
         </div>
       </div>
 
