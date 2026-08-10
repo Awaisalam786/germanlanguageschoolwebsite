@@ -268,7 +268,14 @@ export default function PracticeTests() {
     return Array.from(activeLevels).sort();
   };
 
-  const filteredTests = materials.filter(m => m.level === selectedLevel && m.test_type === selectedCategory);
+  const extractChapterNumber = (title) => {
+    const match = title.match(/Chapter\s*(\d+)/i);
+    return match ? parseInt(match[1], 10) : 999;
+  };
+
+  const filteredTests = materials
+    .filter(m => m.level === selectedLevel && m.test_type === selectedCategory)
+    .sort((a, b) => extractChapterNumber(a.title) - extractChapterNumber(b.title));
 
   return (
     <div className="min-h-screen bg-slate-950 py-12 px-4 sm:px-6 lg:px-8 flex flex-col">
@@ -591,19 +598,34 @@ export default function PracticeTests() {
                 </div>
               ) : (
                 filteredTests.map(mat => (
-                  <div key={mat.id} className="bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between group hover:border-amber-500/50 transition-colors shadow-lg">
-                    <div>
-                      <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 font-extrabold flex items-center justify-center text-lg mb-4 border border-amber-500/20">
-                        {mat.level}
+                  <div 
+                    key={mat.id} 
+                    className="group relative bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between hover:border-amber-500 transition-all shadow-lg hover:-translate-y-1 hover:shadow-amber-500/20 overflow-hidden"
+                  >
+                    {/* Subtle gradient overlay on hover */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                    
+                    <div className="relative z-10">
+                      <div className="flex justify-between items-start mb-6">
+                        <div className="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 font-extrabold flex items-center justify-center text-xl border border-amber-500/30 shadow-inner">
+                          {mat.level}
+                        </div>
+                        <span className="px-3 py-1 bg-slate-950 border border-slate-800 rounded-full text-[10px] uppercase tracking-widest text-slate-400 font-bold flex items-center gap-1.5">
+                          <BookOpen className="w-3 h-3 text-emerald-400" /> {mat.test_type}
+                        </span>
                       </div>
-                      <h3 className="text-lg font-bold text-white mb-2 group-hover:text-amber-400 transition-colors">{mat.title}</h3>
-                      <p className="text-xs text-slate-400 flex items-center gap-1.5"><BookOpen className="w-3.5 h-3.5" /> {mat.test_type}</p>
+                      
+                      <h3 className="text-xl font-playfair font-bold text-white mb-2 group-hover:text-amber-400 transition-colors">
+                        {mat.title}
+                      </h3>
                     </div>
+
                     <button
                       onClick={() => navigateToTest(mat)}
-                      className="mt-6 w-full py-2.5 rounded-xl bg-slate-800 hover:bg-amber-500 hover:text-slate-950 text-slate-300 font-bold text-sm transition-all flex items-center justify-center gap-2 group-hover:shadow-gold-glow"
+                      className="relative z-10 mt-8 w-full py-3.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-amber-500 hover:bg-amber-500 hover:text-slate-950 text-slate-300 font-bold text-sm transition-all flex items-center justify-center gap-2 group-hover:shadow-lg"
                     >
-                      Start Test <PlayCircle className="w-4 h-4" />
+                      Start Test 
+                      <PlayCircle className="w-4 h-4 group-hover:scale-110 transition-transform" />
                     </button>
                   </div>
                 ))
