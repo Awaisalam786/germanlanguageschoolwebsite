@@ -110,13 +110,34 @@ export default function PracticeTests() {
       setHtmlLoading(true);
       setHtmlContent('');
       try {
+        console.log('[PracticeTests] Loading test via proxy. Material ID:', selectedMaterial.id);
+        
         const res = await fetch(`/api/serve-test/${selectedMaterial.id}`);
-        if (!res.ok) throw new Error('Failed to load test file');
+        
+        console.log('[PracticeTests] API response status:', res.status);
+        
+        if (!res.ok) {
+          const errText = await res.text();
+          console.error('[PracticeTests] API error body:', errText);
+          
+          // Fallback: fetch directly from Supabase storage URL
+          console.log('[PracticeTests] Trying direct file_url fallback:', selectedMaterial.file_url);
+          const fallbackRes = await fetch(selectedMaterial.file_url);
+          if (!fallbackRes.ok) {
+            throw new Error(`Both proxy and direct fetch failed. Proxy: ${res.status} ${errText}. Direct: ${fallbackRes.status}`);
+          }
+          const fallbackText = await fallbackRes.text();
+          console.log('[PracticeTests] Fallback succeeded, HTML length:', fallbackText.length);
+          setHtmlContent(fallbackText);
+          return;
+        }
+        
         const text = await res.text();
+        console.log('[PracticeTests] Proxy succeeded, HTML length:', text.length);
         setHtmlContent(text);
       } catch (err) {
-        console.error('Error loading HTML test:', err);
-        alert('Could not load the test. Please try again.');
+        console.error('[PracticeTests] Full error loading HTML test:', err);
+        alert(`Could not load the test: ${err.message}\n\nPlease check the browser console for details.`);
         setStep(2);
       } finally {
         setHtmlLoading(false);
