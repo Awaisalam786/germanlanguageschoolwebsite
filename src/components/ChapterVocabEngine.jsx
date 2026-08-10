@@ -54,11 +54,19 @@ export default function ChapterVocabEngine({
 
   const fetchChapters = async () => {
     setLoading(true);
+    console.log(`[ChapterVocabEngine] Fetching chapters for level: "${level}"`);
+
     const { data, error } = await supabase
       .from('vocab_chapters')
       .select('id, chapter_number, word_count, json_data')
       .eq('level', level)
       .order('chapter_number', { ascending: true });
+      
+    console.log(`[ChapterVocabEngine] Query returned:`, { data, error });
+
+    if (error) {
+      console.error(`[ChapterVocabEngine] Error fetching chapters:`, error);
+    }
       
     if (!error && data) {
       setChapters(data);
