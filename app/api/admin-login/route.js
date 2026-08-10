@@ -27,7 +27,7 @@ export async function POST(request) {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     const systemEmail = process.env.SYSTEM_SUPABASE_EMAIL || 'awaisalam506@gmail.com';
-    const systemPassword = process.env.SYSTEM_SUPABASE_PASSWORD || 'password123';
+    const systemPassword = process.env.SYSTEM_SUPABASE_PASSWORD || 'ranaawaisalam12345';
 
     const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
