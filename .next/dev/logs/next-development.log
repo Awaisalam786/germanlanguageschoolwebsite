@@ -22,3 +22,5 @@
 {"timestamp":"00:21:45.969","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
 {"timestamp":"00:21:46.299","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
 {"timestamp":"00:29:37.901","source":"Server","level":"LOG","message":"✓ Finished filesystem cache database compaction in 45s"}
+{"timestamp":"00:38:13.965","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
+{"timestamp":"00:38:20.409","source":"Server","level":"LOG","message":"○ Compiling /api/admin-login ..."}

@@ -1,4 +1,4 @@
-import Dashboard from '@/views/Dashboard';
+import Dashboard from '../../src/views/Dashboard';
 
 export const metadata = {
   title: 'My Progress | GLS',
