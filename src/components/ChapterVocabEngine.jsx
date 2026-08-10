@@ -32,7 +32,7 @@ export default function ChapterVocabEngine({
   const [loading, setLoading] = useState(true);
   
   // Setup Mode State
-  const [selectedChapterIds, setSelectedChapterIds] = useState(new Set());
+  const [selectedChapterCount, setSelectedChapterCount] = useState(1);
   
   // Test Run State
   const [testStarted, setTestStarted] = useState(false);
@@ -70,26 +70,22 @@ export default function ChapterVocabEngine({
       
     if (!error && data) {
       setChapters(data);
+      if (data.length > 0) setSelectedChapterCount(1);
     }
     setLoading(false);
   };
 
-  const toggleChapter = (id) => {
-    const newSet = new Set(selectedChapterIds);
-    if (newSet.has(id)) newSet.delete(id);
-    else newSet.add(id);
-    setSelectedChapterIds(newSet);
-  };
 
   const startTest = () => {
-    if (selectedChapterIds.size === 0) return;
+    if (selectedChapterCount === 0 || chapters.length === 0) return;
+    
+    // Get active chapters based on count
+    const activeChapters = chapters.slice(0, selectedChapterCount);
     
     // Combine all selected JSON arrays
     let combined = [];
-    chapters.forEach(chap => {
-      if (selectedChapterIds.has(chap.id)) {
-        combined = combined.concat(chap.json_data || []);
-      }
+    activeChapters.forEach(chap => {
+      combined = combined.concat(chap.json_data || []);
     });
 
     if (combined.length === 0) {
@@ -234,7 +230,7 @@ export default function ChapterVocabEngine({
         phone: userType === 'free' ? storedFreeUser?.phone : null,
         access_code_used: userType === 'student' ? verifiedCode : null,
         level: level,
-        chapters_selected: Array.from(selectedChapterIds),
+        chapters_selected: chapters.slice(0, selectedChapterCount).map(c => c.id),
         test_mode: 'mixed',
         total_questions: totalQuestions,
         correct_count: finalCorrectCount,
@@ -261,7 +257,6 @@ export default function ChapterVocabEngine({
   const resetEngine = () => {
     setTestStarted(false);
     setFinished(false);
-    setSelectedChapterIds(new Set());
   };
 
   if (loading) {
@@ -294,34 +289,45 @@ export default function ChapterVocabEngine({
           </div>
         ) : (
           <div className="grid md:grid-cols-2 gap-8">
-            {/* Left: Chapter Selection */}
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
-              <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+            {/* Left: Chapter Selection Counter */}
+            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col items-center text-center">
+              <h2 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-amber-500" /> Select Chapters
               </h2>
-              <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                {chapters.map(chap => {
-                  const isSelected = selectedChapterIds.has(chap.id);
-                  return (
-                    <button
-                      key={chap.id}
-                      onClick={() => toggleChapter(chap.id)}
-                      className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${
-                        isSelected 
-                          ? 'bg-amber-500/10 border-amber-500 text-amber-400' 
-                          : 'bg-slate-950 border-slate-800 text-slate-300 hover:border-slate-600'
-                      }`}
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className={`w-5 h-5 rounded flex items-center justify-center border ${isSelected ? 'bg-amber-500 border-amber-500 text-slate-900' : 'border-slate-600'}`}>
-                          {isSelected && <CheckCircle className="w-3.5 h-3.5" />}
-                        </div>
-                        <span className="font-bold">Chapter {chap.chapter_number}</span>
-                      </div>
-                      <span className="text-xs opacity-70">{chap.word_count} words</span>
-                    </button>
-                  );
-                })}
+              <p className="text-slate-400 text-sm mb-8">How many chapters do you want to include?</p>
+              
+              <div className="flex items-center gap-6 mb-8">
+                <button 
+                  onClick={() => setSelectedChapterCount(Math.max(1, selectedChapterCount - 1))}
+                  disabled={selectedChapterCount <= 1}
+                  className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-white hover:bg-slate-700 disabled:opacity-50 transition"
+                >
+                  <span className="text-2xl font-bold">-</span>
+                </button>
+                
+                <div className="text-5xl font-extrabold text-amber-500 w-16 text-center">
+                  {selectedChapterCount}
+                </div>
+                
+                <button 
+                  onClick={() => setSelectedChapterCount(Math.min(chapters.length, selectedChapterCount + 1))}
+                  disabled={selectedChapterCount >= chapters.length}
+                  className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-white hover:bg-slate-700 disabled:opacity-50 transition"
+                >
+                  <span className="text-2xl font-bold">+</span>
+                </button>
+              </div>
+
+              <div className="w-full bg-slate-950 rounded-xl p-4 border border-slate-800 min-h-[100px]">
+                <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-3 text-left">Selected Chapters:</p>
+                <div className="flex flex-wrap gap-2">
+                  {chapters.slice(0, selectedChapterCount).map(chap => (
+                    <div key={chap.id} className="px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-lg text-sm font-bold flex items-center gap-2">
+                      <CheckCircle className="w-3.5 h-3.5" />
+                      Ch {chap.chapter_number}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
@@ -354,13 +360,13 @@ export default function ChapterVocabEngine({
 
               <button
                 onClick={startTest}
-                disabled={selectedChapterIds.size === 0}
+                disabled={selectedChapterCount === 0 || chapters.length === 0}
                 className="mt-8 w-full py-4 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 font-extrabold rounded-xl flex justify-center items-center gap-2 transition-all shadow-lg hover:shadow-amber-500/20"
               >
                 <PlayCircle className="w-5 h-5" /> Start Test
               </button>
-              {selectedChapterIds.size === 0 && (
-                <p className="text-center text-xs text-slate-500 mt-3">Select at least one chapter to begin.</p>
+              {selectedChapterCount === 0 && (
+                <p className="text-center text-xs text-slate-500 mt-3">Increase chapter count to begin.</p>
               )}
             </div>
           </div>
