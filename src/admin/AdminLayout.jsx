@@ -59,6 +59,7 @@ export default function AdminLayout({
     { id: 'couponManager', label: 'Coupon Manager', icon: Ticket },
     { id: 'themeCustomizer', label: 'Theme Customizer', icon: Palette, badge: 'CSS' },
     { id: 'practiceTests', label: 'Practice Tests', icon: FileCode2, badge: 'New' },
+    { id: 'chapterVocab', label: 'Chapter Vocab', icon: BookOpen, badge: 'New' },
     { id: 'blogCMS', label: t.admin.blogCMS, icon: Newspaper },
     { id: 'inquiries', label: t.admin.inquiries, icon: MessageSquare, badge: '3' },
     { id: 'testimonialsManager', label: 'Testimonials', icon: Star },

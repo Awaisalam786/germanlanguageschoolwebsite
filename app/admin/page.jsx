@@ -25,6 +25,7 @@ import CouponManager from '../../src/admin/CouponManager';
 import AnnouncementsManager from '../../src/admin/AnnouncementsManager';
 import GlobalContentManager from '../../src/admin/GlobalContentManager';
 import PracticeTestManager from '../../src/admin/PracticeTestManager';
+import ChapterVocabManager from '../../src/admin/ChapterVocabManager';
 import { useGlobalState } from '../../src/context/GlobalStateContext';
 import { useRouter } from 'next/navigation';
 
@@ -60,6 +61,7 @@ export default function AdminPage() {
       case 'paymentStatus': return <PaymentStatusTracker />;
       case 'themeCustomizer': return <ThemeCustomizer />;
       case 'practiceTests': return <PracticeTestManager />;
+      case 'chapterVocab': return <ChapterVocabManager />;
       case 'blogCMS': return <BlogCMS />;
       case 'inquiries': return <Inquiries />;
       case 'testimonialsManager': return <TestimonialManager />;
