@@ -32,6 +32,8 @@ export default function ChapterVocabEngine({
   const [loading, setLoading] = useState(true);
   
   // Setup Mode State
+  const [selectionMode, setSelectionMode] = useState('quick'); // 'quick' or 'custom'
+  const [customSelectedChapterIds, setCustomSelectedChapterIds] = useState([]);
   const [selectedChapterCount, setSelectedChapterCount] = useState(1);
   const [sessionTime, setSessionTime] = useState(10); // 10, 20, 30 minutes
   
@@ -91,10 +93,12 @@ export default function ChapterVocabEngine({
 
 
   const startTest = () => {
-    if (selectedChapterCount === 0 || chapters.length === 0) return;
-    
-    // Get active chapters based on count
-    const activeChapters = chapters.slice(0, selectedChapterCount);
+    // Get active chapters based on mode
+    const activeChapters = selectionMode === 'quick'
+      ? chapters.slice(0, selectedChapterCount)
+      : chapters.filter(chap => customSelectedChapterIds.includes(chap.id));
+      
+    if (activeChapters.length === 0 || chapters.length === 0) return;
     
     // Combine all selected JSON arrays
     let combined = [];
@@ -255,7 +259,9 @@ export default function ChapterVocabEngine({
         phone: userType === 'free' ? storedFreeUser?.phone : null,
         access_code_used: userType === 'student' ? verifiedCode : null,
         level: level,
-        chapters_selected: chapters.slice(0, selectedChapterCount).map(c => c.id),
+        chapters_selected: selectionMode === 'quick' 
+          ? chapters.slice(0, selectedChapterCount).map(c => c.id)
+          : customSelectedChapterIds,
         test_mode: 'mixed',
         total_questions: totalQuestions,
         correct_count: finalCorrectCount,
@@ -315,44 +321,115 @@ export default function ChapterVocabEngine({
           </div>
         ) : (
           <div className="grid md:grid-cols-2 gap-8">
-            {/* Left: Chapter Selection Counter */}
+            {/* Left: Chapter Selection Counter/Custom */}
             <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl flex flex-col items-center text-center">
-              <h2 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+              <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-amber-500" /> Select Chapters
               </h2>
-              <p className="text-slate-400 text-sm mb-8">How many chapters do you want to include?</p>
               
-              <div className="flex items-center gap-6 mb-8">
-                <button 
-                  onClick={() => setSelectedChapterCount(Math.max(1, selectedChapterCount - 1))}
-                  disabled={selectedChapterCount <= 1}
-                  className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-white hover:bg-slate-700 disabled:opacity-50 transition"
+              {/* Toggle Switch */}
+              <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-800 mb-8 w-full max-w-sm">
+                <button
+                  onClick={() => setSelectionMode('quick')}
+                  className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${
+                    selectionMode === 'quick'
+                      ? 'bg-amber-500 text-slate-950 shadow-md'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
                 >
-                  <span className="text-2xl font-bold">-</span>
+                  Quick Select
                 </button>
-                
-                <div className="text-5xl font-extrabold text-amber-500 w-16 text-center">
-                  {selectedChapterCount}
-                </div>
-                
-                <button 
-                  onClick={() => setSelectedChapterCount(Math.min(chapters.length, selectedChapterCount + 1))}
-                  disabled={selectedChapterCount >= chapters.length}
-                  className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-white hover:bg-slate-700 disabled:opacity-50 transition"
+                <button
+                  onClick={() => setSelectionMode('custom')}
+                  className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${
+                    selectionMode === 'custom'
+                      ? 'bg-amber-500 text-slate-950 shadow-md'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
                 >
-                  <span className="text-2xl font-bold">+</span>
+                  Custom Select
                 </button>
               </div>
 
-              <div className="w-full bg-slate-950 rounded-xl p-4 border border-slate-800 min-h-[100px]">
+              {selectionMode === 'quick' ? (
+                <>
+                  <p className="text-slate-400 text-sm mb-8">How many chapters do you want to include?</p>
+                  
+                  <div className="flex items-center gap-6 mb-8">
+                    <button 
+                      onClick={() => setSelectedChapterCount(Math.max(1, selectedChapterCount - 1))}
+                      disabled={selectedChapterCount <= 1}
+                      className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-white hover:bg-slate-700 disabled:opacity-50 transition"
+                    >
+                      <span className="text-2xl font-bold">-</span>
+                    </button>
+                    
+                    <div className="text-5xl font-extrabold text-amber-500 w-16 text-center">
+                      {selectedChapterCount}
+                    </div>
+                    
+                    <button 
+                      onClick={() => setSelectedChapterCount(Math.min(chapters.length, selectedChapterCount + 1))}
+                      disabled={selectedChapterCount >= chapters.length}
+                      className="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center text-white hover:bg-slate-700 disabled:opacity-50 transition"
+                    >
+                      <span className="text-2xl font-bold">+</span>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <div className="w-full mb-8">
+                  <p className="text-slate-400 text-sm mb-4 text-left">Select specific chapters to test:</p>
+                  <div className="flex flex-wrap gap-3">
+                    {chapters.map(chap => {
+                      const isSelected = customSelectedChapterIds.includes(chap.id);
+                      return (
+                        <button
+                          key={chap.id}
+                          onClick={() => {
+                            if (isSelected) {
+                              setCustomSelectedChapterIds(prev => prev.filter(id => id !== chap.id));
+                            } else {
+                              setCustomSelectedChapterIds(prev => [...prev, chap.id]);
+                            }
+                          }}
+                          className={`px-4 py-2 rounded-xl text-sm font-bold flex items-center gap-2 transition-all border ${
+                            isSelected
+                              ? 'bg-amber-500/20 border-amber-500 text-amber-400'
+                              : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-600 hover:text-white'
+                          }`}
+                        >
+                          {isSelected && <CheckCircle className="w-4 h-4" />}
+                          Chapter {chap.chapter_number}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              <div className="w-full bg-slate-950 rounded-xl p-4 border border-slate-800 min-h-[100px] mt-auto">
                 <p className="text-xs text-slate-500 uppercase tracking-wider font-bold mb-3 text-left">Selected Chapters:</p>
                 <div className="flex flex-wrap gap-2">
-                  {chapters.slice(0, selectedChapterCount).map(chap => (
-                    <div key={chap.id} className="px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-lg text-sm font-bold flex items-center gap-2">
-                      <CheckCircle className="w-3.5 h-3.5" />
-                      Ch {chap.chapter_number}
-                    </div>
-                  ))}
+                  {selectionMode === 'quick' ? (
+                    chapters.slice(0, selectedChapterCount).map(chap => (
+                      <div key={chap.id} className="px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-lg text-sm font-bold flex items-center gap-2">
+                        <CheckCircle className="w-3.5 h-3.5" />
+                        Ch {chap.chapter_number}
+                      </div>
+                    ))
+                  ) : (
+                    customSelectedChapterIds.length === 0 ? (
+                      <p className="text-sm text-slate-500">None selected</p>
+                    ) : (
+                      chapters.filter(c => customSelectedChapterIds.includes(c.id)).map(chap => (
+                        <div key={chap.id} className="px-3 py-1.5 bg-amber-500/10 border border-amber-500/30 text-amber-400 rounded-lg text-sm font-bold flex items-center gap-2">
+                          <CheckCircle className="w-3.5 h-3.5" />
+                          Ch {chap.chapter_number}
+                        </div>
+                      ))
+                    )
+                  )}
                 </div>
               </div>
             </div>
@@ -401,13 +478,17 @@ export default function ChapterVocabEngine({
 
               <button
                 onClick={startTest}
-                disabled={selectedChapterCount === 0 || chapters.length === 0}
+                disabled={
+                  (selectionMode === 'quick' && (selectedChapterCount === 0 || chapters.length === 0)) ||
+                  (selectionMode === 'custom' && customSelectedChapterIds.length === 0)
+                }
                 className="mt-8 w-full py-4 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 font-extrabold rounded-xl flex justify-center items-center gap-2 transition-all shadow-lg hover:shadow-amber-500/20"
               >
                 <PlayCircle className="w-5 h-5" /> Start Test
               </button>
-              {selectedChapterCount === 0 && (
-                <p className="text-center text-xs text-slate-500 mt-3">Increase chapter count to begin.</p>
+              {((selectionMode === 'quick' && selectedChapterCount === 0) || 
+                (selectionMode === 'custom' && customSelectedChapterIds.length === 0)) && (
+                <p className="text-center text-xs text-slate-500 mt-3">Select at least one chapter to begin.</p>
               )}
             </div>
           </div>
