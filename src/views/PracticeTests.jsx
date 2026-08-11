@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import ChapterVocabEngine from '../components/ChapterVocabEngine';
+import ReadingTestEngine from '../components/ReadingTestEngine';
 
 export default function PracticeTests() {
   // Navigation Steps:
@@ -36,6 +37,7 @@ export default function PracticeTests() {
 
   // Practice Test Navigation
   const [materials, setMaterials] = useState([]);
+  const [readingPassages, setReadingPassages] = useState([]);
   const [selectedLevel, setSelectedLevel] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null); // 'Vocab Test', 'Grammar Test', 'Reading Test', 'Speaking Test'
   const [selectedMaterial, setSelectedMaterial] = useState(null);
@@ -71,6 +73,17 @@ export default function PracticeTests() {
     if (!error && data) {
       setMaterials(data);
     }
+    
+    // Fetch Reading Passages
+    const { data: readingData, error: readingError } = await supabase
+      .from('reading_passages')
+      .select('*')
+      .order('passage_id', { ascending: true });
+      
+    if (!readingError && readingData) {
+      setReadingPassages(readingData);
+    }
+    
     setLoading(false);
   };
 
@@ -542,6 +555,21 @@ export default function PracticeTests() {
         </div>
       )}
 
+      {/* ───── STEP: Reading Test Engine ───── */}
+      {step === 'reading_engine' && selectedMaterial && (
+        <div className="w-full mt-4 flex-1">
+          <ReadingTestEngine 
+            passage={selectedMaterial}
+            onBack={() => setStep(4)}
+            userType={userType}
+            storedFreeUser={storedFreeUser}
+            studentName={studentName}
+            verifiedCode={verifiedCode}
+            batchName={batchName}
+          />
+        </div>
+      )}
+
       {/* ───── STEP 4: Content (Test List, Placeholder, or WhatsApp) ───── */}
       {step === 4 && (
         <div className="max-w-5xl mx-auto space-y-8 animate-fade-in w-full mt-4 flex-1">
@@ -556,14 +584,58 @@ export default function PracticeTests() {
             </h1>
           </div>
 
-          {/* Reading Test Placeholder */}
+          {/* Reading Test List */}
           {selectedCategory === 'Reading Test' && (
-            <div className="text-center py-24 bg-slate-900 border border-slate-800 rounded-3xl max-w-2xl mx-auto shadow-xl">
-              <div className="w-20 h-20 mx-auto bg-blue-500/10 rounded-full flex items-center justify-center mb-6">
-                <BookOpen className="w-10 h-10 text-blue-400" />
-              </div>
-              <h2 className="text-3xl font-extrabold text-white mb-3">Coming Soon!</h2>
-              <p className="text-slate-400 max-w-md mx-auto">We are currently preparing high-quality reading materials for you. Check back later!</p>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {loading ? (
+                <div className="col-span-full text-center py-12">
+                  <Loader2 className="w-8 h-8 text-amber-500 animate-spin mx-auto" />
+                </div>
+              ) : readingPassages.filter(p => p.level === selectedLevel).length === 0 ? (
+                <div className="col-span-full text-center text-slate-500 py-12 bg-slate-900/50 rounded-2xl border border-slate-800 border-dashed">
+                  No reading passages uploaded yet for Level {selectedLevel}.
+                </div>
+              ) : (
+                readingPassages
+                  .filter(p => p.level === selectedLevel)
+                  .map(mat => (
+                    <div 
+                      key={mat.id} 
+                      className="group relative bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between hover:border-blue-500 transition-all shadow-lg hover:-translate-y-1 hover:shadow-blue-500/20 overflow-hidden"
+                    >
+                      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                      
+                      <div className="relative z-10">
+                        <div className="flex justify-between items-start mb-6">
+                          <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 font-extrabold flex items-center justify-center text-xl border border-blue-500/30 shadow-inner">
+                            {mat.level}
+                          </div>
+                          <span className="px-3 py-1 bg-slate-950 border border-slate-800 rounded-full text-[10px] uppercase tracking-widest text-slate-400 font-bold flex items-center gap-1.5">
+                            <BookOpen className="w-3 h-3 text-blue-400" /> Reading
+                          </span>
+                        </div>
+                        
+                        <h3 className="text-xl font-playfair font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">
+                          {mat.passage_title}
+                        </h3>
+                        <p className="text-xs text-slate-400 flex items-center gap-1.5 mt-2">
+                          <CheckSquare className="w-3.5 h-3.5 text-slate-500" /> {mat.questions?.length || 0} Questions
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          setSelectedMaterial(mat); // Use selectedMaterial to store the passage
+                          setStep('reading_engine');
+                        }}
+                        className="relative z-10 mt-8 w-full py-3.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-blue-500 hover:bg-blue-500 hover:text-white font-bold text-sm transition-all flex items-center justify-center gap-2 group-hover:shadow-lg text-slate-300 group-hover:text-white"
+                      >
+                        Start Test 
+                        <PlayCircle className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                      </button>
+                    </div>
+                  ))
+              )}
             </div>
           )}
 
