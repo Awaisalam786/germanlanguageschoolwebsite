@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { BookOpen, Upload, Trash2, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { BookOpen, Upload, Trash2, Loader2, CheckCircle, AlertCircle, Edit2, Filter, X } from 'lucide-react';
 
 export default function ReadingPassagesManager() {
   const [passages, setPassages] = useState([]);
@@ -8,6 +8,10 @@ export default function ReadingPassagesManager() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [filterLevel, setFilterLevel] = useState('All');
+  const [filterChapter, setFilterChapter] = useState('All');
+  const [editingPassage, setEditingPassage] = useState(null);
+  const [editJson, setEditJson] = useState('');
 
   const [form, setForm] = useState({
     level: 'A1',
@@ -73,11 +77,19 @@ export default function ReadingPassagesManager() {
     let updatedCount = 0;
 
     for (const p of passagesArray) {
-      const { data: existing } = await supabase
+      let query = supabase
         .from('reading_passages')
         .select('id')
         .eq('level', form.level)
         .eq('passage_id', p.passage_id);
+
+      if (form.chapter_reference) {
+        query = query.eq('chapter_reference', parseInt(form.chapter_reference));
+      } else {
+        query = query.is('chapter_reference', null);
+      }
+
+      const { data: existing } = await query;
 
       const payload = {
         level: form.level,
@@ -132,6 +144,62 @@ export default function ReadingPassagesManager() {
       fetchPassages();
     }
   };
+
+  const openEditModal = (passage) => {
+    setEditingPassage(passage);
+    // Format JSON for editing, picking only the editable fields
+    const editableData = {
+      passage_id: passage.passage_id,
+      passage_title: passage.passage_title,
+      passage_text: passage.passage_text,
+      questions: passage.questions
+    };
+    setEditJson(JSON.stringify(editableData, null, 2));
+  };
+
+  const handleEditSave = async () => {
+    try {
+      const parsed = JSON.parse(editJson);
+      
+      const payload = {
+        passage_id: parsed.passage_id,
+        passage_title: parsed.passage_title,
+        passage_text: parsed.passage_text,
+        questions: parsed.questions
+      };
+
+      const { error } = await supabase
+        .from('reading_passages')
+        .update(payload)
+        .eq('id', editingPassage.id);
+
+      if (error) throw error;
+
+      setEditingPassage(null);
+      setEditJson('');
+      fetchPassages();
+    } catch (err) {
+      alert("Invalid JSON or save failed: " + err.message);
+    }
+  };
+
+  // Compute filters
+  const availableChapters = Array.from(new Set(
+    passages
+      .filter(p => filterLevel === 'All' || p.level === filterLevel)
+      .map(p => p.chapter_reference || 'Other')
+  )).sort((a, b) => {
+    if (a === 'Other') return 1;
+    if (b === 'Other') return -1;
+    return parseInt(a) - parseInt(b);
+  });
+
+  const filteredPassages = passages.filter(p => {
+    if (filterLevel !== 'All' && p.level !== filterLevel) return false;
+    const ch = p.chapter_reference || 'Other';
+    if (filterChapter !== 'All' && ch.toString() !== filterChapter.toString()) return false;
+    return true;
+  });
 
   const handleFileUpload = (e) => {
     const file = e.target.files[0];
@@ -239,23 +307,91 @@ export default function ReadingPassagesManager() {
 
         {/* Passages List */}
         <div className="lg:col-span-2">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl h-[800px] flex flex-col">
-            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-amber-500" />
-              Uploaded Passages
-            </h2>
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl h-[800px] flex flex-col relative">
+            
+            {/* Edit Modal Overlay */}
+            {editingPassage && (
+              <div className="absolute inset-0 z-20 bg-slate-950/95 backdrop-blur-sm rounded-2xl p-6 flex flex-col">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <Edit2 className="w-4 h-4 text-amber-500" />
+                    Edit Passage {editingPassage.passage_id}
+                  </h3>
+                  <button onClick={() => setEditingPassage(null)} className="text-slate-400 hover:text-white">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+                <textarea
+                  value={editJson}
+                  onChange={(e) => setEditJson(e.target.value)}
+                  className="flex-1 w-full bg-slate-900 border border-slate-800 rounded-xl p-4 text-slate-300 text-xs font-mono focus:border-amber-500 focus:outline-none custom-scrollbar mb-4"
+                />
+                <div className="flex gap-3">
+                  <button onClick={() => setEditingPassage(null)} className="flex-1 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition">
+                    Cancel
+                  </button>
+                  <button onClick={handleEditSave} className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl transition">
+                    Save Changes
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                <BookOpen className="w-5 h-5 text-amber-500" />
+                Uploaded Passages
+              </h2>
+              <span className="text-xs text-slate-500 font-bold">{filteredPassages.length} Total</span>
+            </div>
+
+            {/* Filters */}
+            <div className="flex items-center gap-3 mb-4 pb-4 border-b border-slate-800">
+              <div className="flex items-center gap-2 text-slate-400 bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-lg flex-1">
+                <Filter className="w-4 h-4" />
+                <select 
+                  value={filterLevel}
+                  onChange={e => {
+                    setFilterLevel(e.target.value);
+                    setFilterChapter('All'); // reset chapter filter on level change
+                  }}
+                  className="bg-transparent text-sm focus:outline-none w-full text-white"
+                >
+                  <option value="All">All Levels</option>
+                  <option value="A1">A1</option>
+                  <option value="A2">A2</option>
+                  <option value="B1">B1</option>
+                  <option value="B2">B2</option>
+                  <option value="C1">C1</option>
+                </select>
+              </div>
+
+              <div className="flex items-center gap-2 text-slate-400 bg-slate-950 border border-slate-800 px-3 py-1.5 rounded-lg flex-1">
+                <BookOpen className="w-4 h-4" />
+                <select 
+                  value={filterChapter}
+                  onChange={e => setFilterChapter(e.target.value)}
+                  className="bg-transparent text-sm focus:outline-none w-full text-white"
+                >
+                  <option value="All">All Chapters</option>
+                  {availableChapters.map(ch => (
+                    <option key={ch} value={ch}>{ch === 'Other' ? 'Additional Passages' : `Chapter ${ch}`}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
 
             <div className="flex-1 overflow-y-auto custom-scrollbar pr-2 space-y-3">
               {loading ? (
                 <div className="flex justify-center py-12">
                   <Loader2 className="w-8 h-8 text-amber-500 animate-spin" />
                 </div>
-              ) : passages.length === 0 ? (
+              ) : filteredPassages.length === 0 ? (
                 <div className="text-center py-12 text-slate-500 border border-slate-800 border-dashed rounded-xl">
-                  No reading passages uploaded yet.
+                  No passages match your filters.
                 </div>
               ) : (
-                passages.map(p => (
+                filteredPassages.map(p => (
                   <div key={p.id} className="bg-slate-950 border border-slate-800 rounded-xl p-4 flex items-center justify-between group hover:border-slate-700 transition">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 bg-amber-500/10 text-amber-400 font-extrabold rounded-lg flex flex-col items-center justify-center">
@@ -271,12 +407,22 @@ export default function ReadingPassagesManager() {
                         <p className="text-xs text-slate-500">{p.questions.length} questions</p>
                       </div>
                     </div>
-                    <button 
-                      onClick={() => handleDelete(p.id)}
-                      className="p-2 text-slate-600 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition opacity-0 group-hover:opacity-100"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button 
+                        onClick={() => openEditModal(p)}
+                        className="p-2 text-slate-400 hover:text-amber-500 hover:bg-amber-500/10 rounded-lg transition"
+                        title="Edit JSON"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(p.id)}
+                        className="p-2 text-slate-400 hover:text-red-500 hover:bg-red-500/10 rounded-lg transition"
+                        title="Delete Passage"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 ))
               )}
