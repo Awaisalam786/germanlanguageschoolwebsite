@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { BookOpen, Upload, Trash2, Loader2, CheckCircle, AlertCircle, Edit2, X, Save, Search } from 'lucide-react';
+import { BookOpen, Upload, Trash2, Loader2, CheckCircle, AlertCircle, Edit2, X, Save, Search, Eye, Play } from 'lucide-react';
 import { translations } from '../i18n/translations';
 import { useGlobalState } from '../context/GlobalStateContext';
 
@@ -16,6 +16,12 @@ export default function ChapterVocabManager() {
   const [editingChapter, setEditingChapter] = useState(null);
   const [editingWords, setEditingWords] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Preview State
+  const [previewIndex, setPreviewIndex] = useState(null);
+  const [previewDir, setPreviewDir] = useState('type_en'); // 'type_en' or 'type_de'
+  const [previewTypedAnswer, setPreviewTypedAnswer] = useState('');
+  const [previewFeedback, setPreviewFeedback] = useState(null);
 
   const [form, setForm] = useState({
     level: 'A1',
@@ -131,6 +137,7 @@ export default function ChapterVocabManager() {
   const handleEditStart = (chap) => {
     setEditingChapter(chap);
     setSearchQuery('');
+    setPreviewIndex(null);
     const words = (chap.json_data || []).map(word => ({
       ...word,
       accepted_answers_str: word.accepted_answers ? word.accepted_answers.join(', ') : '',
@@ -143,6 +150,36 @@ export default function ChapterVocabManager() {
     const updated = [...editingWords];
     updated[index][field] = value;
     setEditingWords(updated);
+  };
+
+  const handlePreviewCheck = (e) => {
+    e.preventDefault();
+    if (previewIndex === null) return;
+    
+    const word = editingWords[previewIndex];
+    const normalizeAnswer = (str) => str.trim().toLowerCase().replace(/[.,;!?]+$/, '');
+    const normalizedUser = normalizeAnswer(previewTypedAnswer);
+    let isCorrect = false;
+
+    if (previewDir === 'type_en') {
+      const enAns = (word.accepted_answers_str || '').split(',').map(s => s.trim()).filter(Boolean);
+      if (!enAns.includes(word.english)) enAns.push(word.english);
+      isCorrect = enAns.some(ans => normalizeAnswer(ans) === normalizedUser);
+    } else {
+      const deAns = (word.accepted_german_answers_str || '').split(',').map(s => s.trim()).filter(Boolean);
+      if (!deAns.includes(word.german)) deAns.push(word.german);
+      isCorrect = deAns.some(ans => normalizeAnswer(ans) === normalizedUser);
+    }
+
+    setPreviewFeedback(isCorrect ? 'correct' : 'incorrect');
+  };
+
+  const getPreviewMcqOptions = (word, dir) => {
+    const others = editingWords.filter((_, idx) => idx !== previewIndex);
+    const shuffled = [...others].sort(() => 0.5 - Math.random());
+    const distractors = shuffled.slice(0, 3).map(w => dir === 'type_en' ? w.english : w.german);
+    const correctAns = dir === 'type_en' ? word.english : word.german;
+    return [correctAns, ...distractors].sort(() => 0.5 - Math.random());
   };
 
   const handleEditSave = async () => {
@@ -382,6 +419,7 @@ export default function ChapterVocabManager() {
                     <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-800">German Synonyms</th>
                     <th className="px-6 py-4 text-xs font-bold text-emerald-500 uppercase tracking-wider border-b border-slate-800 border-l">Primary English</th>
                     <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-800">English Synonyms</th>
+                    <th className="px-6 py-4 text-xs font-bold text-blue-400 uppercase tracking-wider border-b border-slate-800 border-l text-center">Test</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-800/50">
@@ -427,6 +465,19 @@ export default function ChapterVocabManager() {
                           placeholder="e.g. car, automobile"
                         />
                       </td>
+                      <td className="p-2 border-l border-slate-800/50 text-center w-16">
+                        <button
+                          onClick={() => {
+                            setPreviewIndex(word.originalIndex);
+                            setPreviewTypedAnswer('');
+                            setPreviewFeedback(null);
+                          }}
+                          className="p-1.5 text-slate-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition"
+                          title="Preview & Test"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -439,6 +490,98 @@ export default function ChapterVocabManager() {
                   No words found matching "{searchQuery}"
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Preview Modal */}
+      {previewIndex !== null && editingWords[previewIndex] && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[60] flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-lg shadow-2xl animate-fade-in overflow-hidden">
+            <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-950">
+              <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                <Play className="w-5 h-5 text-blue-500" /> Test Word Behavior
+              </h3>
+              <button 
+                onClick={() => setPreviewIndex(null)} 
+                className="text-slate-500 hover:text-white transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="p-6">
+              {/* Question Direction Toggle */}
+              <div className="flex bg-slate-950 p-1 rounded-xl border border-slate-800 mb-6">
+                <button
+                  onClick={() => { setPreviewDir('type_en'); setPreviewFeedback(null); setPreviewTypedAnswer(''); }}
+                  className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                    previewDir === 'type_en' ? 'bg-blue-500 text-white shadow-md' : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  DE ➔ EN
+                </button>
+                <button
+                  onClick={() => { setPreviewDir('type_de'); setPreviewFeedback(null); setPreviewTypedAnswer(''); }}
+                  className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                    previewDir === 'type_de' ? 'bg-blue-500 text-white shadow-md' : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  EN ➔ DE
+                </button>
+              </div>
+
+              <div className="text-center mb-6">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 block">Prompt</span>
+                <div className="text-3xl font-extrabold text-white">
+                  {previewDir === 'type_en' ? editingWords[previewIndex].german : editingWords[previewIndex].english}
+                </div>
+              </div>
+
+              <div className="space-y-6">
+                {/* Typing Preview */}
+                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                  <h4 className="text-xs font-bold text-slate-400 mb-3 uppercase">Typing Simulation</h4>
+                  <form onSubmit={handlePreviewCheck} className="flex gap-2">
+                    <input 
+                      type="text" 
+                      value={previewTypedAnswer}
+                      onChange={e => { setPreviewTypedAnswer(e.target.value); setPreviewFeedback(null); }}
+                      className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-blue-500"
+                      placeholder="Type answer & press enter"
+                    />
+                    <button type="submit" className="px-4 py-2 bg-blue-500 hover:bg-blue-400 text-white text-sm font-bold rounded-lg transition">Check</button>
+                  </form>
+                  {previewFeedback && (
+                    <div className={`mt-3 p-2 rounded-lg text-sm font-bold flex items-center justify-center gap-2 ${
+                      previewFeedback === 'correct' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-red-500/20 text-red-400 border border-red-500/30'
+                    }`}>
+                      {previewFeedback === 'correct' ? <CheckCircle className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
+                      {previewFeedback === 'correct' ? 'Accepted!' : 'Incorrect'}
+                    </div>
+                  )}
+                  <p className="text-[10px] text-slate-500 mt-2 text-center">
+                    Uses exact normalization & synonym rules as live engine.
+                  </p>
+                </div>
+
+                {/* MCQ Preview */}
+                <div className="bg-slate-950 p-4 rounded-xl border border-slate-800">
+                  <h4 className="text-xs font-bold text-slate-400 mb-3 uppercase">MCQ Distractor Preview</h4>
+                  <div className="grid grid-cols-2 gap-2">
+                    {getPreviewMcqOptions(editingWords[previewIndex], previewDir).map((opt, i) => (
+                      <div key={i} className={`p-2 rounded border text-sm text-center font-bold ${
+                        opt === (previewDir === 'type_en' ? editingWords[previewIndex].english : editingWords[previewIndex].german)
+                          ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                          : 'bg-slate-900 border-slate-800 text-slate-300'
+                      }`}>
+                        {opt}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
