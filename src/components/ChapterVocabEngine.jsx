@@ -189,15 +189,20 @@ export default function ChapterVocabEngine({
     };
 
     const normalizedUser = normalizeAnswer(userAnswer);
-    
-    // For type_en, the correct answer is the english field, for type_de it's the german field
-    const correctStr = questions[currentQIndex].testFormat === 'type_en' 
-      ? questions[currentQIndex].english 
-      : questions[currentQIndex].german;
+    const currentQ = questions[currentQIndex];
+    let isCorrect = false;
+
+    if (currentQ.testFormat === 'type_en') {
+      const validAnswers = currentQ.accepted_answers ? [...currentQ.accepted_answers] : [];
+      if (!validAnswers.includes(currentQ.english)) validAnswers.push(currentQ.english);
       
-    const normalizedCorrect = normalizeAnswer(correctStr);
-    
-    const isCorrect = normalizedUser === normalizedCorrect;
+      isCorrect = validAnswers.some(ans => normalizeAnswer(ans) === normalizedUser);
+    } else {
+      const validAnswers = currentQ.accepted_german_answers ? [...currentQ.accepted_german_answers] : [];
+      if (!validAnswers.includes(currentQ.german)) validAnswers.push(currentQ.german);
+      
+      isCorrect = validAnswers.some(ans => normalizeAnswer(ans) === normalizedUser);
+    }
     setFeedback(isCorrect ? 'correct' : 'incorrect');
     if (isCorrect) setScore(s => s + 1);
 

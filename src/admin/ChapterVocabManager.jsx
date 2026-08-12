@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { BookOpen, Upload, Trash2, Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+import { BookOpen, Upload, Trash2, Loader2, CheckCircle, AlertCircle, Edit2, X, Save } from 'lucide-react';
 import { translations } from '../i18n/translations';
 import { useGlobalState } from '../context/GlobalStateContext';
 
@@ -13,6 +13,8 @@ export default function ChapterVocabManager() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [editingChapter, setEditingChapter] = useState(null);
+  const [editingWords, setEditingWords] = useState([]);
 
   const [form, setForm] = useState({
     level: 'A1',
@@ -121,6 +123,53 @@ export default function ChapterVocabManager() {
     if (error) {
       alert("Error deleting chapter: " + error.message);
     } else {
+      fetchChapters();
+    }
+  };
+
+  const handleEditStart = (chap) => {
+    setEditingChapter(chap);
+    const words = (chap.json_data || []).map(word => ({
+      ...word,
+      accepted_answers_str: word.accepted_answers ? word.accepted_answers.join(', ') : '',
+      accepted_german_answers_str: word.accepted_german_answers ? word.accepted_german_answers.join(', ') : ''
+    }));
+    setEditingWords(words);
+  };
+
+  const handleWordChange = (index, field, value) => {
+    const updated = [...editingWords];
+    updated[index][field] = value;
+    setEditingWords(updated);
+  };
+
+  const handleEditSave = async () => {
+    const newJson = editingWords.map(word => {
+      const cleanWord = { ...word };
+      
+      const enAns = (cleanWord.accepted_answers_str || '').split(',').map(s => s.trim()).filter(Boolean);
+      if (enAns.length > 0) cleanWord.accepted_answers = enAns;
+      else delete cleanWord.accepted_answers;
+      
+      const deAns = (cleanWord.accepted_german_answers_str || '').split(',').map(s => s.trim()).filter(Boolean);
+      if (deAns.length > 0) cleanWord.accepted_german_answers = deAns;
+      else delete cleanWord.accepted_german_answers;
+      
+      delete cleanWord.accepted_answers_str;
+      delete cleanWord.accepted_german_answers_str;
+      
+      return cleanWord;
+    });
+
+    const { error } = await supabase
+      .from('vocab_chapters')
+      .update({ json_data: newJson })
+      .eq('id', editingChapter.id);
+
+    if (error) {
+      alert("Failed to save chapter: " + error.message);
+    } else {
+      setEditingChapter(null);
       fetchChapters();
     }
   };
@@ -263,13 +312,22 @@ export default function ChapterVocabManager() {
                         <p className="text-xs text-slate-400">{chap.word_count} words</p>
                       </div>
                     </div>
-                    <button 
-                      onClick={() => handleDelete(chap.id)}
-                      className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition opacity-0 group-hover:opacity-100"
-                      title="Delete Chapter"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition">
+                      <button 
+                        onClick={() => handleEditStart(chap)}
+                        className="p-2 text-slate-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition"
+                        title="Edit Words"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </button>
+                      <button 
+                        onClick={() => handleDelete(chap.id)}
+                        className="p-2 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition"
+                        title="Delete Chapter"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -277,6 +335,92 @@ export default function ChapterVocabManager() {
           </div>
         </div>
       </div>
+
+      {/* Edit Overlay */}
+      {editingChapter && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl animate-fade-in overflow-hidden">
+            <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900 z-10 shrink-0">
+              <div>
+                <h3 className="text-2xl font-bold text-white">Edit Level {editingChapter.level} - Chapter {editingChapter.chapter_number}</h3>
+                <p className="text-slate-400 text-sm mt-1">Update primary words or add comma-separated synonyms for typing mode.</p>
+              </div>
+              <div className="flex gap-4">
+                <button 
+                  onClick={() => setEditingChapter(null)} 
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition flex items-center gap-2"
+                >
+                  <X className="w-4 h-4" /> Cancel
+                </button>
+                <button 
+                  onClick={handleEditSave} 
+                  className="px-6 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl transition flex items-center gap-2 shadow-lg hover:shadow-amber-500/20"
+                >
+                  <Save className="w-4 h-4" /> Save Changes
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6 overflow-y-auto custom-scrollbar flex-1 space-y-6">
+              {editingWords.map((word, idx) => (
+                <div key={idx} className="bg-slate-950 border border-slate-800 p-5 rounded-2xl">
+                  <div className="mb-4">
+                    <span className="inline-block px-3 py-1 bg-slate-800 text-slate-400 rounded-lg text-xs font-bold">Word {idx + 1}</span>
+                  </div>
+                  
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {/* German Side */}
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-xs font-bold text-amber-500 mb-1 uppercase tracking-wider">Primary German Word</label>
+                        <input 
+                          type="text" 
+                          value={word.german} 
+                          onChange={(e) => handleWordChange(idx, 'german', e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-400 mb-1">German Synonyms (Comma separated)</label>
+                        <input 
+                          type="text" 
+                          value={word.accepted_german_answers_str} 
+                          onChange={(e) => handleWordChange(idx, 'accepted_german_answers_str', e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300 focus:border-amber-500 focus:outline-none"
+                          placeholder="e.g. Auto, PKW"
+                        />
+                      </div>
+                    </div>
+                    
+                    {/* English Side */}
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-xs font-bold text-emerald-500 mb-1 uppercase tracking-wider">Primary English Word</label>
+                        <input 
+                          type="text" 
+                          value={word.english} 
+                          onChange={(e) => handleWordChange(idx, 'english', e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-bold text-slate-400 mb-1">English Synonyms (Comma separated)</label>
+                        <input 
+                          type="text" 
+                          value={word.accepted_answers_str} 
+                          onChange={(e) => handleWordChange(idx, 'accepted_answers_str', e.target.value)}
+                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300 focus:border-emerald-500 focus:outline-none"
+                          placeholder="e.g. car, automobile"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
