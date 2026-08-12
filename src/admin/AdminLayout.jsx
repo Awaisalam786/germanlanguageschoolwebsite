@@ -62,6 +62,8 @@ export default function AdminLayout({
     { id: 'practiceTests', label: 'Practice Tests', icon: FileCode2, badge: 'New' },
     { id: 'chapterVocab', label: 'Chapter Vocab', icon: BookOpen, badge: 'New' },
     { id: 'smartVocabResults', label: 'Smart Vocab Results', icon: Trophy, badge: 'New' },
+    { id: 'grammarChapters', label: 'Grammar Chapters', icon: BookOpen, badge: 'New' },
+    { id: 'grammarResults', label: 'Grammar Results', icon: Trophy, badge: 'New' },
     { id: 'readingPassages', label: 'Reading Passages', icon: BookOpen, badge: 'New' },
     { id: 'readingResults', label: 'Reading Results', icon: Trophy, badge: 'New' },
     { id: 'blogCMS', label: t.admin.blogCMS, icon: Newspaper },

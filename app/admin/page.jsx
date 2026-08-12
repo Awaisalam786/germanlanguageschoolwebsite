@@ -27,6 +27,8 @@ import GlobalContentManager from '../../src/admin/GlobalContentManager';
 import PracticeTestManager from '../../src/admin/PracticeTestManager';
 import ChapterVocabManager from '../../src/admin/ChapterVocabManager';
 import SmartVocabResultsManager from '../../src/admin/SmartVocabResultsManager';
+import GrammarChaptersManager from '../../src/admin/GrammarChaptersManager';
+import GrammarResultsManager from '../../src/admin/GrammarResultsManager';
 import ReadingPassagesManager from '../../src/admin/ReadingPassagesManager';
 import ReadingResultsManager from '../../src/admin/ReadingResultsManager';
 import { useGlobalState } from '../../src/context/GlobalStateContext';
@@ -66,6 +68,8 @@ export default function AdminPage() {
       case 'practiceTests': return <PracticeTestManager />;
       case 'chapterVocab': return <ChapterVocabManager />;
       case 'smartVocabResults': return <SmartVocabResultsManager />;
+      case 'grammarChapters': return <GrammarChaptersManager />;
+      case 'grammarResults': return <GrammarResultsManager />;
       case 'readingPassages': return <ReadingPassagesManager />;
       case 'readingResults': return <ReadingResultsManager />;
       case 'blogCMS': return <BlogCMS />;
