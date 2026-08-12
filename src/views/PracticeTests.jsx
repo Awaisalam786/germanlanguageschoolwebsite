@@ -42,6 +42,7 @@ export default function PracticeTests() {
   const [selectedLevel, setSelectedLevel] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null); // 'Vocab Test', 'Grammar Test', 'Reading Test', 'Speaking Test'
   const [selectedMaterial, setSelectedMaterial] = useState(null);
+  const [htmlTestsEnabled, setHtmlTestsEnabled] = useState(true);
 
   // Test Runner State
   const [htmlContent, setHtmlContent] = useState('');
@@ -83,6 +84,17 @@ export default function PracticeTests() {
       
     if (!readingError && readingData) {
       setReadingPassages(readingData);
+    }
+    
+    // Fetch Settings
+    const { data: settingsData } = await supabase
+      .from('site_settings')
+      .select('value')
+      .eq('key', 'html_tests_enabled')
+      .single();
+      
+    if (settingsData) {
+      setHtmlTestsEnabled(settingsData.value === 'true');
     }
     
     setLoading(false);
@@ -563,18 +575,20 @@ export default function PracticeTests() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <button
-              onClick={() => navigateToContent('Grammar Test')}
-              className="p-6 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-6 hover:border-emerald-500 transition-all group shadow-lg hover:shadow-emerald-500/10 text-left"
-            >
-              <div className="w-16 h-16 shrink-0 bg-emerald-500/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform border border-emerald-500/20">
-                <BookOpen className="w-8 h-8 text-emerald-400" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors">Grammar Test</h3>
-                <p className="text-sm text-slate-400">Practice grammar rules, sentence structure, and forms.</p>
-              </div>
-            </button>
+            {htmlTestsEnabled && (
+              <button
+                onClick={() => navigateToContent('Grammar Test')}
+                className="p-6 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-6 hover:border-emerald-500 transition-all group shadow-lg hover:shadow-emerald-500/10 text-left"
+              >
+                <div className="w-16 h-16 shrink-0 bg-emerald-500/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform border border-emerald-500/20">
+                  <BookOpen className="w-8 h-8 text-emerald-400" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-1 group-hover:text-emerald-400 transition-colors">Grammar Test</h3>
+                  <p className="text-sm text-slate-400">Practice grammar rules, sentence structure, and forms.</p>
+                </div>
+              </button>
+            )}
 
             <button
               onClick={() => navigateToContent('Reading Test')}
@@ -618,18 +632,20 @@ export default function PracticeTests() {
               </div>
             </button>
 
-            <button
-              onClick={() => navigateToContent('Vocab Test')}
-              className="p-6 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-6 hover:border-amber-500 transition-all group shadow-lg hover:shadow-amber-500/10 text-left"
-            >
-              <div className="w-16 h-16 shrink-0 bg-amber-500/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform border border-amber-500/20">
-                <Languages className="w-8 h-8 text-amber-400" />
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-white mb-1 group-hover:text-amber-400 transition-colors">Vocab Test</h3>
-                <p className="text-sm text-slate-400">Test your vocabulary and word meaning skills.</p>
-              </div>
-            </button>
+            {htmlTestsEnabled && (
+              <button
+                onClick={() => navigateToContent('Vocab Test')}
+                className="p-6 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-6 hover:border-amber-500 transition-all group shadow-lg hover:shadow-amber-500/10 text-left"
+              >
+                <div className="w-16 h-16 shrink-0 bg-amber-500/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform border border-amber-500/20">
+                  <Languages className="w-8 h-8 text-amber-400" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-1 group-hover:text-amber-400 transition-colors">Vocab Test</h3>
+                  <p className="text-sm text-slate-400">Test your vocabulary and word meaning skills.</p>
+                </div>
+              </button>
+            )}
 
             <button
               onClick={() => setStep('alphabet_engine')}

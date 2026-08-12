@@ -12,6 +12,7 @@ export default function PracticeTestManager() {
   const [activeTab, setActiveTab] = useState('materials'); 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: '', type: '' });
+  const [htmlTestsEnabled, setHtmlTestsEnabled] = useState(true);
 
   // Materials State
   const [materials, setMaterials] = useState([]);
@@ -37,6 +38,35 @@ export default function PracticeTestManager() {
     if (activeTab === 'results') fetchAttempts();
     if (activeTab === 'leads') fetchAttempts(); // same data, filtered differently
   }, [activeTab]);
+
+  useEffect(() => {
+    fetchSettings();
+  }, []);
+
+  const fetchSettings = async () => {
+    const { data } = await supabase.from('site_settings').select('value').eq('key', 'html_tests_enabled').single();
+    if (data) {
+      setHtmlTestsEnabled(data.value === 'true');
+    }
+  };
+
+  const toggleHtmlTests = async () => {
+    const newValue = !htmlTestsEnabled;
+    setHtmlTestsEnabled(newValue);
+    const { error } = await supabase.from('site_settings').upsert({
+      key: 'html_tests_enabled',
+      value: newValue.toString(),
+      updated_at: new Date()
+    }, { onConflict: 'key' });
+    
+    if (error) {
+      console.error(error);
+      showMessage("Error updating setting", "error");
+      setHtmlTestsEnabled(!newValue); // revert
+    } else {
+      showMessage(`Legacy HTML Tests ${newValue ? 'Enabled' : 'Disabled'}`);
+    }
+  };
 
   const showMessage = (text, type = 'success') => {
     setMessage({ text, type });
@@ -332,7 +362,24 @@ export default function PracticeTestManager() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in">
           
           {/* Upload Form */}
-          <div className="lg:col-span-1 bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 h-fit sticky top-6">
+          <div className="lg:col-span-1 bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-6 h-fit sticky top-6">
+            
+            {/* HTML Tests Toggle */}
+            <div className="bg-slate-950 border border-slate-800 rounded-xl p-4 flex items-center justify-between">
+              <div>
+                <h4 className="text-white font-bold text-sm">Legacy HTML Tests</h4>
+                <p className="text-xs text-slate-400 mt-1">Enable Vocab & Grammar categories</p>
+              </div>
+              <button 
+                onClick={toggleHtmlTests}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${htmlTestsEnabled ? 'bg-amber-500' : 'bg-slate-700'}`}
+              >
+                <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${htmlTestsEnabled ? 'translate-x-6' : 'translate-x-1'}`} />
+              </button>
+            </div>
+
+            <hr className="border-slate-800" />
+            
             <h3 className="text-lg font-bold text-white flex items-center gap-2">
               <Upload className="w-5 h-5 text-amber-400" />
               Upload New Test
