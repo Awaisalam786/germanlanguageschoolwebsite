@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { BookOpen, Upload, Trash2, Loader2, CheckCircle, AlertCircle, Edit2, X, Save } from 'lucide-react';
+import { BookOpen, Upload, Trash2, Loader2, CheckCircle, AlertCircle, Edit2, X, Save, Search } from 'lucide-react';
 import { translations } from '../i18n/translations';
 import { useGlobalState } from '../context/GlobalStateContext';
 
@@ -15,6 +15,7 @@ export default function ChapterVocabManager() {
   const [success, setSuccess] = useState('');
   const [editingChapter, setEditingChapter] = useState(null);
   const [editingWords, setEditingWords] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const [form, setForm] = useState({
     level: 'A1',
@@ -129,6 +130,7 @@ export default function ChapterVocabManager() {
 
   const handleEditStart = (chap) => {
     setEditingChapter(chap);
+    setSearchQuery('');
     const words = (chap.json_data || []).map(word => ({
       ...word,
       accepted_answers_str: word.accepted_answers ? word.accepted_answers.join(', ') : '',
@@ -339,13 +341,24 @@ export default function ChapterVocabManager() {
       {/* Edit Overlay */}
       {editingChapter && (
         <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-5xl max-h-[90vh] flex flex-col shadow-2xl animate-fade-in overflow-hidden">
-            <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900 z-10 shrink-0">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-7xl max-h-[90vh] flex flex-col shadow-2xl animate-fade-in overflow-hidden">
+            <div className="p-6 border-b border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900 z-10 shrink-0">
               <div>
                 <h3 className="text-2xl font-bold text-white">Edit Level {editingChapter.level} - Chapter {editingChapter.chapter_number}</h3>
                 <p className="text-slate-400 text-sm mt-1">Update primary words or add comma-separated synonyms for typing mode.</p>
               </div>
-              <div className="flex gap-4">
+              
+              <div className="flex items-center gap-4 w-full sm:w-auto">
+                <div className="relative flex-1 sm:w-64">
+                  <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search words..."
+                    className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-4 py-2 text-sm text-white focus:outline-none focus:border-amber-500"
+                  />
+                </div>
                 <button 
                   onClick={() => setEditingChapter(null)} 
                   className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-xl transition flex items-center gap-2"
@@ -356,67 +369,76 @@ export default function ChapterVocabManager() {
                   onClick={handleEditSave} 
                   className="px-6 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl transition flex items-center gap-2 shadow-lg hover:shadow-amber-500/20"
                 >
-                  <Save className="w-4 h-4" /> Save Changes
+                  <Save className="w-4 h-4" /> Save All
                 </button>
               </div>
             </div>
             
-            <div className="p-6 overflow-y-auto custom-scrollbar flex-1 space-y-6">
-              {editingWords.map((word, idx) => (
-                <div key={idx} className="bg-slate-950 border border-slate-800 p-5 rounded-2xl">
-                  <div className="mb-4">
-                    <span className="inline-block px-3 py-1 bg-slate-800 text-slate-400 rounded-lg text-xs font-bold">Word {idx + 1}</span>
-                  </div>
-                  
-                  <div className="grid md:grid-cols-2 gap-6">
-                    {/* German Side */}
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-xs font-bold text-amber-500 mb-1 uppercase tracking-wider">Primary German Word</label>
+            <div className="flex-1 overflow-y-auto custom-scrollbar p-0 relative">
+              <table className="w-full text-left border-collapse">
+                <thead className="bg-slate-950 sticky top-0 z-10">
+                  <tr>
+                    <th className="px-6 py-4 text-xs font-bold text-amber-500 uppercase tracking-wider border-b border-slate-800">Primary German</th>
+                    <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-800">German Synonyms</th>
+                    <th className="px-6 py-4 text-xs font-bold text-emerald-500 uppercase tracking-wider border-b border-slate-800 border-l">Primary English</th>
+                    <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider border-b border-slate-800">English Synonyms</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-800/50">
+                  {editingWords
+                    .map((word, index) => ({ ...word, originalIndex: index }))
+                    .filter(w => 
+                      (w.german || '').toLowerCase().includes(searchQuery.toLowerCase()) || 
+                      (w.english || '').toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                    .map((word) => (
+                    <tr key={word.originalIndex} className="hover:bg-slate-800/20 transition-colors">
+                      <td className="p-2 border-r border-slate-800/50 w-1/4">
                         <input 
                           type="text" 
                           value={word.german} 
-                          onChange={(e) => handleWordChange(idx, 'german', e.target.value)}
-                          className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
+                          onChange={(e) => handleWordChange(word.originalIndex, 'german', e.target.value)}
+                          className="w-full bg-transparent px-3 py-2 text-sm text-white focus:bg-slate-950 focus:outline-none focus:ring-1 focus:ring-amber-500 rounded"
                         />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-slate-400 mb-1">German Synonyms (Comma separated)</label>
+                      </td>
+                      <td className="p-2 border-r border-slate-800/50 w-1/4">
                         <input 
                           type="text" 
                           value={word.accepted_german_answers_str} 
-                          onChange={(e) => handleWordChange(idx, 'accepted_german_answers_str', e.target.value)}
-                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300 focus:border-amber-500 focus:outline-none"
+                          onChange={(e) => handleWordChange(word.originalIndex, 'accepted_german_answers_str', e.target.value)}
+                          className="w-full bg-transparent px-3 py-2 text-sm text-slate-400 focus:text-white focus:bg-slate-950 focus:outline-none focus:ring-1 focus:ring-amber-500 rounded"
                           placeholder="e.g. Auto, PKW"
                         />
-                      </div>
-                    </div>
-                    
-                    {/* English Side */}
-                    <div className="space-y-4">
-                      <div>
-                        <label className="block text-xs font-bold text-emerald-500 mb-1 uppercase tracking-wider">Primary English Word</label>
+                      </td>
+                      <td className="p-2 border-r border-slate-800/50 w-1/4">
                         <input 
                           type="text" 
                           value={word.english} 
-                          onChange={(e) => handleWordChange(idx, 'english', e.target.value)}
-                          className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:border-emerald-500 focus:outline-none"
+                          onChange={(e) => handleWordChange(word.originalIndex, 'english', e.target.value)}
+                          className="w-full bg-transparent px-3 py-2 text-sm text-white focus:bg-slate-950 focus:outline-none focus:ring-1 focus:ring-emerald-500 rounded"
                         />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-slate-400 mb-1">English Synonyms (Comma separated)</label>
+                      </td>
+                      <td className="p-2 w-1/4">
                         <input 
                           type="text" 
                           value={word.accepted_answers_str} 
-                          onChange={(e) => handleWordChange(idx, 'accepted_answers_str', e.target.value)}
-                          className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-300 focus:border-emerald-500 focus:outline-none"
+                          onChange={(e) => handleWordChange(word.originalIndex, 'accepted_answers_str', e.target.value)}
+                          className="w-full bg-transparent px-3 py-2 text-sm text-slate-400 focus:text-white focus:bg-slate-950 focus:outline-none focus:ring-1 focus:ring-emerald-500 rounded"
                           placeholder="e.g. car, automobile"
                         />
-                      </div>
-                    </div>
-                  </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {editingWords.filter(w => 
+                (w.german || '').toLowerCase().includes(searchQuery.toLowerCase()) || 
+                (w.english || '').toLowerCase().includes(searchQuery.toLowerCase())
+              ).length === 0 && (
+                <div className="p-12 text-center text-slate-500">
+                  No words found matching "{searchQuery}"
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>
