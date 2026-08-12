@@ -5,11 +5,12 @@ import { supabase } from '../lib/supabaseClient';
 import {
   CheckSquare, BookOpen, Key, User,
   ArrowRight, Loader2, PlayCircle, CheckCircle, AlertCircle, Trophy,
-  LogOut, LayoutDashboard, Languages, MessageCircle, Brain
+  LogOut, LayoutDashboard, Languages, MessageCircle, Brain, Volume2
 } from 'lucide-react';
 import Link from 'next/link';
 import ChapterVocabEngine from '../components/ChapterVocabEngine';
 import ReadingTestEngine from '../components/ReadingTestEngine';
+import AlphabetNumbersEngine from '../components/AlphabetNumbersEngine';
 
 export default function PracticeTests() {
   // Navigation Steps:
@@ -619,7 +620,7 @@ export default function PracticeTests() {
 
             <button
               onClick={() => navigateToContent('Vocab Test')}
-              className="p-6 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-6 hover:border-amber-500 transition-all group shadow-lg hover:shadow-amber-500/10 text-left md:col-span-2"
+              className="p-6 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-6 hover:border-amber-500 transition-all group shadow-lg hover:shadow-amber-500/10 text-left"
             >
               <div className="w-16 h-16 shrink-0 bg-amber-500/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform border border-amber-500/20">
                 <Languages className="w-8 h-8 text-amber-400" />
@@ -627,6 +628,19 @@ export default function PracticeTests() {
               <div>
                 <h3 className="text-xl font-bold text-white mb-1 group-hover:text-amber-400 transition-colors">Vocab Test</h3>
                 <p className="text-sm text-slate-400">Test your vocabulary and word meaning skills.</p>
+              </div>
+            </button>
+
+            <button
+              onClick={() => setStep('alphabet_engine')}
+              className="p-6 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-6 hover:border-amber-500 transition-all group shadow-lg hover:shadow-amber-500/10 text-left"
+            >
+              <div className="w-16 h-16 shrink-0 bg-amber-500/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform border border-amber-500/20">
+                <Volume2 className="w-8 h-8 text-amber-400" />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-white mb-1 group-hover:text-amber-400 transition-colors">Alphabet & Numbers</h3>
+                <p className="text-sm text-slate-400">Practice German alphabet and numbers pronunciation.</p>
               </div>
             </button>
           </div>
@@ -644,6 +658,13 @@ export default function PracticeTests() {
             studentName={studentName}
             verifiedCode={verifiedCode}
           />
+        </div>
+      )}
+
+      {/* ───── STEP: Alphabet & Numbers Engine ───── */}
+      {step === 'alphabet_engine' && (
+        <div className="w-full mt-4 flex-1">
+          <AlphabetNumbersEngine onBack={() => setStep(3)} />
         </div>
       )}
 
