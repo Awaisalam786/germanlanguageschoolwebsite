@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { BookOpen, Upload, Trash2, Loader2, CheckCircle, AlertCircle, Edit2, X, Save, Search, Eye, Play } from 'lucide-react';
 import { translations } from '../i18n/translations';
@@ -16,6 +16,7 @@ export default function ChapterVocabManager() {
   const [editingChapter, setEditingChapter] = useState(null);
   const [editingWords, setEditingWords] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [globalSearchQuery, setGlobalSearchQuery] = useState('');
   
   // Preview State
   const [previewIndex, setPreviewIndex] = useState(null);
@@ -51,6 +52,28 @@ export default function ChapterVocabManager() {
     }
     setLoading(false);
   };
+
+  const globalSearchResults = useMemo(() => {
+    if (!globalSearchQuery.trim()) return [];
+    const query = globalSearchQuery.toLowerCase();
+    const results = [];
+    
+    for (const chap of chapters) {
+      if (!chap.json_data) continue;
+      for (const word of chap.json_data) {
+        if (
+          (word.german || '').toLowerCase().includes(query) ||
+          (word.english || '').toLowerCase().includes(query)
+        ) {
+          results.push({
+            chapter: chap,
+            word: word
+          });
+        }
+      }
+    }
+    return results;
+  }, [globalSearchQuery, chapters]);
 
   const handleUpload = async (e) => {
     e.preventDefault();
@@ -231,6 +254,44 @@ export default function ChapterVocabManager() {
           <h1 className="text-3xl font-extrabold text-white">Chapter Vocabulary</h1>
           <p className="text-slate-400 text-sm mt-1">Manage JSON-powered multi-chapter vocabulary tests.</p>
         </div>
+      </div>
+
+      {/* Global Search */}
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl mb-6 relative z-10">
+        <div className="relative">
+          <Search className="w-5 h-5 text-slate-500 absolute left-4 top-1/2 -translate-y-1/2" />
+          <input 
+             value={globalSearchQuery}
+             onChange={e => setGlobalSearchQuery(e.target.value)}
+             placeholder="Global Search: Find a word across all chapters and levels..."
+             className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-12 pr-4 py-3 text-white focus:outline-none focus:border-blue-500"
+          />
+        </div>
+        {globalSearchResults.length > 0 && (
+           <div className="mt-4 max-h-60 overflow-y-auto custom-scrollbar border border-slate-800 rounded-xl divide-y divide-slate-800/50">
+             {globalSearchResults.map((res, i) => (
+               <div key={i} className="flex justify-between items-center p-3 bg-slate-950 hover:bg-slate-900 transition">
+                 <div>
+                   <div className="font-bold text-white">{res.word.german} <span className="text-slate-500 font-normal mx-2">•</span> <span className="text-emerald-400 font-normal">{res.word.english}</span></div>
+                   <div className="text-xs text-slate-400 mt-1">Level {res.chapter.level} - Chapter {res.chapter.chapter_number}</div>
+                 </div>
+                 <button 
+                   onClick={() => {
+                      setGlobalSearchQuery('');
+                      handleEditStart(res.chapter);
+                      setSearchQuery(res.word.german);
+                   }}
+                   className="px-3 py-1.5 bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white rounded-lg text-xs font-bold transition flex items-center gap-1"
+                 >
+                   <Edit2 className="w-3 h-3" /> Edit
+                 </button>
+               </div>
+             ))}
+           </div>
+        )}
+        {globalSearchQuery.trim() && globalSearchResults.length === 0 && (
+           <div className="mt-4 p-4 text-center text-slate-500 bg-slate-950 rounded-xl border border-slate-800">No matching words found across any chapter.</div>
+        )}
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
