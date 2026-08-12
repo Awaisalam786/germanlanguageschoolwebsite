@@ -5,9 +5,36 @@ export default function AlphabetNumbersEngine({ onBack }) {
   const [playing, setPlaying] = useState(null);
 
   const alphabet = [
-    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 
-    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 
-    'Ä', 'Ö', 'Ü', 'ß'
+    { letter: 'A', pron: 'Ah' },
+    { letter: 'B', pron: 'Beh' },
+    { letter: 'C', pron: 'Tseh' },
+    { letter: 'D', pron: 'Deh' },
+    { letter: 'E', pron: 'Eh' },
+    { letter: 'F', pron: 'Ef' },
+    { letter: 'G', pron: 'Geh' },
+    { letter: 'H', pron: 'Hah' },
+    { letter: 'I', pron: 'Ih' },
+    { letter: 'J', pron: 'Yot' },
+    { letter: 'K', pron: 'Kah' },
+    { letter: 'L', pron: 'El' },
+    { letter: 'M', pron: 'Em' },
+    { letter: 'N', pron: 'En' },
+    { letter: 'O', pron: 'Oh' },
+    { letter: 'P', pron: 'Peh' },
+    { letter: 'Q', pron: 'Kuh' },
+    { letter: 'R', pron: 'Er' },
+    { letter: 'S', pron: 'Es' },
+    { letter: 'T', pron: 'Teh' },
+    { letter: 'U', pron: 'Uh' },
+    { letter: 'V', pron: 'Fau' },
+    { letter: 'W', pron: 'Veh' },
+    { letter: 'X', pron: 'Iks' },
+    { letter: 'Y', pron: 'Ypsilon' },
+    { letter: 'Z', pron: 'Tset' },
+    { letter: 'Ä', pron: 'Ah-Umlaut' },
+    { letter: 'Ö', pron: 'Oh-Umlaut' },
+    { letter: 'Ü', pron: 'Uh-Umlaut' },
+    { letter: 'ß', pron: 'Eszett' }
   ];
 
   const numbers = [
@@ -83,28 +110,32 @@ export default function AlphabetNumbersEngine({ onBack }) {
           Das Alphabet
         </h2>
         
-        <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3">
-          {alphabet.map((letter) => {
-            const id = `alpha_${letter}`;
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+          {alphabet.map((item) => {
+            const id = `alpha_${item.letter}`;
             const isPlaying = playing === id;
             return (
               <button
-                key={letter}
-                onClick={() => playAudio(letter, id)}
-                className={`relative group aspect-square flex flex-col items-center justify-center rounded-2xl border transition-all duration-300 overflow-hidden ${
+                key={item.letter}
+                onClick={() => playAudio(item.letter, id)}
+                className={`relative group p-4 flex flex-col items-center justify-center rounded-2xl border transition-all duration-300 overflow-hidden ${
                   isPlaying 
                     ? 'bg-amber-500 border-amber-400 scale-105 shadow-[0_0_20px_rgba(245,158,11,0.3)]' 
                     : 'bg-slate-950 border-slate-800 hover:border-amber-500/50 hover:bg-slate-800'
                 }`}
               >
-                {/* Glow effect behind text on hover */}
                 <div className="absolute inset-0 bg-gradient-to-br from-amber-500/0 to-amber-500/0 group-hover:from-amber-500/5 group-hover:to-transparent transition-colors"></div>
                 
-                <span className={`text-3xl sm:text-4xl font-bold z-10 transition-colors duration-300 ${isPlaying ? 'text-slate-950' : 'text-white group-hover:text-amber-400'}`}>
-                  {letter}
+                <span className={`text-3xl sm:text-4xl font-extrabold mb-1 z-10 transition-colors duration-300 ${isPlaying ? 'text-slate-950' : 'text-white group-hover:text-amber-400'}`}>
+                  {item.letter}
+                </span>
+                <span className={`text-sm font-medium z-10 transition-colors duration-300 ${isPlaying ? 'text-amber-950/70' : 'text-slate-500 group-hover:text-amber-200'}`}>
+                  {item.pron}
                 </span>
                 
-                <Volume2 className={`w-4 h-4 mt-2 z-10 transition-colors duration-300 ${isPlaying ? 'text-slate-950 opacity-100' : 'text-slate-500 opacity-0 group-hover:opacity-100'}`} />
+                <div className={`absolute top-2 right-2 transition-opacity duration-300 ${isPlaying ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}>
+                  <Volume2 className={`w-3.5 h-3.5 ${isPlaying ? 'text-amber-950' : 'text-slate-500'}`} />
+                </div>
               </button>
             );
           })}
