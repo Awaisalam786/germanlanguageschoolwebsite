@@ -150,25 +150,15 @@ export default function GrammarEngine({ level, onBack, userType, storedFreeUser,
     let isCorrect = false;
     let actualUserAnswerString = typeof userAns === 'string' ? userAns : userAns.join(' ');
     
-    if (currentQ.type === 'hint_construction') {
-      // STRICT CHECKING (preserve case and punctuation, only trim whitespace)
-      const correctAnswer = currentQ.correct_answer;
-      const allCorrects = [correctAnswer, ...(currentQ.accepted_answers || [])].map(a => (a || '').trim());
-      
-      isCorrect = allCorrects.includes(actualUserAnswerString.trim());
-    } else if (currentQ.type === 'word_order') {
-      // WORD ORDER CHECKING: Strip all punctuation and case. 
-      // The student is just ordering chips, so we only care if the word sequence matches.
-      const normalizeWO = (str) => (str || '').toLowerCase().replace(/[.,!?]/g, '').replace(/\s+/g, ' ').trim();
-      const normalizedUser = normalizeWO(actualUserAnswerString);
-      const normalizedCorrect = normalizeWO(currentQ.correct_sentence);
-      isCorrect = normalizedUser === normalizedCorrect;
+    // ALL EXERCISES NOW USE RELAXED CHECKING (ignore case and all punctuation)
+    // The focus is on grammar rules/vocab/order rather than exact typing syntax.
+    const normalize = (str) => (str || '').toLowerCase().replace(/[.,!?]/g, '').replace(/\s+/g, ' ').trim();
+    const normalizedUser = normalize(actualUserAnswerString);
+
+    if (currentQ.type === 'word_order') {
+      isCorrect = normalizedUser === normalize(currentQ.correct_sentence);
     } else {
-      // RELAXED CHECKING (fill_blank, mcq) - lowercase, strip trailing punctuation
-      const normalize = (str) => (str || '').toLowerCase().trim().replace(/[.,!?]+$/, '');
-      const normalizedUser = normalize(actualUserAnswerString);
       const allCorrects = [currentQ.correct_answer, ...(currentQ.accepted_answers || [])].map(normalize);
-      
       isCorrect = allCorrects.includes(normalizedUser);
     }
 
@@ -436,17 +426,12 @@ export default function GrammarEngine({ level, onBack, userType, storedFreeUser,
                         type="text"
                         value={typedAnswer}
                         onChange={(e) => setTypedAnswer(e.target.value)}
-                        placeholder={currentQ.type === 'hint_construction' ? "Type the full sentence exactly (case & punctuation matter)..." : "Type your answer..."}
+                        placeholder={currentQ.type === 'hint_construction' ? "Translate using hint words..." : "Type your answer..."}
                         className="w-full bg-slate-950 border border-slate-700 focus:border-emerald-500 rounded-2xl px-6 py-4 text-xl text-white text-center focus:outline-none focus:ring-4 focus:ring-emerald-500/20 transition-all shadow-inner"
                         autoComplete="off"
                         autoCorrect="off"
                         spellCheck="false"
                       />
-                      {currentQ.type === 'hint_construction' && (
-                        <p className="text-[11px] text-amber-500 text-center uppercase tracking-wider font-bold">
-                          Strict checking: Capitalization and punctuation (. , ?) must be exact!
-                        </p>
-                      )}
                       <button 
                         type="submit" 
                         disabled={!typedAnswer.trim()}
@@ -491,10 +476,6 @@ export default function GrammarEngine({ level, onBack, userType, storedFreeUser,
                           </button>
                         ))}
                       </div>
-                      
-                      <p className="text-[11px] text-amber-500 text-center uppercase tracking-wider font-bold">
-                        Strict checking: Order and punctuation matter!
-                      </p>
 
                       <button
                         onClick={() => handleAnswer(selectedChips)}

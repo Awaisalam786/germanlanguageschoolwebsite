@@ -237,28 +237,19 @@ export default function GrammarChaptersManager() {
 
   // --- Evaluation Logic for Preview ---
   const checkAnswer = (ex, typedAns, chipOrder = []) => {
-    const normalize = (text) => (text || '').trim().toLowerCase().replace(/[.,!?]+$/, "");
+    // ALL EXERCISES NOW USE RELAXED CHECKING (ignore case and all punctuation)
+    const normalize = (text) => (text || '').toLowerCase().replace(/[.,!?]/g, "").replace(/\s+/g, ' ').trim();
     
-    if (ex.type === 'fill_blank' || ex.type === 'mcq') {
-      const correct = normalize(ex.correct_answer || '');
-      const accepted = (ex.accepted_answers || []).map(normalize);
-      const student = normalize(typedAns || '');
-      return student === correct || accepted.includes(student);
-    }
     if (ex.type === 'word_order') {
-      // WORD ORDER CHECKING: Strip all punctuation and case globally.
-      const normalizeWO = (str) => (str || '').toLowerCase().replace(/[.,!?]/g, '').replace(/\s+/g, ' ').trim();
-      const correct = normalizeWO(ex.correct_sentence);
-      const student = normalizeWO(chipOrder.join(' '));
+      const correct = normalize(ex.correct_sentence);
+      const student = normalize(chipOrder.join(' '));
       return student === correct;
-    }
-    if (ex.type === 'hint_construction') {
-      const correct = (ex.correct_answer || '').trim();
-      const accepted = (ex.accepted_answers || []).map(a => a.trim());
-      const student = (typedAns || '').trim();
+    } else {
+      const correct = normalize(ex.correct_answer);
+      const accepted = (ex.accepted_answers || []).map(normalize);
+      const student = normalize(typedAns);
       return student === correct || accepted.includes(student);
     }
-    return false;
   };
 
   const displayedChapters = chapters.filter(c => c.exercise_type === activeTab);
