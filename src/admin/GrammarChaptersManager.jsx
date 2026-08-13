@@ -16,6 +16,7 @@ export default function GrammarChaptersManager() {
   const [editingChapter, setEditingChapter] = useState(null);
   const [editingExercises, setEditingExercises] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [globalSearchQuery, setGlobalSearchQuery] = useState('');
   
   // New state for exercise type tabs
   const [activeTab, setActiveTab] = useState('fill_blank');
@@ -204,14 +205,89 @@ export default function GrammarChaptersManager() {
     );
   }, [searchQuery, editingExercises]);
 
+  const globalSearchResults = useMemo(() => {
+    if (!globalSearchQuery.trim()) return [];
+    const query = globalSearchQuery.toLowerCase();
+    const results = [];
+    chapters.forEach(chap => {
+      (chap.json_data || []).forEach(ex => {
+        if (
+          (ex.topic || '').toLowerCase().includes(query) ||
+          (ex.question || ex.prompt || ex.correct_sentence || '').toLowerCase().includes(query) ||
+          (ex.correct_answer || '').toLowerCase().includes(query) ||
+          (ex.type || '').toLowerCase().includes(query)
+        ) {
+          results.push({
+            chapter: chap,
+            exercise: ex
+          });
+        }
+      });
+    });
+    return results.slice(0, 50); // limit to 50 results
+  }, [globalSearchQuery, chapters]);
+
+  const jumpToEdit = (chap, queryStr) => {
+    setActiveTab(chap.exercise_type);
+    handleEditStart(chap);
+    setSearchQuery(queryStr);
+    setGlobalSearchQuery('');
+  };
+
   const displayedChapters = chapters.filter(c => c.exercise_type === activeTab);
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
           <h1 className="text-3xl font-extrabold text-white">Grammar Chapters</h1>
           <p className="text-slate-400 text-sm mt-1">Organize exercises by type and topic.</p>
+        </div>
+        
+        <div className="w-full md:w-[28rem] relative z-40">
+          <Search className="w-5 h-5 text-slate-500 absolute left-4 top-1/2 -translate-y-1/2" />
+          <input 
+            type="text" 
+            placeholder="Global search across all chapters & types..."
+            value={globalSearchQuery}
+            onChange={(e) => setGlobalSearchQuery(e.target.value)}
+            className="w-full bg-slate-900 border border-slate-700 rounded-xl pl-11 pr-4 py-3 text-sm text-white focus:outline-none focus:border-emerald-500 shadow-xl"
+          />
+          
+          {globalSearchQuery && (
+            <div className="absolute top-full left-0 right-0 mt-2 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl max-h-96 overflow-y-auto custom-scrollbar">
+              {globalSearchResults.length === 0 ? (
+                <div className="p-4 text-sm text-slate-400 text-center">No results found globally.</div>
+              ) : (
+                <div className="divide-y divide-slate-800">
+                  {globalSearchResults.map((res, idx) => {
+                    const text = res.exercise.question || res.exercise.prompt || res.exercise.correct_sentence || res.exercise.correct_answer || 'Exercise';
+                    return (
+                      <div key={idx} className="p-4 hover:bg-slate-800/50 flex justify-between items-center gap-4 group transition cursor-default">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="text-[10px] uppercase font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded">
+                              {res.chapter.exercise_type.replace('_', ' ')}
+                            </span>
+                            <span className="text-xs text-slate-400 truncate">
+                              Lvl {res.chapter.level} - Ch {res.chapter.chapter_number}: {res.chapter.topic_title}
+                            </span>
+                          </div>
+                          <p className="text-sm text-white truncate" title={text}>{text}</p>
+                        </div>
+                        <button 
+                          onClick={() => jumpToEdit(res.chapter, globalSearchQuery)}
+                          className="p-2 bg-blue-500/10 text-blue-400 hover:bg-blue-500 hover:text-white rounded-lg transition shrink-0 opacity-0 group-hover:opacity-100"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
