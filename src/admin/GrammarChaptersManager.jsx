@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { BookOpen, Upload, Trash2, Loader2, CheckCircle, AlertCircle, Edit2, X, Save, Search, Type, List, AlignLeft, Edit3 } from 'lucide-react';
+import { BookOpen, Upload, Trash2, Loader2, CheckCircle, AlertCircle, Edit2, X, Save, Search, Type, List, AlignLeft, Edit3, Play } from 'lucide-react';
 import { translations } from '../i18n/translations';
 import { useGlobalState } from '../context/GlobalStateContext';
 
