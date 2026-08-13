@@ -46,7 +46,25 @@ export default function GrammarEngine({ level, onBack, userType, storedFreeUser,
       .order('chapter_number', { ascending: true });
       
     if (!error && data) {
-      setChapters(data);
+      // Group by chapter_number to consolidate different exercise types into one logical chapter
+      const grouped = {};
+      data.forEach(row => {
+        if (!grouped[row.chapter_number]) {
+          grouped[row.chapter_number] = {
+            id: `chap_${row.chapter_number}`,
+            chapter_number: row.chapter_number,
+            topic_title: row.topic_title,
+            level: row.level,
+            word_count: 0,
+            json_data: []
+          };
+        }
+        grouped[row.chapter_number].word_count += (row.word_count || 0);
+        if (row.json_data) {
+          grouped[row.chapter_number].json_data = [...grouped[row.chapter_number].json_data, ...row.json_data];
+        }
+      });
+      setChapters(Object.values(grouped).sort((a, b) => a.chapter_number - b.chapter_number));
     }
     setLoading(false);
   };

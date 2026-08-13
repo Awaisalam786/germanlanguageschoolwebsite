@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { BookOpen, Upload, Trash2, Loader2, CheckCircle, AlertCircle, Edit2, X, Save, Search, Play } from 'lucide-react';
+import { BookOpen, Upload, Trash2, Loader2, CheckCircle, AlertCircle, Edit2, X, Save, Search, Type, List, AlignLeft, Edit3 } from 'lucide-react';
 import { translations } from '../i18n/translations';
 import { useGlobalState } from '../context/GlobalStateContext';
 
@@ -17,12 +17,22 @@ export default function GrammarChaptersManager() {
   const [editingExercises, setEditingExercises] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   
+  // New state for exercise type tabs
+  const [activeTab, setActiveTab] = useState('fill_blank');
+  
   const [form, setForm] = useState({
     level: 'A1',
     chapter_number: '',
     topic_title: '',
     json_text: ''
   });
+
+  const EXERCISE_TABS = [
+    { id: 'fill_blank', label: 'Fill in the Blanks', icon: Edit3 },
+    { id: 'mcq', label: 'Multiple Choice', icon: List },
+    { id: 'word_order', label: 'Sentence Structure', icon: AlignLeft },
+    { id: 'hint_construction', label: 'Hint Construction', icon: Type }
+  ];
 
   useEffect(() => {
     fetchChapters();
@@ -38,8 +48,8 @@ export default function GrammarChaptersManager() {
       
     if (error) {
       console.error(error);
-      if (error.code === '42P01') {
-        setError("Table 'grammar_chapters' does not exist. Please run the SQL schema script in your Supabase dashboard.");
+      if (error.code === '42P01' || error.message.includes('exercise_type')) {
+        setError("Database schema error. Please run the SQL patch to add exercise_type to grammar_chapters.");
       }
     } else {
       setChapters(data || []);
@@ -66,6 +76,12 @@ export default function GrammarChaptersManager() {
       if (parsedJson.length === 0) {
         throw new Error("JSON array cannot be empty.");
       }
+      
+      // Enforce that all items in the array match the active tab's type (optional but good for consistency)
+      const invalidItems = parsedJson.filter(item => item.type !== activeTab);
+      if (invalidItems.length > 0) {
+         throw new Error(`Found exercises with type other than '${activeTab}'. Please ensure all exercises match the selected tab.`);
+      }
     } catch (err) {
       setError('Invalid JSON format: ' + err.message);
       return;
@@ -73,12 +89,13 @@ export default function GrammarChaptersManager() {
 
     setUploading(true);
 
-    // Check if chapter already exists
+    // Check if chapter/type already exists
     const { data: existing } = await supabase
       .from('grammar_chapters')
       .select('id')
       .eq('level', form.level)
-      .eq('chapter_number', parseInt(form.chapter_number));
+      .eq('chapter_number', parseInt(form.chapter_number))
+      .eq('exercise_type', activeTab);
 
     if (existing && existing.length > 0) {
       // Update existing
@@ -93,7 +110,7 @@ export default function GrammarChaptersManager() {
 
       if (updateErr) setError(updateErr.message);
       else {
-        setSuccess(`Chapter ${form.chapter_number} updated successfully!`);
+        setSuccess(`Chapter ${form.chapter_number} (${activeTab}) updated successfully!`);
         setForm({ ...form, chapter_number: '', topic_title: '', json_text: '' });
         fetchChapters();
       }
@@ -104,6 +121,7 @@ export default function GrammarChaptersManager() {
         .insert([{
           level: form.level,
           chapter_number: parseInt(form.chapter_number),
+          exercise_type: activeTab,
           topic_title: form.topic_title,
           json_data: parsedJson,
           word_count: parsedJson.length
@@ -111,7 +129,7 @@ export default function GrammarChaptersManager() {
 
       if (insertErr) setError(insertErr.message);
       else {
-        setSuccess(`Chapter ${form.chapter_number} added successfully!`);
+        setSuccess(`Chapter ${form.chapter_number} (${activeTab}) added successfully!`);
         setForm({ ...form, chapter_number: '', topic_title: '', json_text: '' });
         fetchChapters();
       }
@@ -121,7 +139,7 @@ export default function GrammarChaptersManager() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this chapter?")) return;
+    if (!window.confirm("Are you sure you want to delete this chapter's exercises for this type?")) return;
     const { error } = await supabase.from('grammar_chapters').delete().eq('id', id);
     if (error) setError(error.message);
     else fetchChapters();
@@ -186,29 +204,37 @@ export default function GrammarChaptersManager() {
     );
   }, [searchQuery, editingExercises]);
 
-  const getStimulus = (ex) => {
-    if (ex.type === 'word_order') return (ex.scrambled_words || []).join(', ');
-    if (ex.type === 'hint_construction') return `${ex.prompt} | ${ex.sentence_template}`;
-    return ex.question || '';
-  };
-
-  const getAnswer = (ex) => {
-    if (ex.type === 'word_order') return ex.correct_sentence || '';
-    return ex.correct_answer || '';
-  };
-
-  const getOptionsOrAccepted = (ex) => {
-    if (ex.type === 'mcq') return (ex.options || []).join(', ');
-    return (ex.accepted_answers || []).join(', ');
-  };
+  const displayedChapters = chapters.filter(c => c.exercise_type === activeTab);
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-extrabold text-white">Grammar Chapters</h1>
-          <p className="text-slate-400 text-sm mt-1">Manage JSON-powered multi-type grammar exercises.</p>
+          <p className="text-slate-400 text-sm mt-1">Organize exercises by type and topic.</p>
         </div>
+      </div>
+
+      {/* Tabs */}
+      <div className="flex flex-wrap gap-2 mb-6 border-b border-slate-800 pb-4">
+        {EXERCISE_TABS.map(tab => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => { setActiveTab(tab.id); setError(''); setSuccess(''); }}
+              className={`flex items-center gap-2 px-4 py-3 rounded-xl font-bold transition-all ${
+                isActive 
+                  ? 'bg-emerald-500 text-slate-950 shadow-lg shadow-emerald-500/20' 
+                  : 'bg-slate-900 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800'
+              }`}
+            >
+              <Icon className="w-5 h-5" />
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
@@ -217,7 +243,7 @@ export default function GrammarChaptersManager() {
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl sticky top-6">
             <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
               <Upload className="w-5 h-5 text-emerald-400" />
-              Upload Grammar JSON
+              Upload {EXERCISE_TABS.find(t => t.id === activeTab)?.label}
             </h2>
 
             {error && (
@@ -288,7 +314,7 @@ export default function GrammarChaptersManager() {
                   value={form.json_text}
                   onChange={e => setForm({...form, json_text: e.target.value})}
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-300 focus:outline-none focus:border-emerald-500 custom-scrollbar"
-                  placeholder={`[\n  {\n    "type": "fill_blank",\n    "topic": "Präsens Verben",\n    "question": "Ich ___ (haben) ein Auto.",\n    "correct_answer": "habe",\n    "accepted_answers": ["habe"],\n    "explanation": "ich takes -e ending in Präsens"\n  }\n]`}
+                  placeholder={`[\n  {\n    "type": "${activeTab}",\n    "topic": "...",\n    "question": "...",\n    "correct_answer": "...",\n    "explanation": "..."\n  }\n]`}
                 />
               </div>
 
@@ -298,7 +324,7 @@ export default function GrammarChaptersManager() {
                 className="w-full py-3 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl transition shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"
               >
                 {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Upload className="w-5 h-5" />}
-                Save Chapter
+                Save {EXERCISE_TABS.find(t => t.id === activeTab)?.label}
               </button>
             </form>
           </div>
@@ -310,7 +336,7 @@ export default function GrammarChaptersManager() {
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-bold text-white flex items-center gap-2">
                 <BookOpen className="w-5 h-5 text-emerald-500" />
-                Uploaded Grammar Chapters
+                Uploaded {EXERCISE_TABS.find(t => t.id === activeTab)?.label}
               </h2>
               <button 
                 onClick={fetchChapters}
@@ -324,24 +350,24 @@ export default function GrammarChaptersManager() {
               <div className="py-12 flex justify-center">
                 <Loader2 className="w-8 h-8 text-emerald-500 animate-spin" />
               </div>
-            ) : chapters.length === 0 ? (
+            ) : displayedChapters.length === 0 ? (
               <div className="py-12 text-center text-slate-500 bg-slate-950/50 rounded-xl border border-slate-800 border-dashed">
-                No chapters uploaded yet.
+                No chapters uploaded for this type yet.
               </div>
             ) : (
               <div className="grid sm:grid-cols-2 gap-4">
-                {chapters.map(chap => (
-                  <div key={chap.id} className="bg-slate-950 border border-slate-800 rounded-xl p-4 flex items-center justify-between group">
+                {displayedChapters.map(chap => (
+                  <div key={chap.id} className="bg-slate-950 border border-slate-800 rounded-xl p-4 flex items-center justify-between group hover:border-emerald-500/50 transition">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center font-extrabold text-emerald-400 border border-emerald-500/20 text-lg">
+                      <div className="w-12 h-12 rounded-lg bg-emerald-500/10 flex items-center justify-center font-extrabold text-emerald-400 border border-emerald-500/20 text-lg shrink-0">
                         {chap.level}
                       </div>
                       <div>
-                        <h4 className="font-bold text-white">Ch {chap.chapter_number}: {chap.topic_title}</h4>
-                        <p className="text-xs text-slate-400">{chap.word_count} exercises</p>
+                        <h4 className="font-bold text-white leading-tight mb-1">Ch {chap.chapter_number}: {chap.topic_title}</h4>
+                        <p className="text-[11px] text-slate-400 font-medium uppercase tracking-wider">{chap.word_count} exercises</p>
                       </div>
                     </div>
-                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition">
+                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition shrink-0">
                       <button 
                         onClick={() => handleEditStart(chap)}
                         className="p-2 text-slate-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition"
@@ -371,7 +397,10 @@ export default function GrammarChaptersManager() {
           <div className="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-7xl max-h-[90vh] flex flex-col shadow-2xl animate-fade-in overflow-hidden">
             <div className="p-6 border-b border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-900 z-10 shrink-0">
               <div>
-                <h3 className="text-2xl font-bold text-white">Edit Level {editingChapter.level} - Chapter {editingChapter.chapter_number}</h3>
+                <h3 className="text-2xl font-bold text-white flex items-center gap-2">
+                  Edit Level {editingChapter.level} - Chapter {editingChapter.chapter_number}
+                  <span className="text-xs px-2 py-1 bg-emerald-500/20 text-emerald-400 rounded-full ml-2 uppercase tracking-wider">{activeTab.replace('_', ' ')}</span>
+                </h3>
                 <p className="text-slate-400 text-sm mt-1">{editingChapter.topic_title} — Update exercises, options, or accepted answers.</p>
               </div>
               
@@ -397,13 +426,38 @@ export default function GrammarChaptersManager() {
 
             <div className="flex-1 overflow-auto custom-scrollbar p-6 bg-slate-950/50">
               <div className="min-w-[900px]">
-                {/* Table Header */}
+                {/* Dynamic Table Header based on active tab */}
                 <div className="grid grid-cols-12 gap-2 p-3 bg-slate-900 border border-slate-800 rounded-t-xl text-xs font-bold text-slate-400 uppercase tracking-wider sticky top-0 z-10">
-                  <div className="col-span-1">Type</div>
-                  <div className="col-span-3">Stimulus (Question/Prompt)</div>
-                  <div className="col-span-2">Correct Answer</div>
-                  <div className="col-span-3">Options / Accepted (CSV)</div>
-                  <div className="col-span-3">Explanation</div>
+                  {activeTab === 'word_order' ? (
+                    <>
+                      <div className="col-span-4">Scrambled Words (CSV)</div>
+                      <div className="col-span-5">Correct Sentence</div>
+                      <div className="col-span-3">Explanation</div>
+                    </>
+                  ) : activeTab === 'hint_construction' ? (
+                    <>
+                      <div className="col-span-2">Prompt</div>
+                      <div className="col-span-2">Template</div>
+                      <div className="col-span-3">Correct Answer</div>
+                      <div className="col-span-2">Accepted Answers (CSV)</div>
+                      <div className="col-span-3">Explanation</div>
+                    </>
+                  ) : activeTab === 'mcq' ? (
+                    <>
+                      <div className="col-span-4">Question</div>
+                      <div className="col-span-2">Correct Answer</div>
+                      <div className="col-span-3">Options (CSV)</div>
+                      <div className="col-span-3">Explanation</div>
+                    </>
+                  ) : (
+                    // fill_blank
+                    <>
+                      <div className="col-span-4">Question</div>
+                      <div className="col-span-2">Correct Answer</div>
+                      <div className="col-span-3">Accepted Answers (CSV)</div>
+                      <div className="col-span-3">Explanation</div>
+                    </>
+                  )}
                 </div>
 
                 {/* Table Body */}
@@ -412,72 +466,96 @@ export default function GrammarChaptersManager() {
                     const originalIndex = editingExercises.indexOf(ex);
                     return (
                       <div key={originalIndex} className="grid grid-cols-12 gap-2 p-2 hover:bg-slate-800/30 transition items-center">
-                        <div className="col-span-1 px-2">
-                          <span className="text-[10px] uppercase font-bold text-slate-500 bg-slate-950 px-2 py-1 rounded">
-                            {ex.type}
-                          </span>
-                        </div>
                         
-                        {/* Stimulus */}
-                        <div className="col-span-3">
-                          {ex.type === 'word_order' ? (
-                            <input 
-                              type="text"
-                              value={getStimulus(ex)}
-                              onChange={(e) => handleCellChange(originalIndex, 'scrambled_words', e.target.value)}
-                              className="w-full bg-slate-950/50 border border-transparent hover:border-slate-700 focus:border-blue-500 rounded px-2 py-1.5 text-sm text-white focus:outline-none transition"
-                              title="Scrambled words (comma separated)"
-                            />
-                          ) : ex.type === 'hint_construction' ? (
-                            <div className="space-y-1">
+                        {activeTab === 'word_order' && (
+                          <>
+                            <div className="col-span-4">
+                              <input 
+                                type="text"
+                                value={(ex.scrambled_words || []).join(', ')}
+                                onChange={(e) => handleCellChange(originalIndex, 'scrambled_words', e.target.value)}
+                                className="w-full bg-slate-950/50 border border-transparent hover:border-slate-700 focus:border-blue-500 rounded px-2 py-1.5 text-sm text-white focus:outline-none transition"
+                              />
+                            </div>
+                            <div className="col-span-5">
+                              <input 
+                                type="text"
+                                value={ex.correct_sentence || ''}
+                                onChange={(e) => handleCellChange(originalIndex, 'correct_sentence', e.target.value)}
+                                className="w-full bg-slate-950/50 border border-transparent hover:border-slate-700 focus:border-blue-500 rounded px-2 py-1.5 text-sm text-white focus:outline-none transition"
+                              />
+                            </div>
+                          </>
+                        )}
+
+                        {activeTab === 'hint_construction' && (
+                          <>
+                            <div className="col-span-2">
                               <input 
                                 type="text"
                                 value={ex.prompt || ''}
                                 onChange={(e) => handleCellChange(originalIndex, 'prompt', e.target.value)}
-                                className="w-full bg-slate-950/50 border border-transparent hover:border-slate-700 focus:border-blue-500 rounded px-2 py-1 text-sm text-white focus:outline-none transition"
-                                placeholder="Prompt"
+                                className="w-full bg-slate-950/50 border border-transparent hover:border-slate-700 focus:border-blue-500 rounded px-2 py-1.5 text-sm text-white focus:outline-none transition"
                               />
+                            </div>
+                            <div className="col-span-2">
                               <input 
                                 type="text"
                                 value={ex.sentence_template || ''}
                                 onChange={(e) => handleCellChange(originalIndex, 'sentence_template', e.target.value)}
-                                className="w-full bg-slate-950/50 border border-transparent hover:border-slate-700 focus:border-blue-500 rounded px-2 py-1 text-sm text-slate-300 focus:outline-none transition"
-                                placeholder="Template"
+                                className="w-full bg-slate-950/50 border border-transparent hover:border-slate-700 focus:border-blue-500 rounded px-2 py-1.5 text-sm text-slate-300 focus:outline-none transition"
                               />
                             </div>
-                          ) : (
-                            <input 
-                              type="text"
-                              value={getStimulus(ex)}
-                              onChange={(e) => handleCellChange(originalIndex, 'question', e.target.value)}
-                              className="w-full bg-slate-950/50 border border-transparent hover:border-slate-700 focus:border-blue-500 rounded px-2 py-1.5 text-sm text-white focus:outline-none transition"
-                            />
-                          )}
-                        </div>
+                            <div className="col-span-3">
+                              <input 
+                                type="text"
+                                value={ex.correct_answer || ''}
+                                onChange={(e) => handleCellChange(originalIndex, 'correct_answer', e.target.value)}
+                                className="w-full bg-slate-950/50 border border-transparent hover:border-slate-700 focus:border-blue-500 rounded px-2 py-1.5 text-sm text-white focus:outline-none transition"
+                              />
+                            </div>
+                            <div className="col-span-2">
+                              <input 
+                                type="text"
+                                value={(ex.accepted_answers || []).join(', ')}
+                                onChange={(e) => handleCellChange(originalIndex, 'accepted_answers', e.target.value)}
+                                className="w-full bg-slate-950/50 border border-transparent hover:border-slate-700 focus:border-blue-500 rounded px-2 py-1.5 text-sm text-slate-300 focus:outline-none transition"
+                              />
+                            </div>
+                          </>
+                        )}
 
-                        {/* Correct Answer */}
-                        <div className="col-span-2">
-                          <input 
-                            type="text"
-                            value={getAnswer(ex)}
-                            onChange={(e) => handleCellChange(originalIndex, ex.type === 'word_order' ? 'correct_sentence' : 'correct_answer', e.target.value)}
-                            className="w-full bg-slate-950/50 border border-transparent hover:border-slate-700 focus:border-blue-500 rounded px-2 py-1.5 text-sm text-white focus:outline-none transition"
-                          />
-                        </div>
+                        {(activeTab === 'fill_blank' || activeTab === 'mcq') && (
+                          <>
+                            <div className="col-span-4">
+                              <input 
+                                type="text"
+                                value={ex.question || ''}
+                                onChange={(e) => handleCellChange(originalIndex, 'question', e.target.value)}
+                                className="w-full bg-slate-950/50 border border-transparent hover:border-slate-700 focus:border-blue-500 rounded px-2 py-1.5 text-sm text-white focus:outline-none transition"
+                              />
+                            </div>
+                            <div className="col-span-2">
+                              <input 
+                                type="text"
+                                value={ex.correct_answer || ''}
+                                onChange={(e) => handleCellChange(originalIndex, 'correct_answer', e.target.value)}
+                                className="w-full bg-slate-950/50 border border-transparent hover:border-slate-700 focus:border-blue-500 rounded px-2 py-1.5 text-sm text-white focus:outline-none transition"
+                              />
+                            </div>
+                            <div className="col-span-3">
+                              <input 
+                                type="text"
+                                value={activeTab === 'mcq' ? (ex.options || []).join(', ') : (ex.accepted_answers || []).join(', ')}
+                                onChange={(e) => handleCellChange(originalIndex, activeTab === 'mcq' ? 'options' : 'accepted_answers', e.target.value)}
+                                className="w-full bg-slate-950/50 border border-transparent hover:border-slate-700 focus:border-blue-500 rounded px-2 py-1.5 text-sm text-slate-300 focus:outline-none transition"
+                              />
+                            </div>
+                          </>
+                        )}
 
-                        {/* Options / Accepted Answers */}
+                        {/* Explanation is common to all */}
                         <div className="col-span-3">
-                          <input 
-                            type="text"
-                            value={getOptionsOrAccepted(ex)}
-                            onChange={(e) => handleCellChange(originalIndex, ex.type === 'mcq' ? 'options' : 'accepted_answers', e.target.value)}
-                            className="w-full bg-slate-950/50 border border-transparent hover:border-slate-700 focus:border-blue-500 rounded px-2 py-1.5 text-sm text-slate-300 focus:outline-none transition"
-                            placeholder="Comma separated"
-                          />
-                        </div>
-
-                        {/* Explanation */}
-                        <div className="col-span-3 flex gap-2 items-center">
                           <input 
                             type="text"
                             value={ex.explanation || ''}
