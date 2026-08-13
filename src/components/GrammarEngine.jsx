@@ -364,7 +364,7 @@ export default function GrammarEngine({ level, onBack, userType, storedFreeUser,
 
   if (appState === 'RUNNING') {
     return (
-      <div className="max-w-3xl mx-auto flex flex-col h-[80vh]">
+      <div className="max-w-3xl mx-auto w-full flex flex-col flex-1 pb-12">
         {/* Header bar */}
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-4">
