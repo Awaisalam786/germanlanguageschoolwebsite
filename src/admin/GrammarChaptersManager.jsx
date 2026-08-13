@@ -236,9 +236,9 @@ export default function GrammarChaptersManager() {
   };
 
   // --- Evaluation Logic for Preview ---
-  const normalize = (text) => text.trim().toLowerCase().replace(/[.,!?]/g, "");
-  
   const checkAnswer = (ex, typedAns, chipOrder = []) => {
+    const normalize = (text) => (text || '').trim().toLowerCase().replace(/[.,!?]+$/, "");
+    
     if (ex.type === 'fill_blank' || ex.type === 'mcq') {
       const correct = normalize(ex.correct_answer || '');
       const accepted = (ex.accepted_answers || []).map(normalize);
@@ -246,8 +246,10 @@ export default function GrammarChaptersManager() {
       return student === correct || accepted.includes(student);
     }
     if (ex.type === 'word_order') {
-      const correct = (ex.correct_sentence || '').trim();
-      const student = chipOrder.join(' ').trim();
+      // WORD ORDER CHECKING: Strip all punctuation and case globally.
+      const normalizeWO = (str) => (str || '').toLowerCase().replace(/[.,!?]/g, '').replace(/\s+/g, ' ').trim();
+      const correct = normalizeWO(ex.correct_sentence);
+      const student = normalizeWO(chipOrder.join(' '));
       return student === correct;
     }
     if (ex.type === 'hint_construction') {

@@ -150,12 +150,19 @@ export default function GrammarEngine({ level, onBack, userType, storedFreeUser,
     let isCorrect = false;
     let actualUserAnswerString = typeof userAns === 'string' ? userAns : userAns.join(' ');
     
-    if (currentQ.type === 'word_order' || currentQ.type === 'hint_construction') {
+    if (currentQ.type === 'hint_construction') {
       // STRICT CHECKING (preserve case and punctuation, only trim whitespace)
-      const correctAnswer = currentQ.type === 'word_order' ? currentQ.correct_sentence : currentQ.correct_answer;
+      const correctAnswer = currentQ.correct_answer;
       const allCorrects = [correctAnswer, ...(currentQ.accepted_answers || [])].map(a => (a || '').trim());
       
       isCorrect = allCorrects.includes(actualUserAnswerString.trim());
+    } else if (currentQ.type === 'word_order') {
+      // WORD ORDER CHECKING: Strip all punctuation and case. 
+      // The student is just ordering chips, so we only care if the word sequence matches.
+      const normalizeWO = (str) => (str || '').toLowerCase().replace(/[.,!?]/g, '').replace(/\s+/g, ' ').trim();
+      const normalizedUser = normalizeWO(actualUserAnswerString);
+      const normalizedCorrect = normalizeWO(currentQ.correct_sentence);
+      isCorrect = normalizedUser === normalizedCorrect;
     } else {
       // RELAXED CHECKING (fill_blank, mcq) - lowercase, strip trailing punctuation
       const normalize = (str) => (str || '').toLowerCase().trim().replace(/[.,!?]+$/, '');
