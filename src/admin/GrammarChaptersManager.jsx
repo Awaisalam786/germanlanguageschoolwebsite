@@ -17,6 +17,7 @@ export default function GrammarChaptersManager() {
   const [editingExercises, setEditingExercises] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [globalSearchQuery, setGlobalSearchQuery] = useState('');
+  const [previewExercise, setPreviewExercise] = useState(null);
   
   // New state for exercise type tabs
   const [activeTab, setActiveTab] = useState('fill_blank');
@@ -232,6 +233,30 @@ export default function GrammarChaptersManager() {
     handleEditStart(chap);
     setSearchQuery(queryStr);
     setGlobalSearchQuery('');
+  };
+
+  // --- Evaluation Logic for Preview ---
+  const normalize = (text) => text.trim().toLowerCase().replace(/[.,!?]/g, "");
+  
+  const checkAnswer = (ex, typedAns, chipOrder = []) => {
+    if (ex.type === 'fill_blank' || ex.type === 'mcq') {
+      const correct = normalize(ex.correct_answer || '');
+      const accepted = (ex.accepted_answers || []).map(normalize);
+      const student = normalize(typedAns || '');
+      return student === correct || accepted.includes(student);
+    }
+    if (ex.type === 'word_order') {
+      const correct = (ex.correct_sentence || '').trim();
+      const student = chipOrder.join(' ').trim();
+      return student === correct;
+    }
+    if (ex.type === 'hint_construction') {
+      const correct = (ex.correct_answer || '').trim();
+      const accepted = (ex.accepted_answers || []).map(a => a.trim());
+      const student = (typedAns || '').trim();
+      return student === correct || accepted.includes(student);
+    }
+    return false;
   };
 
   const displayedChapters = chapters.filter(c => c.exercise_type === activeTab);
@@ -631,13 +656,20 @@ export default function GrammarChaptersManager() {
                         )}
 
                         {/* Explanation is common to all */}
-                        <div className="col-span-3">
+                        <div className="col-span-3 flex items-center gap-2">
                           <input 
                             type="text"
                             value={ex.explanation || ''}
                             onChange={(e) => handleCellChange(originalIndex, 'explanation', e.target.value)}
                             className="w-full bg-slate-950/50 border border-transparent hover:border-slate-700 focus:border-blue-500 rounded px-2 py-1.5 text-sm text-slate-400 focus:outline-none transition"
                           />
+                          <button 
+                            onClick={() => setPreviewExercise(ex)}
+                            className="p-1.5 text-blue-400 hover:text-white bg-blue-500/10 hover:bg-blue-500 rounded transition shrink-0"
+                            title="Preview Exercise"
+                          >
+                            <Play className="w-4 h-4" />
+                          </button>
                         </div>
 
                       </div>
@@ -672,6 +704,148 @@ export default function GrammarChaptersManager() {
           </div>
         </div>
       )}
+      
+      {/* Preview Modal */}
+      {previewExercise && (
+        <PreviewModal 
+          exercise={previewExercise} 
+          onClose={() => setPreviewExercise(null)} 
+          onCheck={checkAnswer} 
+        />
+      )}
+    </div>
+  );
+}
+
+function PreviewModal({ exercise, onClose, onCheck }) {
+  const [inputVal, setInputVal] = useState('');
+  const [availableChips, setAvailableChips] = useState([]);
+  const [selectedChips, setSelectedChips] = useState([]);
+  const [feedback, setFeedback] = useState(null);
+
+  useEffect(() => {
+    setInputVal('');
+    setSelectedChips([]);
+    setFeedback(null);
+    if (exercise.type === 'word_order') {
+      setAvailableChips([...(exercise.scrambled_words || [])]);
+    }
+  }, [exercise]);
+
+  const handleChipTap = (chip, fromAvailable) => {
+    setFeedback(null);
+    if (fromAvailable) {
+      const idx = availableChips.findIndex(c => c === chip);
+      const newAvail = [...availableChips];
+      newAvail.splice(idx, 1);
+      setAvailableChips(newAvail);
+      setSelectedChips([...selectedChips, chip]);
+    } else {
+      const idx = selectedChips.findIndex(c => c === chip);
+      const newSel = [...selectedChips];
+      newSel.splice(idx, 1);
+      setSelectedChips(newSel);
+      setAvailableChips([...availableChips, chip]);
+    }
+  };
+
+  const handleTest = (val = inputVal, chips = selectedChips) => {
+    setFeedback(onCheck(exercise, val, chips));
+  };
+
+  return (
+    <div className="fixed inset-0 bg-slate-950/90 backdrop-blur-sm z-[70] flex items-center justify-center p-4">
+      <div className="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-lg shadow-2xl animate-fade-in p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h3 className="text-xl font-bold text-white flex items-center gap-2">
+            <Play className="w-5 h-5 text-blue-400" />
+            Preview: {exercise.type.replace('_', ' ')}
+          </h3>
+          <button onClick={onClose} className="text-slate-400 hover:text-white"><X className="w-5 h-5"/></button>
+        </div>
+        
+        <div className="bg-slate-950 border border-slate-800 rounded-xl p-6 min-h-[200px] flex flex-col justify-center">
+          <div className="text-center text-lg text-white mb-6">
+            {exercise.type === 'hint_construction' ? exercise.prompt : exercise.question}
+          </div>
+
+          {exercise.type === 'mcq' && (
+            <div className="flex flex-col gap-2">
+              {(exercise.options || []).map((opt, i) => (
+                <button 
+                  key={i} 
+                  onClick={() => handleTest(opt)}
+                  className="w-full py-3 bg-slate-900 border border-slate-700 hover:border-blue-500 rounded-xl text-white font-medium transition"
+                >
+                  {opt}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {(exercise.type === 'fill_blank' || exercise.type === 'hint_construction') && (
+            <div className="space-y-4">
+              {exercise.type === 'hint_construction' && (
+                <div className="text-center text-slate-400 text-sm">{exercise.sentence_template}</div>
+              )}
+              <input 
+                autoFocus
+                type="text"
+                value={inputVal}
+                onChange={e => { setInputVal(e.target.value); setFeedback(null); }}
+                onKeyDown={e => e.key === 'Enter' && handleTest()}
+                className="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500 text-center text-lg"
+                placeholder="Type answer..."
+              />
+              <button 
+                onClick={() => handleTest()}
+                className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition"
+              >
+                Check Answer
+              </button>
+            </div>
+          )}
+
+          {exercise.type === 'word_order' && (
+            <div className="space-y-6">
+              <div className="min-h-[60px] p-4 bg-slate-900 border border-slate-700 rounded-xl flex flex-wrap gap-2 items-center justify-center">
+                {selectedChips.map((chip, i) => (
+                  <button key={i} onClick={() => handleChipTap(chip, false)} className="px-4 py-2 bg-blue-600 text-white rounded-lg font-bold shadow hover:bg-blue-500">
+                    {chip}
+                  </button>
+                ))}
+                {selectedChips.length === 0 && <span className="text-slate-500 text-sm">Tap words to build sentence</span>}
+              </div>
+              
+              <div className="flex flex-wrap gap-2 justify-center">
+                {availableChips.map((chip, i) => (
+                  <button key={i} onClick={() => handleChipTap(chip, true)} className="px-4 py-2 bg-slate-800 border border-slate-700 text-white rounded-lg font-bold hover:border-slate-500 transition">
+                    {chip}
+                  </button>
+                ))}
+              </div>
+
+              <button 
+                onClick={() => handleTest(null, selectedChips)}
+                disabled={availableChips.length > 0}
+                className={`w-full py-3 font-bold rounded-xl transition ${availableChips.length === 0 ? 'bg-blue-600 hover:bg-blue-500 text-white' : 'bg-slate-800 text-slate-500 cursor-not-allowed'}`}
+              >
+                Check Sentence
+              </button>
+            </div>
+          )}
+        </div>
+
+        {feedback !== null && (
+          <div className={`mt-4 p-4 rounded-xl flex items-center justify-center gap-2 font-bold text-lg animate-fade-in ${feedback ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+            {feedback ? (
+              <><CheckCircle className="w-6 h-6" /> Correct!</>
+            ) : (
+              <><X className="w-6 h-6" /> Incorrect</>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
