@@ -391,14 +391,18 @@ export default function GrammarEngine({ level, onBack, userType, storedFreeUser,
             </div>
 
             {/* Stimulus */}
-            <div className="mb-8 mt-4 text-center">
-              <h2 className="text-2xl md:text-3xl font-extrabold text-white leading-tight">
-                {currentQ.type === 'word_order' ? "Unscramble the sentence:" : 
-                 currentQ.type === 'hint_construction' ? currentQ.prompt : currentQ.question}
-              </h2>
-              {currentQ.type === 'hint_construction' && (
-                <p className="text-slate-400 font-medium text-lg mt-3">{currentQ.sentence_template}</p>
+            <div className="mb-8 mt-4 text-center space-y-3">
+              {(currentQ.type === 'word_order' || currentQ.type === 'hint_construction') && (
+                <p className="text-sm text-emerald-400 font-bold uppercase tracking-widest">
+                  {currentQ.type === 'word_order' ? "Unscramble the sentence:" : currentQ.prompt}
+                </p>
               )}
+              <h2 className="text-2xl md:text-3xl font-extrabold text-white leading-tight">
+                {currentQ.type === 'hint_construction' 
+                  ? currentQ.sentence_template 
+                  : currentQ.type === 'word_order' ? null : currentQ.question
+                }
+              </h2>
             </div>
 
             {/* Inputs based on type */}
