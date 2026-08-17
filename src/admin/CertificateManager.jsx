@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Award, Plus, Eye, Trash2, ShieldCheck, Lock, Upload, Sparkles, CheckCircle2, Loader2 } from 'lucide-react';
+import { Award, Plus, Eye, Trash2, ShieldCheck, Lock, Upload, Sparkles, CheckCircle2, Loader2, Image as ImageIcon } from 'lucide-react';
 import ProtectedImage from '../components/ProtectedImage';
 import { supabase } from '../lib/supabaseClient';
+import ImageEditorModal from './ImageEditorModal';
 
 export default function CertificateManager() {
   const [certificates, setCertificates] = useState([]);
@@ -11,6 +12,7 @@ export default function CertificateManager() {
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadNotice, setUploadNotice] = useState('');
   const [uploadingFile, setUploadingFile] = useState(false);
+  const [editorFile, setEditorFile] = useState(null); // { url, name, extension }
 
   // 30-Second Quick Upload Form State
   const [newCert, setNewCert] = useState({
@@ -112,7 +114,6 @@ export default function CertificateManager() {
       setUploadNotice(`Certificate for ${newCert.studentName} uploaded and watermarked!`);
       setTimeout(() => setUploadNotice(''), 4000);
 
-      // Reset form
       setNewCert({
         studentName: '',
         examBody: 'Goethe-Zertifikat B1',
@@ -123,7 +124,8 @@ export default function CertificateManager() {
         imageUrl: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80'
       });
     } else {
-      alert('Failed to upload certificate');
+      console.error("Supabase Insert Error:", error);
+      alert('Failed to upload certificate: ' + (error?.message || 'Unknown error'));
     }
   };
 
@@ -131,6 +133,50 @@ export default function CertificateManager() {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    // If it's an image, open the editor
+    if (file.type.startsWith('image/')) {
+      const url = URL.createObjectURL(file);
+      setEditorFile({ url, name: file.name, extension: file.name.split('.').pop() });
+      // Reset the file input so the same file can be selected again if needed
+      e.target.value = '';
+      return;
+    }
+
+    // If it's a PDF or something else, upload directly
+    await processFileUpload(file);
+  };
+
+  const handleEditorSave = async (base64Image, extension) => {
+    setEditorFile(null);
+    setUploadingFile(true);
+    
+    try {
+      // Convert base64 to Blob
+      const res = await fetch(base64Image);
+      const blob = await res.blob();
+      
+      const fileName = `cert-${Date.now()}.${extension || 'jpg'}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('certificates')
+        .upload(fileName, blob);
+
+      if (uploadError) throw uploadError;
+
+      const { data: publicUrlData } = supabase.storage
+        .from('certificates')
+        .getPublicUrl(fileName);
+
+      setNewCert(prev => ({ ...prev, imageUrl: publicUrlData.publicUrl }));
+    } catch (error) {
+      console.error('Error uploading edited certificate:', error);
+      alert('Failed to upload file. Please run the SQL bucket script in Supabase first.');
+    } finally {
+      setUploadingFile(false);
+    }
+  };
+
+  const processFileUpload = async (file) => {
     setUploadingFile(true);
     try {
       const fileExt = file.name.split('.').pop();
@@ -322,63 +368,60 @@ export default function CertificateManager() {
               </div>
 
               {/* OPTIONAL FIELDS */}
-              <div className="border-t border-slate-800 pt-3 space-y-3">
-                <span className="text-[10px] uppercase font-bold text-slate-500 tracking-wider block">Optional Details (Leave blank if not needed)</span>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="text-slate-400 font-medium">City / Location</label>
+              {/* 3. Optional Details */}
+              <div className="pt-2 border-t border-slate-800">
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">Optional Details (Leave blank if not needed)</p>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="space-y-1">
+                    <label className="text-slate-400">City / Location</label>
                     <input
                       type="text"
                       value={newCert.city}
                       onChange={(e) => setNewCert({ ...newCert, city: e.target.value })}
-                      placeholder="e.g. Lahore, Pakistan"
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-100"
+                      placeholder="Lahore"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-100 focus:outline-none focus:border-amber-500"
                     />
                   </div>
-                  <div>
-                    <label className="text-slate-400 font-medium">Score Achieved</label>
+                  <div className="space-y-1">
+                    <label className="text-slate-400">Score Achieved</label>
                     <input
                       type="text"
                       value={newCert.score}
                       onChange={(e) => setNewCert({ ...newCert, score: e.target.value })}
-                      placeholder="e.g. 94 / 100 (Sehr Gut)"
-                      className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-100"
+                      placeholder="e.g. 95/100 or 1,0"
+                      className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-100 focus:outline-none focus:border-amber-500"
                     />
                   </div>
                 </div>
-
-                <div>
-                  <label className="text-slate-400 font-medium">Student Testimonial Quote</label>
+                <div className="space-y-1">
+                  <label className="text-slate-400">Student Testimonial Quote</label>
                   <input
                     type="text"
                     value={newCert.quote}
                     onChange={(e) => setNewCert({ ...newCert, quote: e.target.value })}
                     placeholder="e.g. Cleared Goethe B2 on first attempt via live online classes."
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-100"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-xl p-2.5 text-slate-100 focus:outline-none focus:border-amber-500"
                   />
                 </div>
               </div>
 
-              <div className="pt-2 flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowUploadModal(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-950 text-slate-400 text-xs font-bold"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  className="px-6 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-extrabold shadow-lg"
-                >
-                  Save & Apply Auto-Watermark
-                </button>
+              <div className="pt-4 flex justify-end gap-3">
+                <button type="button" onClick={() => setShowUploadModal(false)} className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold transition">Cancel</button>
+                <button type="submit" className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-extrabold shadow-lg shadow-emerald-500/20 transition hover:scale-105 disabled:opacity-50" disabled={uploadingFile}>Save & Apply Auto-Watermark</button>
               </div>
-
             </form>
           </div>
         </div>
+      )}
+
+      {/* Filerobot Image Editor Modal */}
+      {editorFile && (
+        <ImageEditorModal
+          fileUrl={editorFile.url}
+          fileName={editorFile.name}
+          onSave={handleEditorSave}
+          onClose={() => setEditorFile(null)}
+        />
       )}
 
       {/* Certificate Preview Modal */}
