@@ -160,7 +160,36 @@ export default function GrammarChaptersManager() {
   // --- Editing Flow ---
   const handleEditStart = (chap) => {
     setEditingChapter(chap);
-    setEditingExercises(JSON.parse(JSON.stringify(chap.json_data || [])));
+    
+    // Safely parse JSON data and normalize string arrays
+    let parsedData = chap.json_data || [];
+    if (typeof parsedData === 'string') {
+      try { parsedData = JSON.parse(parsedData); } catch (e) { parsedData = []; }
+    }
+    if (!Array.isArray(parsedData)) parsedData = [];
+
+    const exercises = parsedData.map(ex => {
+      let accepted_answers = ex.accepted_answers || [];
+      if (typeof accepted_answers === 'string') accepted_answers = accepted_answers.split(',');
+      if (!Array.isArray(accepted_answers)) accepted_answers = [];
+
+      let options = ex.options || [];
+      if (typeof options === 'string') options = options.split(',');
+      if (!Array.isArray(options)) options = [];
+
+      let scrambled_words = ex.scrambled_words || [];
+      if (typeof scrambled_words === 'string') scrambled_words = scrambled_words.split(',');
+      if (!Array.isArray(scrambled_words)) scrambled_words = [];
+
+      return {
+        ...ex,
+        accepted_answers: accepted_answers.map(s => String(s).trim()).filter(Boolean),
+        options: options.map(s => String(s).trim()).filter(Boolean),
+        scrambled_words: scrambled_words.map(s => String(s).trim()).filter(Boolean)
+      };
+    });
+
+    setEditingExercises(JSON.parse(JSON.stringify(exercises)));
     setSearchQuery('');
   };
 

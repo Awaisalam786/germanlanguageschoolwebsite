@@ -165,11 +165,29 @@ export default function ChapterVocabManager() {
     setEditingChapter(chap);
     setSearchQuery('');
     setPreviewIndex(null);
-    const words = (chap.json_data || []).map(word => ({
-      ...word,
-      accepted_answers_str: word.accepted_answers ? word.accepted_answers.join(', ') : '',
-      accepted_german_answers_str: word.accepted_german_answers ? word.accepted_german_answers.join(', ') : ''
-    }));
+    
+    // Safety check for json_data
+    let parsedData = chap.json_data || [];
+    if (typeof parsedData === 'string') {
+      try { parsedData = JSON.parse(parsedData); } catch (e) { parsedData = []; }
+    }
+    if (!Array.isArray(parsedData)) parsedData = [];
+
+    const words = parsedData.map(word => {
+      let engAns = word.accepted_answers || [];
+      if (typeof engAns === 'string') engAns = engAns.split(',');
+      if (!Array.isArray(engAns)) engAns = [];
+
+      let gerAns = word.accepted_german_answers || [];
+      if (typeof gerAns === 'string') gerAns = gerAns.split(',');
+      if (!Array.isArray(gerAns)) gerAns = [];
+
+      return {
+        ...word,
+        accepted_answers_str: engAns.map(s => String(s).trim()).filter(Boolean).join(', '),
+        accepted_german_answers_str: gerAns.map(s => String(s).trim()).filter(Boolean).join(', ')
+      };
+    });
     setEditingWords(words);
   };
 
