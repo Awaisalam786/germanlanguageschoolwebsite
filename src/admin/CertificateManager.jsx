@@ -87,7 +87,7 @@ export default function CertificateManager() {
       exam_body: newCert.examBody,
       city: newCert.city,
       score: newCert.score,
-      issue_date: newCert.date || 'July 2026',
+      issue_date: newCert.date ? new Date(newCert.date).toISOString() : new Date().toISOString(),
       quote: newCert.quote,
       image_url: newCert.imageUrl,
       verified: true
