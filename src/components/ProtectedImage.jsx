@@ -37,7 +37,7 @@ export default function ProtectedImage({
       <img
         src={watermarkedSrc}
         alt={alt}
-        className={`w-full h-full ${fitClass} select-none pointer-events-auto`}
+        className={`w-full h-auto max-h-[80vh] ${fitClass} select-none pointer-events-auto`}
         onContextMenu={handlePrevent}
         onDragStart={handlePrevent}
       />

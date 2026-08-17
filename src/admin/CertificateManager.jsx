@@ -458,7 +458,7 @@ export default function CertificateManager() {
               </div>
             </div>
 
-            <div className="aspect-[4/3] max-h-[380px] rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 relative flex items-center justify-center p-2">
+            <div className="rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 relative flex items-center justify-center p-2">
               <ProtectedImage
                 src={previewCert.imageUrl}
                 alt={previewCert.studentName}
