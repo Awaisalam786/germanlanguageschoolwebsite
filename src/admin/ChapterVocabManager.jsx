@@ -24,6 +24,10 @@ export default function ChapterVocabManager() {
   const [previewTypedAnswer, setPreviewTypedAnswer] = useState('');
   const [previewFeedback, setPreviewFeedback] = useState(null);
 
+  // Tab State for filtering uploaded chapters
+  const [activeTab, setActiveTab] = useState('A1');
+  const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
+
   const [form, setForm] = useState({
     level: 'A1',
     chapter_number: '',
@@ -391,17 +395,34 @@ export default function ChapterVocabManager() {
               </button>
             </div>
 
+            {/* Level Tabs */}
+            <div className="flex gap-2 overflow-x-auto pb-4 mb-2 custom-scrollbar">
+              {LEVELS.map(level => (
+                <button
+                  key={level}
+                  onClick={() => setActiveTab(level)}
+                  className={`px-4 py-2 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${
+                    activeTab === level 
+                      ? 'bg-amber-500 text-slate-950 shadow-lg shadow-amber-500/20' 
+                      : 'bg-slate-950 text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800'
+                  }`}
+                >
+                  {level} Level
+                </button>
+              ))}
+            </div>
+
             {loading ? (
               <div className="py-12 flex justify-center">
                 <Loader2 className="w-8 h-8 text-amber-500 animate-spin" />
               </div>
-            ) : chapters.length === 0 ? (
+            ) : chapters.filter(chap => chap.level === activeTab).length === 0 ? (
               <div className="py-12 text-center text-slate-500 bg-slate-950/50 rounded-xl border border-slate-800 border-dashed">
-                No chapters uploaded yet.
+                No chapters uploaded for {activeTab} yet.
               </div>
             ) : (
               <div className="grid sm:grid-cols-2 gap-4">
-                {chapters.map(chap => (
+                {chapters.filter(chap => chap.level === activeTab).map(chap => (
                   <div key={chap.id} className="bg-slate-950 border border-slate-800 rounded-xl p-4 flex items-center justify-between group">
                     <div className="flex items-center gap-4">
                       <div className="w-12 h-12 rounded-lg bg-amber-500/10 flex items-center justify-center font-extrabold text-amber-400 border border-amber-500/20 text-lg">
