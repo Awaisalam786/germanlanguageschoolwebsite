@@ -10,6 +10,7 @@ export default function CertificateManager() {
   const [showPrivateOriginal, setShowPrivateOriginal] = useState(false);
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploadNotice, setUploadNotice] = useState('');
+  const [uploadingFile, setUploadingFile] = useState(false);
 
   // 30-Second Quick Upload Form State
   const [newCert, setNewCert] = useState({
@@ -72,6 +73,11 @@ export default function CertificateManager() {
       alert('Please enter student name');
       return;
     }
+    
+    if (!newCert.imageUrl) {
+      alert('Please upload a certificate image or provide a URL.');
+      return;
+    }
 
     const payload = {
       student_name: newCert.studentName,
@@ -118,6 +124,34 @@ export default function CertificateManager() {
       });
     } else {
       alert('Failed to upload certificate');
+    }
+  };
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingFile(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `cert-${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('certificates')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: publicUrlData } = supabase.storage
+        .from('certificates')
+        .getPublicUrl(fileName);
+
+      setNewCert(prev => ({ ...prev, imageUrl: publicUrlData.publicUrl }));
+    } catch (error) {
+      console.error('Error uploading certificate:', error);
+      alert('Failed to upload file. Please run the SQL bucket script in Supabase first.');
+    } finally {
+      setUploadingFile(false);
     }
   };
 
@@ -221,14 +255,39 @@ export default function CertificateManager() {
               
               {/* Image Upload / URL */}
               <div className="space-y-1">
-                <label className="text-slate-300 font-bold">Certificate Image URL / Raw File</label>
-                <input
-                  type="text"
-                  value={newCert.imageUrl}
-                  onChange={(e) => setNewCert({ ...newCert, imageUrl: e.target.value })}
-                  placeholder="https://..."
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl p-3 text-slate-100 focus:outline-none focus:border-amber-500"
-                />
+                <label className="text-slate-300 font-bold flex justify-between">
+                  <span>Certificate Image / PDF File</span>
+                  {uploadingFile && <span className="text-amber-400 text-[10px] animate-pulse flex items-center gap-1"><Loader2 className="w-3 h-3 animate-spin"/> Uploading...</span>}
+                </label>
+                
+                {!newCert.imageUrl || newCert.imageUrl === 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80' ? (
+                  <div className="w-full relative bg-slate-950 border border-slate-800 border-dashed rounded-xl p-6 flex flex-col items-center justify-center text-center hover:bg-slate-900 transition-colors cursor-pointer overflow-hidden group">
+                     <input
+                        type="file"
+                        accept="image/*,application/pdf"
+                        onChange={handleFileUpload}
+                        disabled={uploadingFile}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer disabled:cursor-not-allowed"
+                      />
+                      <Upload className="w-8 h-8 text-slate-500 group-hover:text-amber-500 mb-2 transition-colors" />
+                      <span className="font-bold text-slate-300">Click to upload file</span>
+                      <span className="text-[10px] text-slate-500 mt-1">Supports JPG, PNG, PDF</span>
+                  </div>
+                ) : (
+                  <div className="w-full bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2 overflow-hidden">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500 shrink-0" />
+                      <span className="text-emerald-400 text-xs truncate">{newCert.imageUrl.split('/').pop()}</span>
+                    </div>
+                    <button 
+                      type="button"
+                      onClick={() => setNewCert({...newCert, imageUrl: ''})}
+                      className="text-red-400 hover:text-red-300 ml-2"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* 1. Student Name (REQUIRED) */}
