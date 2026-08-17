@@ -155,7 +155,7 @@ export default function SmartVocabResultsManager() {
                       </td>
                       <td className="px-6 py-4">
                         <p className="font-bold text-emerald-400">{r.level}</p>
-                        <p className="text-xs text-slate-400">Ch: {r.chapters_selected.join(', ')}</p>
+                        <p className="text-xs text-slate-400">Ch: {Array.isArray(r.chapters_selected) ? r.chapters_selected.join(', ') : (r.chapters_selected || 'N/A')}</p>
                       </td>
                       <td className="px-6 py-4">
                         <span className="px-2 py-1 bg-slate-800 rounded text-xs text-slate-300 uppercase tracking-wider">
