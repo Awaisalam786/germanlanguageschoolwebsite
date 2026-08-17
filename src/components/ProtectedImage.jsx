@@ -39,9 +39,9 @@ export default function ProtectedImage({
     >
       {isPdf ? (
         <iframe
-          src={`${watermarkedSrc}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+          src={`${watermarkedSrc}#toolbar=0&navpanes=0&scrollbar=0&view=Fit`}
           title={alt}
-          className="w-full h-[600px] max-h-[80vh] border-none bg-white"
+          className="w-full aspect-[1/1.414] max-h-[85vh] border-none bg-white"
           style={{ pointerEvents: isPrivateOriginal ? 'auto' : 'none' }}
         />
       ) : (
