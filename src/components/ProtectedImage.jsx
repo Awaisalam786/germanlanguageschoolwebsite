@@ -10,16 +10,19 @@ export default function ProtectedImage({
   objectFit = 'contain'
 }) {
   const [watermarkedSrc, setWatermarkedSrc] = useState(src);
+  const isPdf = src && src.toLowerCase().includes('.pdf');
 
   useEffect(() => {
-    if (src && !isPrivateOriginal) {
+    if (src && !isPrivateOriginal && !isPdf) {
       applyAutoWatermark(src, watermarkText, 0.18).then((res) => {
         setWatermarkedSrc(res);
+      }).catch(() => {
+        setWatermarkedSrc(src);
       });
     } else {
       setWatermarkedSrc(src);
     }
-  }, [src, watermarkText, isPrivateOriginal]);
+  }, [src, watermarkText, isPrivateOriginal, isPdf]);
 
   const handlePrevent = (e) => {
     e.preventDefault();
@@ -34,18 +37,27 @@ export default function ProtectedImage({
       onContextMenu={handlePrevent}
       onDragStart={handlePrevent}
     >
-      <img
-        src={watermarkedSrc}
-        alt={alt}
-        className={`w-full h-auto max-h-[80vh] ${fitClass} select-none pointer-events-auto`}
-        onContextMenu={handlePrevent}
-        onDragStart={handlePrevent}
-      />
+      {isPdf ? (
+        <iframe
+          src={`${watermarkedSrc}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
+          title={alt}
+          className="w-full h-[600px] max-h-[80vh] border-none bg-white"
+          style={{ pointerEvents: isPrivateOriginal ? 'auto' : 'none' }}
+        />
+      ) : (
+        <img
+          src={watermarkedSrc}
+          alt={alt}
+          className={`w-full h-auto max-h-[80vh] ${fitClass} select-none pointer-events-auto`}
+          onContextMenu={handlePrevent}
+          onDragStart={handlePrevent}
+        />
+      )}
       
       {/* CSS Overlay Watermark Layer to Guarantee Watermark Text Visibility on Screenshots */}
       {!isPrivateOriginal && (
         <div 
-          className="absolute inset-0 pointer-events-none flex flex-wrap items-center justify-around p-4 opacity-25 select-none"
+          className="absolute inset-0 pointer-events-none flex flex-wrap items-center justify-around p-4 opacity-25 select-none z-10"
           style={{ transform: 'rotate(-20deg) scale(1.1)' }}
         >
           <span className="text-white font-extrabold text-xs sm:text-sm drop-shadow-md tracking-wider">
