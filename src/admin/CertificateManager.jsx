@@ -13,6 +13,7 @@ export default function CertificateManager() {
   const [uploadNotice, setUploadNotice] = useState('');
   const [uploadingFile, setUploadingFile] = useState(false);
   const [editorFile, setEditorFile] = useState(null); // { url, name, extension }
+  const [editCertId, setEditCertId] = useState(null);
 
   // 30-Second Quick Upload Form State
   const [newCert, setNewCert] = useState({
@@ -93,41 +94,92 @@ export default function CertificateManager() {
       verified: true
     };
 
-    const { data, error } = await supabase.from('certificates').insert([payload]).select().single();
-
-    if (!error && data) {
-      const mapped = {
-        id: data.id,
-        studentName: data.student_name,
-        congratsTitle: data.congrats_title,
-        examBody: data.exam_body,
-        city: data.city,
-        score: data.score,
-        date: data.issue_date,
-        quote: data.quote,
-        imageUrl: data.image_url,
-        verified: data.verified
-      };
-      
-      setCertificates([mapped, ...certificates]);
-      setShowUploadModal(false);
-      setUploadNotice(`Certificate for ${newCert.studentName} uploaded and watermarked!`);
-      setTimeout(() => setUploadNotice(''), 4000);
-
-      setNewCert({
-        studentName: '',
-        examBody: 'Goethe-Zertifikat B1',
-        city: '',
-        score: '',
-        date: '',
-        quote: '',
-        imageUrl: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80'
-      });
+    if (editCertId) {
+      const { data, error } = await supabase.from('certificates').update(payload).eq('id', editCertId).select().single();
+      if (!error && data) {
+        const mapped = {
+          id: data.id,
+          studentName: data.student_name,
+          congratsTitle: data.congrats_title,
+          examBody: data.exam_body,
+          city: data.city,
+          score: data.score,
+          date: data.issue_date,
+          quote: data.quote,
+          imageUrl: data.image_url,
+          verified: data.verified
+        };
+        setCertificates(certificates.map(c => c.id === editCertId ? mapped : c));
+        setUploadNotice('Certificate updated successfully!');
+        setTimeout(() => setUploadNotice(''), 3000);
+        setShowUploadModal(false);
+        setEditCertId(null);
+      } else {
+        alert('Failed to update certificate: ' + (error?.message || 'Unknown error'));
+      }
     } else {
-      console.error("Supabase Insert Error:", error);
-      alert('Failed to upload certificate: ' + (error?.message || 'Unknown error'));
+      const { data, error } = await supabase.from('certificates').insert([payload]).select().single();
+
+      if (!error && data) {
+        const mapped = {
+          id: data.id,
+          studentName: data.student_name,
+          congratsTitle: data.congrats_title,
+          examBody: data.exam_body,
+          city: data.city,
+          score: data.score,
+          date: data.issue_date,
+          quote: data.quote,
+          imageUrl: data.image_url,
+          verified: data.verified
+        };
+        setCertificates([mapped, ...certificates]);
+        setUploadNotice('Certificate uploaded and watermarked successfully!');
+        setTimeout(() => setUploadNotice(''), 3000);
+        setShowUploadModal(false);
+        setNewCert({
+          studentName: '',
+          examBody: 'Goethe-Zertifikat B1',
+          city: '',
+          score: '',
+          date: '',
+          quote: '',
+          imageUrl: 'https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800&q=80'
+        });
+      } else {
+        alert('Failed to save certificate: ' + (error?.message || 'Unknown error'));
+      }
     }
   };
+
+  const handleEditClick = (cert) => {
+    setEditCertId(cert.id);
+    setNewCert({
+      studentName: cert.studentName,
+      examBody: cert.examBody,
+      city: cert.city || '',
+      score: cert.score || '',
+      date: cert.date || '',
+      quote: cert.quote || '',
+      imageUrl: cert.imageUrl
+    });
+    setShowUploadModal(true);
+  };
+
+  const handleCreateNewClick = () => {
+    setEditCertId(null);
+    setNewCert({
+      studentName: '',
+      examBody: 'Goethe-Zertifikat B1',
+      city: '',
+      score: '',
+      date: '',
+      quote: '',
+      imageUrl: ''
+    });
+    setShowUploadModal(true);
+  };
+
 
   const handleFileUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -225,7 +277,7 @@ export default function CertificateManager() {
         </div>
 
         <button
-          onClick={() => setShowUploadModal(true)}
+          onClick={handleCreateNewClick}
           className="px-5 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs font-extrabold shadow-gold-glow flex items-center gap-2 transition hover:scale-105"
         >
           <Plus className="w-4 h-4" />
@@ -272,6 +324,12 @@ export default function CertificateManager() {
                   <Eye className="w-3.5 h-3.5" />
                   <span>Preview</span>
                 </button>
+                <button
+                  onClick={() => handleEditClick(cert)}
+                  className="px-2.5 py-1 rounded bg-slate-800 text-blue-400 hover:bg-slate-700 text-xs font-bold flex items-center gap-1"
+                >
+                  <span>Edit</span>
+                </button>
               </div>
 
               <button onClick={() => handleDelete(cert.id)} className="p-1.5 rounded bg-slate-800 text-red-400 hover:bg-slate-700">
@@ -290,9 +348,9 @@ export default function CertificateManager() {
               <div>
                 <h3 className="text-lg font-bold text-white flex items-center gap-2">
                   <Upload className="w-5 h-5 text-amber-400" />
-                  <span>30-Second Certificate Upload</span>
+                  <span>{editCertId ? 'Edit Certificate Details' : '30-Second Certificate Upload'}</span>
                 </h3>
-                <p className="text-[11px] text-slate-400">Only Student Name & Level are required. Auto-watermarked upon upload.</p>
+                <p className="text-[11px] text-slate-400">{editCertId ? 'Update details below.' : 'Only Student Name & Level are required. Auto-watermarked upon upload.'}</p>
               </div>
               <button onClick={() => setShowUploadModal(false)} className="text-slate-400 hover:text-white">✕</button>
             </div>
@@ -407,7 +465,9 @@ export default function CertificateManager() {
 
               <div className="pt-4 flex justify-end gap-3">
                 <button type="button" onClick={() => setShowUploadModal(false)} className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold transition">Cancel</button>
-                <button type="submit" className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-extrabold shadow-lg shadow-emerald-500/20 transition hover:scale-105 disabled:opacity-50" disabled={uploadingFile}>Save & Apply Auto-Watermark</button>
+                <button type="submit" className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-extrabold shadow-lg shadow-emerald-500/20 transition hover:scale-105 disabled:opacity-50" disabled={uploadingFile}>
+                  {editCertId ? 'Update Details' : 'Save & Apply Auto-Watermark'}
+                </button>
               </div>
             </form>
           </div>
