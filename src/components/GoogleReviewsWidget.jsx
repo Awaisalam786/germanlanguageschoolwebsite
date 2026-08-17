@@ -22,6 +22,11 @@ export default function GoogleReviewsWidget() {
     );
   }
 
+  // If the API failed entirely (no cache available)
+  if (liveData?.error || !liveData) {
+    return null;
+  }
+
   const rating = liveData?.averageRating || 4.9;
   const totalReviews = liveData?.totalReviews || 348;
   const reviewsList = liveData?.reviews && liveData.reviews.length > 0 ? liveData.reviews : [];
@@ -61,13 +66,7 @@ export default function GoogleReviewsWidget() {
         </a>
       </div>
 
-      {/* Unconfigured Alert Banner */}
-      {!liveData?.isConfigured && (
-        <div className="bg-amber-500/10 border border-amber-500/30 p-3.5 rounded-xl text-xs text-amber-400 flex items-center gap-2">
-          <AlertCircle className="w-4 h-4 shrink-0" />
-          <span>Admin Note: Connect Google Place ID & API Key in Admin Settings to stream real-time Google Business reviews automatically.</span>
-        </div>
-      )}
+      {/* Alert Banner Removed - Keys are now managed securely via ENV */}
 
       {/* Review Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -106,7 +105,7 @@ export default function GoogleReviewsWidget() {
           ))
         ) : (
           <div className="col-span-3 text-center py-8 text-xs text-slate-400 bg-slate-950 rounded-2xl border border-slate-800">
-            No live Google reviews fetched yet. Configure Google Places API Key in Admin Panel.
+            No live Google reviews available at this time.
           </div>
         )}
       </div>

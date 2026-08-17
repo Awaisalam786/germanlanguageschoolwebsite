@@ -1,8 +1,6 @@
 // SECURE GOOGLE REVIEWS PROXY SERVICE
 // Calls backend endpoint /api/google-reviews (Never exposes API Key to frontend browser)
 
-import { googleReviewsData } from '../mockData/seedData';
-
 export async function fetchLiveGoogleReviews() {
   try {
     const response = await fetch('/api/google-reviews', {
@@ -16,19 +14,12 @@ export async function fetchLiveGoogleReviews() {
     }
 
     const data = await response.json();
+    if (data.error) throw new Error(data.message || 'API Error');
+    
     return data;
   } catch (error) {
-    console.warn("Backend /api/google-reviews server offline or unconfigured. Using graceful fallback data.", error);
-    
-    // Return graceful fallback state if local standalone dev server without backend node is running
-    return {
-      isConfigured: false,
-      averageRating: googleReviewsData.averageRating,
-      totalReviews: googleReviewsData.totalReviews,
-      reviews: googleReviewsData.reviews,
-      placeUrl: 'https://search.google.com/local/reviews',
-      message: 'Connect your Google Business Profile (Place ID & API Key) in Admin Settings to display live reviews.'
-    };
+    console.warn("Google Reviews API fetch failed. The widget will gracefully hide.", error);
+    return { error: true, message: error.message };
   }
 }
 
