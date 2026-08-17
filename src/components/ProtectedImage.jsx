@@ -33,6 +33,26 @@ export default function ProtectedImage({
 
   const fitClass = objectFit === 'cover' ? 'object-cover' : 'object-contain';
 
+  const getSvgWatermarkUrl = () => {
+    // Generate a reliable brick-pattern SVG watermark for dense overlay
+    const svg = `
+      <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <pattern id="wm" x="0" y="0" width="450" height="150" patternUnits="userSpaceOnUse" patternTransform="rotate(-30)">
+            <text x="50%" y="30%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="22" fill="${watermarkColor}" opacity="${watermarkOpacity}">
+              ${watermarkText}
+            </text>
+            <text x="0%" y="80%" dominant-baseline="middle" text-anchor="middle" font-family="sans-serif" font-weight="bold" font-size="22" fill="${watermarkColor}" opacity="${watermarkOpacity}">
+              ${watermarkText}
+            </text>
+          </pattern>
+        </defs>
+        <rect x="0" y="0" width="100%" height="100%" fill="url(#wm)" />
+      </svg>
+    `;
+    return `url('data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svg)))}')`;
+  };
+
   return (
     <div 
       className={`relative overflow-hidden select-none flex items-center justify-center bg-slate-950 ${className}`}
@@ -56,22 +76,12 @@ export default function ProtectedImage({
         />
       )}
       
-      {/* CSS Overlay Watermark Layer to Guarantee Watermark Text Visibility on Screenshots */}
+      {/* Dense SVG Pattern Overlay */}
       {!isPrivateOriginal && (
         <div 
-          className="absolute inset-0 pointer-events-none flex flex-wrap items-center justify-around p-4 select-none z-10"
-          style={{ transform: 'rotate(-20deg) scale(1.1)', opacity: watermarkOpacity * 1.5 }}
-        >
-          <span className="font-extrabold text-xs sm:text-sm drop-shadow-md tracking-wider" style={{ color: watermarkColor }}>
-            {watermarkText}
-          </span>
-          <span className="font-extrabold text-xs sm:text-sm drop-shadow-md tracking-wider" style={{ color: watermarkColor }}>
-            {watermarkText}
-          </span>
-          <span className="font-extrabold text-xs sm:text-sm drop-shadow-md tracking-wider hidden sm:inline" style={{ color: watermarkColor }}>
-            {watermarkText}
-          </span>
-        </div>
+          className="absolute inset-0 pointer-events-none z-10"
+          style={{ backgroundImage: getSvgWatermarkUrl() }}
+        />
       )}
     </div>
   );

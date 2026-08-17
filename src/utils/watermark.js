@@ -28,31 +28,27 @@ export function applyAutoWatermark(imageSrc, text = "03421189593", opacity = 0.1
       ctx.shadowBlur = 4;
 
       // Calculate font size relative to image height
-      const fontSize = Math.max(16, Math.min(width / 18, 36));
+      const fontSize = Math.max(16, Math.min(width / 24, 48));
       ctx.font = `bold ${fontSize}px Inter, sans-serif`;
 
-      // Determine repeats count based on image dimensions
-      let gridCols = 2;
-      let gridRows = 2;
+      const textMetrics = ctx.measureText(text);
+      const textWidth = textMetrics.width;
 
-      if (width > 600 && height > 400) {
-        gridCols = 3;
-        gridRows = 3; // 4-5 repeats tiled across
-      } else if (width < 300 || height < 300) {
-        gridCols = 1;
-        gridRows = 2; // 1-2 repeats for small images
-      }
+      // Spacing between text repeats
+      const stepX = textWidth + 80; // 80px gap horizontally
+      const stepY = fontSize * 4;   // gap vertically
 
       // Rotate for diagonal placement
       ctx.translate(width / 2, height / 2);
-      ctx.rotate((-25 * Math.PI) / 180);
+      ctx.rotate((-35 * Math.PI) / 180);
 
-      const stepX = width / gridCols;
-      const stepY = height / gridRows;
-
-      for (let x = -width; x < width * 1.5; x += stepX * 1.2) {
-        for (let y = -height; y < height * 1.5; y += stepY * 1.2) {
-          ctx.fillText(text, x, y);
+      // Tile across a large area to cover rotation bounds (brick pattern)
+      for (let x = -width * 2; x < width * 2; x += stepX) {
+        let rowIndex = 0;
+        for (let y = -height * 2; y < height * 2; y += stepY) {
+          let offsetX = (rowIndex % 2 === 1) ? stepX / 2 : 0;
+          ctx.fillText(text, x + offsetX, y);
+          rowIndex++;
         }
       }
 
