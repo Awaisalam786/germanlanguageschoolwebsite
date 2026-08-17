@@ -14,6 +14,10 @@ export default function CertificateManager() {
   const [uploadingFile, setUploadingFile] = useState(false);
   const [editorFile, setEditorFile] = useState(null); // { url, name, extension }
   const [editCertId, setEditCertId] = useState(null);
+  
+  // Watermark Settings State
+  const [watermarkConfig, setWatermarkConfig] = useState({ text: '03421189593', opacity: 0.18 });
+  const [savingWatermark, setSavingWatermark] = useState(false);
 
   // 30-Second Quick Upload Form State
   const [newCert, setNewCert] = useState({
@@ -28,7 +32,27 @@ export default function CertificateManager() {
 
   useEffect(() => {
     fetchCertificates();
+    fetchWatermarkSettings();
   }, []);
+
+  const fetchWatermarkSettings = async () => {
+    const { data } = await supabase.from('global_settings').select('*').eq('id', 'watermark').single();
+    if (data && data.value) {
+      setWatermarkConfig(data.value);
+    }
+  };
+
+  const saveWatermarkSettings = async () => {
+    setSavingWatermark(true);
+    const { error } = await supabase.from('global_settings').upsert({ id: 'watermark', value: watermarkConfig });
+    if (error) {
+      alert("Failed to save watermark settings. Make sure you ran the SQL script in Supabase.");
+    } else {
+      setUploadNotice("Watermark settings updated globally!");
+      setTimeout(() => setUploadNotice(''), 3000);
+    }
+    setSavingWatermark(false);
+  };
 
   const fetchCertificates = async () => {
     setLoading(true);
@@ -264,6 +288,50 @@ export default function CertificateManager() {
   return (
     <div className="space-y-8">
       
+      {/* Global Watermark Settings */}
+      <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 shadow-xl">
+        <div className="flex items-center gap-2 mb-4 border-b border-slate-800 pb-3">
+          <ShieldCheck className="w-5 h-5 text-emerald-400" />
+          <h2 className="text-lg font-bold text-white">Global Watermark Settings</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+          <div className="space-y-2">
+            <label className="block text-xs font-bold text-slate-400">Watermark Text</label>
+            <input
+              type="text"
+              value={watermarkConfig.text}
+              onChange={(e) => setWatermarkConfig({ ...watermarkConfig, text: e.target.value })}
+              className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition outline-none"
+            />
+          </div>
+          <div className="space-y-2">
+            <div className="flex justify-between items-center">
+              <label className="block text-xs font-bold text-slate-400">Fade / Opacity Trigger</label>
+              <span className="text-xs text-amber-400 font-bold">{Math.round(watermarkConfig.opacity * 100)}%</span>
+            </div>
+            <input
+              type="range"
+              min="0.05"
+              max="1"
+              step="0.01"
+              value={watermarkConfig.opacity}
+              onChange={(e) => setWatermarkConfig({ ...watermarkConfig, opacity: parseFloat(e.target.value) })}
+              className="w-full accent-amber-500"
+            />
+          </div>
+        </div>
+        <div className="mt-5 flex justify-end">
+          <button
+            onClick={saveWatermarkSettings}
+            disabled={savingWatermark}
+            className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm rounded-xl transition flex items-center gap-2"
+          >
+            {savingWatermark ? <Loader2 className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
+            Save Watermark Settings
+          </button>
+        </div>
+      </div>
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
         <div>
@@ -272,7 +340,7 @@ export default function CertificateManager() {
             <span>Featured Certificate Showcase Manager</span>
           </h2>
           <p className="text-xs text-slate-400">
-            Upload raw landscape certificates in under 30 seconds. The system automatically applies the diagonal watermark (<span className="text-amber-400 font-bold">03421189593</span>) for public view.
+            Upload raw landscape certificates in under 30 seconds. The system automatically applies the diagonal watermark (<span className="text-amber-400 font-bold">{watermarkConfig.text}</span>) for public view.
           </p>
         </div>
 
@@ -522,7 +590,8 @@ export default function CertificateManager() {
               <ProtectedImage
                 src={previewCert.imageUrl}
                 alt={previewCert.studentName}
-                watermarkText="03421189593"
+                watermarkText={watermarkConfig.text}
+                watermarkOpacity={watermarkConfig.opacity}
                 isPrivateOriginal={showPrivateOriginal}
                 objectFit="contain"
                 className="w-full h-full rounded-xl"

@@ -7,14 +7,16 @@ import { useGlobalContent } from '../context/GlobalContentContext';
 export default function CertificateShowcase() {
   const { settings } = useGlobalContent();
   const [certificates, setCertificates] = useState([]);
+  const [watermarkConfig, setWatermarkConfig] = useState({ text: '03421189593', opacity: 0.18 });
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
-    const fetchCertificates = async () => {
-      const { data } = await supabase.from('certificates').select('*').eq('verified', true).order('issue_date', { ascending: false });
-      if (data) {
-        const mapped = data.map(c => ({
+    const fetchCertificatesAndSettings = async () => {
+      // Fetch certificates
+      const { data: certData } = await supabase.from('certificates').select('*').eq('verified', true).order('issue_date', { ascending: false });
+      if (certData) {
+        const mapped = certData.map(c => ({
           studentName: c.student_name,
           congratsTitle: c.congrats_title,
           examBody: c.exam_body,
@@ -26,9 +28,16 @@ export default function CertificateShowcase() {
         }));
         setCertificates(mapped);
       }
+
+      // Fetch watermark config
+      const { data: settingsData } = await supabase.from('global_settings').select('*').eq('id', 'watermark').single();
+      if (settingsData && settingsData.value) {
+        setWatermarkConfig(settingsData.value);
+      }
+
       setLoading(false);
     };
-    fetchCertificates();
+    fetchCertificatesAndSettings();
   }, []);
 
   if (loading) {
@@ -83,7 +92,8 @@ export default function CertificateShowcase() {
               <ProtectedImage
                 src={cert.imageUrl}
                 alt={congratsHeading}
-                watermarkText={settings?.whatsapp_number || "03421189593"}
+                watermarkText={watermarkConfig.text}
+                watermarkOpacity={watermarkConfig.opacity}
                 objectFit="contain"
                 className="w-full h-full rounded-lg sm:rounded-xl"
               />

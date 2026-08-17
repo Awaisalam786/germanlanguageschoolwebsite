@@ -6,6 +6,7 @@ export default function ProtectedImage({
   alt = 'Protected Image', 
   className = '', 
   watermarkText = '03421189593',
+  watermarkOpacity = 0.18,
   isPrivateOriginal = false,
   objectFit = 'contain'
 }) {
@@ -14,7 +15,7 @@ export default function ProtectedImage({
 
   useEffect(() => {
     if (src && !isPrivateOriginal && !isPdf) {
-      applyAutoWatermark(src, watermarkText, 0.18).then((res) => {
+      applyAutoWatermark(src, watermarkText, watermarkOpacity).then((res) => {
         setWatermarkedSrc(res);
       }).catch(() => {
         setWatermarkedSrc(src);
@@ -22,7 +23,7 @@ export default function ProtectedImage({
     } else {
       setWatermarkedSrc(src);
     }
-  }, [src, watermarkText, isPrivateOriginal, isPdf]);
+  }, [src, watermarkText, watermarkOpacity, isPrivateOriginal, isPdf]);
 
   const handlePrevent = (e) => {
     e.preventDefault();
@@ -57,8 +58,8 @@ export default function ProtectedImage({
       {/* CSS Overlay Watermark Layer to Guarantee Watermark Text Visibility on Screenshots */}
       {!isPrivateOriginal && (
         <div 
-          className="absolute inset-0 pointer-events-none flex flex-wrap items-center justify-around p-4 opacity-25 select-none z-10"
-          style={{ transform: 'rotate(-20deg) scale(1.1)' }}
+          className="absolute inset-0 pointer-events-none flex flex-wrap items-center justify-around p-4 select-none z-10"
+          style={{ transform: 'rotate(-20deg) scale(1.1)', opacity: watermarkOpacity * 1.5 }}
         >
           <span className="text-white font-extrabold text-xs sm:text-sm drop-shadow-md tracking-wider">
             {watermarkText}
