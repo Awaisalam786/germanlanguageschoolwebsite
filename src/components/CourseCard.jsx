@@ -75,7 +75,20 @@ export default function CourseCard({ course, onEnroll }) {
   };
 
   const finalPricePKR = appliedCoupon ? getDiscountedPrice(course.feesPKR, appliedCoupon) : course.feesPKR;
-  const finalPriceEUR = appliedCoupon ? getDiscountedPrice(course.feesEUR, appliedCoupon) : course.feesEUR;
+
+  const computeEUR = (pkrStr) => {
+    if (!pkrStr) return '0';
+    const match = String(pkrStr).match(/[\d,]+/);
+    if (!match) return pkrStr;
+    const val = parseFloat(match[0].replace(/,/g, ''));
+    return Math.round(val / 300).toLocaleString();
+  };
+
+  const rawEUR = (course.feesEUR === course.feesPKR || String(course.feesEUR).includes('PKR') || String(course.feesEUR).includes('Rs'))
+    ? computeEUR(course.feesPKR)
+    : course.feesEUR;
+
+  const finalPriceEUR = appliedCoupon ? getDiscountedPrice(String(rawEUR), appliedCoupon) : String(rawEUR);
 
   const handleEnrollClick = (e) => {
     e.stopPropagation();
