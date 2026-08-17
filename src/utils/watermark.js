@@ -1,7 +1,7 @@
 // AUTOMATED WATERMARK UTILITY ENGINE FOR GERMAN LANGUAGE SCHOOL
 // Automatically tiles diagonal watermark "03421189593" (1-5 repeats) at 15-20% opacity
 
-export function applyAutoWatermark(imageSrc, text = "03421189593", opacity = 0.18) {
+export function applyAutoWatermark(imageSrc, text = "03421189593", opacity = 0.18, color = "#FFFFFF") {
   return new Promise((resolve) => {
     const img = new Image();
     img.crossOrigin = "anonymous";
@@ -23,7 +23,7 @@ export function applyAutoWatermark(imageSrc, text = "03421189593", opacity = 0.1
       // Watermark styling
       ctx.save();
       ctx.globalAlpha = opacity; // 18% opacity
-      ctx.fillStyle = '#FFFFFF';
+      ctx.fillStyle = color;
       ctx.shadowColor = '#000000';
       ctx.shadowBlur = 4;
 

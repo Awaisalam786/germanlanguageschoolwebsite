@@ -7,7 +7,7 @@ import { useGlobalContent } from '../context/GlobalContentContext';
 export default function CertificateShowcase() {
   const { settings } = useGlobalContent();
   const [certificates, setCertificates] = useState([]);
-  const [watermarkConfig, setWatermarkConfig] = useState({ text: '03421189593', opacity: 0.18 });
+  const [watermarkConfig, setWatermarkConfig] = useState({ text: '03421189593', opacity: 0.18, color: '#ffffff' });
   const [loading, setLoading] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -94,6 +94,7 @@ export default function CertificateShowcase() {
                 alt={congratsHeading}
                 watermarkText={watermarkConfig.text}
                 watermarkOpacity={watermarkConfig.opacity}
+                watermarkColor={watermarkConfig.color}
                 objectFit="contain"
                 className="w-full h-full rounded-lg sm:rounded-xl"
               />

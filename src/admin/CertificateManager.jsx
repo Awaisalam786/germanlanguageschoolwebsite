@@ -16,7 +16,7 @@ export default function CertificateManager() {
   const [editCertId, setEditCertId] = useState(null);
   
   // Watermark Settings State
-  const [watermarkConfig, setWatermarkConfig] = useState({ text: '03421189593', opacity: 0.18 });
+  const [watermarkConfig, setWatermarkConfig] = useState({ text: '03421189593', opacity: 0.18, color: '#ffffff' });
   const [savingWatermark, setSavingWatermark] = useState(false);
 
   // 30-Second Quick Upload Form State
@@ -294,27 +294,39 @@ export default function CertificateManager() {
           <ShieldCheck className="w-5 h-5 text-emerald-400" />
           <h2 className="text-lg font-bold text-white">Global Watermark Settings</h2>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
           <div className="space-y-2">
             <label className="block text-xs font-bold text-slate-400">Watermark Text</label>
             <input
               type="text"
-              value={watermarkConfig.text}
+              value={watermarkConfig.text || ''}
               onChange={(e) => setWatermarkConfig({ ...watermarkConfig, text: e.target.value })}
               className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:border-amber-500 focus:ring-1 focus:ring-amber-500 transition outline-none"
             />
           </div>
           <div className="space-y-2">
+            <label className="block text-xs font-bold text-slate-400">Watermark Color</label>
+            <div className="flex items-center gap-3">
+              <input
+                type="color"
+                value={watermarkConfig.color || '#ffffff'}
+                onChange={(e) => setWatermarkConfig({ ...watermarkConfig, color: e.target.value })}
+                className="w-10 h-10 rounded cursor-pointer bg-slate-950 border border-slate-800 p-0.5"
+              />
+              <span className="text-xs text-slate-300 font-mono">{watermarkConfig.color || '#ffffff'}</span>
+            </div>
+          </div>
+          <div className="space-y-2">
             <div className="flex justify-between items-center">
               <label className="block text-xs font-bold text-slate-400">Fade / Opacity Trigger</label>
-              <span className="text-xs text-amber-400 font-bold">{Math.round(watermarkConfig.opacity * 100)}%</span>
+              <span className="text-xs text-amber-400 font-bold">{Math.round((watermarkConfig.opacity || 0.18) * 100)}%</span>
             </div>
             <input
               type="range"
               min="0.05"
               max="1"
               step="0.01"
-              value={watermarkConfig.opacity}
+              value={watermarkConfig.opacity || 0.18}
               onChange={(e) => setWatermarkConfig({ ...watermarkConfig, opacity: parseFloat(e.target.value) })}
               className="w-full accent-amber-500"
             />
@@ -592,6 +604,7 @@ export default function CertificateManager() {
                 alt={previewCert.studentName}
                 watermarkText={watermarkConfig.text}
                 watermarkOpacity={watermarkConfig.opacity}
+                watermarkColor={watermarkConfig.color}
                 isPrivateOriginal={showPrivateOriginal}
                 objectFit="contain"
                 className="w-full h-full rounded-xl"

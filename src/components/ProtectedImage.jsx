@@ -7,6 +7,7 @@ export default function ProtectedImage({
   className = '', 
   watermarkText = '03421189593',
   watermarkOpacity = 0.18,
+  watermarkColor = '#ffffff',
   isPrivateOriginal = false,
   objectFit = 'contain'
 }) {
@@ -15,7 +16,7 @@ export default function ProtectedImage({
 
   useEffect(() => {
     if (src && !isPrivateOriginal && !isPdf) {
-      applyAutoWatermark(src, watermarkText, watermarkOpacity).then((res) => {
+      applyAutoWatermark(src, watermarkText, watermarkOpacity, watermarkColor).then((res) => {
         setWatermarkedSrc(res);
       }).catch(() => {
         setWatermarkedSrc(src);
@@ -23,7 +24,7 @@ export default function ProtectedImage({
     } else {
       setWatermarkedSrc(src);
     }
-  }, [src, watermarkText, watermarkOpacity, isPrivateOriginal, isPdf]);
+  }, [src, watermarkText, watermarkOpacity, watermarkColor, isPrivateOriginal, isPdf]);
 
   const handlePrevent = (e) => {
     e.preventDefault();
@@ -61,13 +62,13 @@ export default function ProtectedImage({
           className="absolute inset-0 pointer-events-none flex flex-wrap items-center justify-around p-4 select-none z-10"
           style={{ transform: 'rotate(-20deg) scale(1.1)', opacity: watermarkOpacity * 1.5 }}
         >
-          <span className="text-white font-extrabold text-xs sm:text-sm drop-shadow-md tracking-wider">
+          <span className="font-extrabold text-xs sm:text-sm drop-shadow-md tracking-wider" style={{ color: watermarkColor }}>
             {watermarkText}
           </span>
-          <span className="text-white font-extrabold text-xs sm:text-sm drop-shadow-md tracking-wider">
+          <span className="font-extrabold text-xs sm:text-sm drop-shadow-md tracking-wider" style={{ color: watermarkColor }}>
             {watermarkText}
           </span>
-          <span className="text-white font-extrabold text-xs sm:text-sm drop-shadow-md tracking-wider hidden sm:inline">
+          <span className="font-extrabold text-xs sm:text-sm drop-shadow-md tracking-wider hidden sm:inline" style={{ color: watermarkColor }}>
             {watermarkText}
           </span>
         </div>
