@@ -184,7 +184,17 @@ export default function ChapterVocabManager() {
     if (previewIndex === null) return;
     
     const word = editingWords[previewIndex];
-    const normalizeAnswer = (str) => str.trim().toLowerCase().replace(/[.,;!?]+$/, '');
+    const isEnglish = previewDir === 'type_en';
+    const normalizeAnswer = (str) => {
+      let normalized = (str || '').trim().toLowerCase().replace(/[.,;!?]+$/, '');
+      if (isEnglish && normalized.startsWith('to ')) {
+        normalized = normalized.substring(3).trim();
+      }
+      if (!isEnglish) {
+        normalized = normalized.replace(/^(der|die|das|ein|eine)\s+/i, '').trim();
+      }
+      return normalized;
+    };
     const normalizedUser = normalizeAnswer(previewTypedAnswer);
     let isCorrect = false;
 

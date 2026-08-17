@@ -186,12 +186,13 @@ export default function ChapterVocabEngine({
     const currentQ = questions[currentQIndex];
     const isEnglish = currentQ.testFormat === 'type_en';
 
-    // Helper to normalize strings: lowercases, trims space, removes trailing punctuation (.,;!?)
-    // For English typing, we also strip a leading "to " to allow both "go" and "to go".
     const normalizeAnswer = (str) => {
       let normalized = (str || '').trim().toLowerCase().replace(/[.,;!?]+$/, '');
       if (isEnglish && normalized.startsWith('to ')) {
         normalized = normalized.substring(3).trim();
+      }
+      if (!isEnglish) {
+        normalized = normalized.replace(/^(der|die|das|ein|eine)\s+/i, '').trim();
       }
       return normalized;
     };
