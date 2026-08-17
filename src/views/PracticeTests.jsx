@@ -599,7 +599,7 @@ export default function PracticeTests() {
                 <BookOpen className="w-8 h-8 text-blue-400" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white mb-1 group-hover:text-blue-400 transition-colors">Reading Test</h3>
+                <h3 className="text-xl font-bold text-white mb-1 group-hover:text-blue-400 transition-colors">Reading</h3>
                 <p className="text-sm text-slate-400">Improve your reading comprehension with short passages.</p>
               </div>
             </button>
@@ -612,7 +612,7 @@ export default function PracticeTests() {
                 <MessageCircle className="w-8 h-8 text-pink-400" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white mb-1 group-hover:text-pink-400 transition-colors">Speaking Test</h3>
+                <h3 className="text-xl font-bold text-white mb-1 group-hover:text-pink-400 transition-colors">Speaking</h3>
                 <p className="text-sm text-slate-400">Join our community to practice speaking with others.</p>
               </div>
             </button>
@@ -626,7 +626,7 @@ export default function PracticeTests() {
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-xl font-bold text-white group-hover:text-amber-400 transition-colors">Smart Vocab Engine</h3>
+                  <h3 className="text-xl font-bold text-white group-hover:text-amber-400 transition-colors">Vocabulary</h3>
                   <span className="px-2 py-0.5 bg-amber-500/20 text-amber-400 text-[10px] font-bold rounded-full uppercase">New</span>
                 </div>
                 <p className="text-sm text-slate-400">Select multiple vocabulary chapters and test yourself in MCQ or Typing mode.</p>
@@ -642,7 +642,7 @@ export default function PracticeTests() {
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <h3 className="text-xl font-bold text-white group-hover:text-emerald-400 transition-colors">Smart Grammar Engine</h3>
+                  <h3 className="text-xl font-bold text-white group-hover:text-emerald-400 transition-colors">Grammar</h3>
                   <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-[10px] font-bold rounded-full uppercase">New</span>
                 </div>
                 <p className="text-sm text-slate-400">Master grammar rules with interactive exercises and real-time checking.</p>
@@ -672,7 +672,7 @@ export default function PracticeTests() {
                 <Volume2 className="w-8 h-8 text-amber-400" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-white mb-1 group-hover:text-amber-400 transition-colors">Alphabet & Numbers</h3>
+                <h3 className="text-xl font-bold text-white mb-1 group-hover:text-amber-400 transition-colors">Alphabets Sounding, Counting</h3>
                 <p className="text-sm text-slate-400">Practice German alphabet and numbers pronunciation.</p>
               </div>
             </button>
