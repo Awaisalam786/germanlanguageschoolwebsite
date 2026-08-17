@@ -152,7 +152,16 @@ export default function GrammarEngine({ level, onBack, userType, storedFreeUser,
     
     // ALL EXERCISES NOW USE RELAXED CHECKING (ignore case and all punctuation)
     // The focus is on grammar rules/vocab/order rather than exact typing syntax.
-    const normalize = (str) => (str || '').toLowerCase().replace(/[.,!?]/g, '').replace(/\s+/g, ' ').trim();
+    const isRelaxedType = currentQ.type === 'fill_blank' || currentQ.type === 'mcq';
+    
+    const normalize = (str) => {
+      let normalized = (str || '').toLowerCase().replace(/[.,!?]/g, '').replace(/\s+/g, ' ').trim();
+      if (isRelaxedType && normalized.startsWith('to ')) {
+        normalized = normalized.substring(3).trim();
+      }
+      return normalized;
+    };
+    
     const normalizedUser = normalize(actualUserAnswerString);
 
     if (currentQ.type === 'word_order') {

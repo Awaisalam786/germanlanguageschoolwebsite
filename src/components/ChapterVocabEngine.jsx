@@ -183,16 +183,23 @@ export default function ChapterVocabEngine({
     e.preventDefault();
     if (feedback || !userAnswer.trim()) return;
 
+    const isEnglish = currentQ.testFormat === 'type_en';
+
     // Helper to normalize strings: lowercases, trims space, removes trailing punctuation (.,;!?)
+    // For English typing, we also strip a leading "to " to allow both "go" and "to go".
     const normalizeAnswer = (str) => {
-      return str.trim().toLowerCase().replace(/[.,;!?]+$/, '');
+      let normalized = str.trim().toLowerCase().replace(/[.,;!?]+$/, '');
+      if (isEnglish && normalized.startsWith('to ')) {
+        normalized = normalized.substring(3).trim();
+      }
+      return normalized;
     };
 
     const normalizedUser = normalizeAnswer(userAnswer);
     const currentQ = questions[currentQIndex];
     let isCorrect = false;
 
-    if (currentQ.testFormat === 'type_en') {
+    if (isEnglish) {
       const validAnswers = currentQ.accepted_answers ? [...currentQ.accepted_answers] : [];
       if (!validAnswers.includes(currentQ.english)) validAnswers.push(currentQ.english);
       
