@@ -6,6 +6,7 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import TrialClassModal from './TrialClassModal';
 import WhatsAppWidget from './WhatsAppWidget';
+import FreeGermanToolsWidget from './FreeGermanToolsWidget';
 import { useGlobalState } from '../context/GlobalStateContext';
 
 export default function AppLayoutWrapper({ children }) {
@@ -65,6 +66,7 @@ export default function AppLayoutWrapper({ children }) {
         />
       )}
       {!pathname.startsWith('/admin') && <WhatsAppWidget />}
+      {!pathname.startsWith('/admin') && <FreeGermanToolsWidget />}
     </div>
   );
 }
