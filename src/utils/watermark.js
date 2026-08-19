@@ -5,8 +5,6 @@ export function applyAutoWatermark(imageSrc, text = "03421189593", opacity = 0.1
   return new Promise((resolve) => {
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.src = imageSrc;
-
     img.onload = () => {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
@@ -62,5 +60,7 @@ export function applyAutoWatermark(imageSrc, text = "03421189593", opacity = 0.1
       // Fallback if image fails to load in canvas
       resolve(imageSrc);
     };
+    
+    img.src = imageSrc;
   });
 }
