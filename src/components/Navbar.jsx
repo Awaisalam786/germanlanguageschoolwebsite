@@ -103,12 +103,16 @@ export default function Navbar({
           <Link href="/"
             className="flex items-center space-x-2 sm:space-x-3 cursor-pointer group shrink-0 min-w-0"
           >
-            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-slate-900 via-slate-800 to-slate-950 p-0.5 shadow-lg group-hover:scale-105 transition-transform duration-300 border border-amber-500/30 shrink-0">
-              <div className="w-full h-full bg-slate-950 rounded-[10px] sm:rounded-[14px] flex items-center justify-center overflow-hidden">
+            <div className="flex h-[40px] sm:h-[56px] rounded-xl sm:rounded-2xl bg-gradient-to-tr from-slate-900 via-slate-800 to-slate-950 p-0.5 shadow-lg group-hover:scale-105 transition-transform duration-300 border border-amber-500/30 shrink-0">
+              <div className="h-full flex items-center justify-center bg-slate-950 rounded-[10px] sm:rounded-[14px] px-2 sm:px-3 py-1.5 sm:py-2">
                 {settings?.logo_url ? (
-                  <img src={settings.logo_url} alt="Logo" className="w-full h-full object-cover scale-[1.2]" />
+                  <img 
+                    src={settings.logo_url} 
+                    alt="Logo" 
+                    className="h-full w-auto object-contain max-w-[140px] sm:max-w-[200px]" 
+                  />
                 ) : (
-                  <span className="text-sm sm:text-xl">🇩🇪</span>
+                  <span className="text-lg sm:text-2xl">🇩🇪</span>
                 )}
               </div>
             </div>
