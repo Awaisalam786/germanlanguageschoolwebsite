@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { translations } from '../i18n/translations';
+import { checkAnswerMatch } from '../utils/answerChecker';
 import { BookOpen, PlayCircle, Loader2, CheckCircle, AlertCircle, ArrowLeft, RotateCcw, Type, List, CheckSquare, XCircle, Trophy } from 'lucide-react';
 
 const UmlautKeyboard = ({ onInsert }) => {
@@ -186,31 +188,20 @@ export default function ChapterVocabEngine({
     const currentQ = questions[currentQIndex];
     const isEnglish = currentQ.testFormat === 'type_en';
 
-    const normalizeAnswer = (str) => {
-      let normalized = (str || '').trim().toLowerCase().replace(/[.,;!?]+$/, '');
-      if (isEnglish && normalized.startsWith('to ')) {
-        normalized = normalized.substring(3).trim();
-      }
-      if (!isEnglish) {
-        normalized = normalized.replace(/^(der|die|das|ein|eine)\s+/i, '').trim();
-      }
-      return normalized;
-    };
-
-    const normalizedUser = normalizeAnswer(userAnswer);
     let isCorrect = false;
 
     if (isEnglish) {
       const validAnswers = currentQ.accepted_answers ? [...currentQ.accepted_answers] : [];
       if (!validAnswers.includes(currentQ.english)) validAnswers.push(currentQ.english);
       
-      isCorrect = validAnswers.some(ans => normalizeAnswer(ans) === normalizedUser);
+      isCorrect = checkAnswerMatch(userAnswer, validAnswers, { isEnglish: true });
     } else {
       const validAnswers = currentQ.accepted_german_answers ? [...currentQ.accepted_german_answers] : [];
       if (!validAnswers.includes(currentQ.german)) validAnswers.push(currentQ.german);
       
-      isCorrect = validAnswers.some(ans => normalizeAnswer(ans) === normalizedUser);
+      isCorrect = checkAnswerMatch(userAnswer, validAnswers, { isGerman: true });
     }
+    
     setFeedback(isCorrect ? 'correct' : 'incorrect');
     if (isCorrect) setScore(s => s + 1);
 

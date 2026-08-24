@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { checkAnswerMatch } from '../utils/answerChecker';
 import { BookOpen, Clock, Loader2, CheckCircle, XCircle, ChevronRight, Play, RefreshCw, X, ArrowLeft } from 'lucide-react';
 import { translations } from '../i18n/translations';
 import { useGlobalState } from '../context/GlobalStateContext';
@@ -150,25 +151,20 @@ export default function GrammarEngine({ level, onBack, userType, storedFreeUser,
     let isCorrect = false;
     let actualUserAnswerString = typeof userAns === 'string' ? userAns : userAns.join(' ');
     
-    // ALL EXERCISES NOW USE RELAXED CHECKING (ignore case and all punctuation)
-    // The focus is on grammar rules/vocab/order rather than exact typing syntax.
-    const isRelaxedType = currentQ.type === 'fill_blank' || currentQ.type === 'mcq';
-    
-    const normalize = (str) => {
-      let normalized = (str || '').toLowerCase().replace(/[.,!?]/g, '').replace(/\s+/g, ' ').trim();
-      if (isRelaxedType && normalized.startsWith('to ')) {
-        normalized = normalized.substring(3).trim();
-      }
-      return normalized;
-    };
-    
-    const normalizedUser = normalize(actualUserAnswerString);
-
-    if (currentQ.type === 'word_order') {
-      isCorrect = normalizedUser === normalize(currentQ.correct_sentence);
+    if (currentQ.type === 'word_order' || currentQ.type === 'hint_construction') {
+      // Strict exact-match checking for strict types (with basic trim/case/spacing normalization)
+      const normalizeStrict = (str) => (str || '').toLowerCase().replace(/\s+/g, ' ').trim();
+      
+      const targetStr = currentQ.type === 'word_order' ? currentQ.correct_sentence : currentQ.correct_answer;
+      isCorrect = normalizeStrict(actualUserAnswerString) === normalizeStrict(targetStr);
     } else {
-      const allCorrects = [currentQ.correct_answer, ...(currentQ.accepted_answers || [])].map(normalize);
-      isCorrect = allCorrects.includes(normalizedUser);
+      // Relaxed checking for fill_blank / mcq
+      const allCorrects = [currentQ.correct_answer, ...(currentQ.accepted_answers || [])];
+      
+      isCorrect = checkAnswerMatch(actualUserAnswerString, allCorrects, {
+        isGerman: true,
+        isEnglish: true // We enable both relaxations for grammar to cover transaltion blanks
+      });
     }
 
     if (isCorrect) setScore(s => s + 1);
