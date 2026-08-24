@@ -108,6 +108,9 @@ export default function ChapterVocabEngine({
       combined = combined.concat(chap.json_data || []);
     });
 
+    // FILTER OUT CORRUPT DATA (missing german/english fields)
+    combined = combined.filter(q => q && typeof q === 'object' && typeof q.german === 'string' && q.german.trim() !== '' && typeof q.english === 'string' && q.english.trim() !== '');
+
     if (combined.length === 0) {
       alert("Selected chapters have no words!");
       return;
