@@ -1,4 +1,4 @@
-﻿export function checkAnswerMatch(userInput, acceptedAnswers, options = {}) {
+export function checkAnswerMatch(userInput, acceptedAnswers, options = {}) {
   const {
     isGerman = false,
     isEnglish = false,
@@ -6,8 +6,8 @@
 
   // STEP 1 - BASIC NORMALIZATION
   const normalizeBasic = (str) => {
-    if (!str) return '';
-    return str
+    if (str === null || str === undefined) return '';
+    return String(str)
       .trim()
       .toLowerCase()
       .replace(/\s+/g, ' ')

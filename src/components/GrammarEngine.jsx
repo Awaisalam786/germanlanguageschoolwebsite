@@ -153,7 +153,10 @@ export default function GrammarEngine({ level, onBack, userType, storedFreeUser,
     
     if (currentQ.type === 'word_order' || currentQ.type === 'hint_construction') {
       // Strict exact-match checking for strict types (with basic trim/case/spacing normalization)
-      const normalizeStrict = (str) => (str || '').toLowerCase().replace(/\s+/g, ' ').trim();
+      const normalizeStrict = (str) => {
+        if (str === null || str === undefined) return '';
+        return String(str).toLowerCase().replace(/\s+/g, ' ').trim();
+      };
       
       const targetStr = currentQ.type === 'word_order' ? currentQ.correct_sentence : currentQ.correct_answer;
       isCorrect = normalizeStrict(actualUserAnswerString) === normalizeStrict(targetStr);
