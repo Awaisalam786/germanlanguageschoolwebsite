@@ -19,6 +19,15 @@ const NounBuilderAdmin = () => {
   // Bulk import states
   const [csvData, setCsvData] = useState('');
   const [previewData, setPreviewData] = useState(null);
+
+  // Manual Add/Edit modal states
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingNoun, setEditingNoun] = useState(null);
+  const [formData, setFormData] = useState({
+    german_noun: '', article: 'der', english_meaning: '', plural: '', 
+    example_sentence: '', english_translation: '', cefr_level: 'A1', 
+    memory_tip: '', image_url: '', status: 'active'
+  });
   
   const LEVELS = ['A1', 'A2', 'B1', 'B2', 'C1'];
 
@@ -142,6 +151,39 @@ const NounBuilderAdmin = () => {
     }
   };
 
+  const openAddModal = () => {
+    setEditingNoun(null);
+    setFormData({
+      german_noun: '', article: 'der', english_meaning: '', plural: '', 
+      example_sentence: '', english_translation: '', cefr_level: 'A1', 
+      memory_tip: '', image_url: '', status: 'active'
+    });
+    setIsModalOpen(true);
+  };
+
+  const openEditModal = (noun) => {
+    setEditingNoun(noun);
+    setFormData(noun);
+    setIsModalOpen(true);
+  };
+
+  const handleSaveNoun = async (e) => {
+    e.preventDefault();
+    if (editingNoun) {
+      const { error } = await supabase.from('noun_builder_nouns').update(formData).eq('id', editingNoun.id);
+      if (!error) {
+        setIsModalOpen(false);
+        fetchNouns();
+      } else { alert(error.message); }
+    } else {
+      const { error } = await supabase.from('noun_builder_nouns').insert([formData]);
+      if (!error) {
+        setIsModalOpen(false);
+        fetchNouns();
+      } else { alert(error.message); }
+    }
+  };
+
   return (
     <div className="w-full max-w-7xl mx-auto p-6 font-sans text-slate-100">
       
@@ -158,7 +200,7 @@ const NounBuilderAdmin = () => {
           >
             <Upload className="w-4 h-4" /> Bulk Import
           </button>
-          <button className="flex items-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl font-bold transition shadow-lg hover:shadow-amber-500/20">
+          <button onClick={openAddModal} className="flex items-center gap-2 px-5 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-xl font-bold transition shadow-lg hover:shadow-amber-500/20">
             <Plus className="w-4 h-4" /> Add Noun
           </button>
         </div>
@@ -352,7 +394,7 @@ const NounBuilderAdmin = () => {
                       </td>
                       <td className="p-4 text-right">
                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
-                          <button className="p-2 hover:bg-blue-500/10 hover:text-blue-400 text-slate-400 rounded-lg transition">
+                          <button onClick={() => openEditModal(noun)} className="p-2 hover:bg-blue-500/10 hover:text-blue-400 text-slate-400 rounded-lg transition">
                             <Edit2 className="w-4 h-4" />
                           </button>
                           <button onClick={() => handleDelete(noun.id)} className="p-2 hover:bg-red-500/10 hover:text-red-400 text-slate-400 rounded-lg transition">
@@ -372,6 +414,137 @@ const NounBuilderAdmin = () => {
                 </tbody>
               </table>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+            <div className="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900 sticky top-0 z-10">
+              <h2 className="text-xl font-bold text-white">{editingNoun ? 'Edit Noun' : 'Add New Noun'}</h2>
+              <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-800 rounded-lg text-slate-400 hover:text-white transition">
+                <XCircle className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSaveNoun} className="p-6 overflow-y-auto custom-scrollbar space-y-4">
+              <div className="grid grid-cols-3 gap-4">
+                <div className="col-span-1">
+                  <label className="block text-xs font-bold text-slate-400 mb-1">Article</label>
+                  <select 
+                    value={formData.article} 
+                    onChange={e => setFormData({...formData, article: e.target.value})}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:border-amber-500 outline-none"
+                  >
+                    <option value="der">der</option>
+                    <option value="die">die</option>
+                    <option value="das">das</option>
+                  </select>
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-xs font-bold text-slate-400 mb-1">German Noun *</label>
+                  <input 
+                    type="text" required 
+                    value={formData.german_noun} 
+                    onChange={e => setFormData({...formData, german_noun: e.target.value})}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:border-amber-500 outline-none"
+                  />
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 mb-1">English Meaning *</label>
+                  <input 
+                    type="text" required 
+                    value={formData.english_meaning} 
+                    onChange={e => setFormData({...formData, english_meaning: e.target.value})}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:border-amber-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 mb-1">Plural Form</label>
+                  <input 
+                    type="text" 
+                    value={formData.plural} 
+                    onChange={e => setFormData({...formData, plural: e.target.value})}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:border-amber-500 outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 mb-1">CEFR Level</label>
+                  <select 
+                    value={formData.cefr_level} 
+                    onChange={e => setFormData({...formData, cefr_level: e.target.value})}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:border-amber-500 outline-none"
+                  >
+                    {LEVELS.map(lvl => <option key={lvl} value={lvl}>{lvl}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-400 mb-1">Status</label>
+                  <select 
+                    value={formData.status} 
+                    onChange={e => setFormData({...formData, status: e.target.value})}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:border-amber-500 outline-none"
+                  >
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 mb-1">Example Sentence (German)</label>
+                <input 
+                  type="text" 
+                  value={formData.example_sentence} 
+                  onChange={e => setFormData({...formData, example_sentence: e.target.value})}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:border-amber-500 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 mb-1">Example Translation (English)</label>
+                <input 
+                  type="text" 
+                  value={formData.english_translation} 
+                  onChange={e => setFormData({...formData, english_translation: e.target.value})}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:border-amber-500 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 mb-1">Memory Tip (Mnemonic)</label>
+                <input 
+                  type="text" 
+                  value={formData.memory_tip} 
+                  onChange={e => setFormData({...formData, memory_tip: e.target.value})}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:border-amber-500 outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-400 mb-1">Image URL</label>
+                <input 
+                  type="text" 
+                  value={formData.image_url} 
+                  onChange={e => setFormData({...formData, image_url: e.target.value})}
+                  placeholder="https://example.com/image.jpg"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:border-amber-500 outline-none"
+                />
+              </div>
+
+              <div className="pt-4 border-t border-slate-800 flex justify-end gap-3 sticky bottom-0 bg-slate-900 pb-2">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2 text-sm font-bold text-slate-400 hover:text-white transition">Cancel</button>
+                <button type="submit" className="px-5 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-lg text-sm font-bold transition shadow-lg">Save Noun</button>
+              </div>
+            </form>
           </div>
         </div>
       )}
