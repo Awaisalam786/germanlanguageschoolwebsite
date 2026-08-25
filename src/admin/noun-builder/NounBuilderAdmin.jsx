@@ -2,12 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { Upload, Plus, Search, FileText, CheckCircle, XCircle, Trash2, Edit2, Info, Loader2 } from 'lucide-react';
-import { createClient } from '@supabase/supabase-js';
-
-// Initialize Supabase client
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { supabase } from '../../lib/supabaseClient';
 
 const NounBuilderAdmin = () => {
   const [nouns, setNouns] = useState([]);

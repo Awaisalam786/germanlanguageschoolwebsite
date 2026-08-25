@@ -1,4 +1,11 @@
 {
+  "/_not-found/page": "app/_not-found/page.js",
+  "/admin/noun-builder-demo/page": "app/admin/noun-builder-demo/page.js",
   "/admin/page": "app/admin/page.js",
-  "/api/admin-login/route": "app/api/admin-login/route.js"
+  "/api/admin-login/route": "app/api/admin-login/route.js",
+  "/noun-builder-demo/page": "app/noun-builder-demo/page.js",
+  "/page": "app/page.js",
+  "/practice-tests/noun-builder/page": "app/practice-tests/noun-builder/page.js",
+  "/practice-tests/page": "app/practice-tests/page.js",
+  "/translator/page": "app/translator/page.js"
 }
