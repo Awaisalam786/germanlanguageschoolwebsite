@@ -60,6 +60,7 @@ export default function AdminLayout({
     { id: 'couponManager', label: 'Coupon Manager', icon: Ticket },
     { id: 'themeCustomizer', label: 'Theme Customizer', icon: Palette, badge: 'CSS' },
     { id: 'practiceTests', label: 'Practice Tests', icon: FileCode2, badge: 'New' },
+    { id: 'nounBuilder', label: 'Noun Builder', icon: BookOpen, badge: 'New' },
     { id: 'chapterVocab', label: 'Chapter Vocab', icon: BookOpen, badge: 'New' },
     { id: 'smartVocabResults', label: 'Smart Vocab Results', icon: Trophy, badge: 'New' },
     { id: 'grammarChapters', label: 'Grammar Chapters', icon: BookOpen, badge: 'New' },
