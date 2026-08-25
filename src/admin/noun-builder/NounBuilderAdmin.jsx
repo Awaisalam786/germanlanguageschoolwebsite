@@ -124,7 +124,11 @@ const NounBuilderAdmin = () => {
       const { error } = await supabase.from('noun_builder_nouns').insert(chunk);
       if (error) {
         console.error("Error inserting chunk:", error);
-        alert(`Import interrupted. Error: ${error.message}`);
+        if (error.code === '42501' || error.message.includes('row-level security')) {
+          alert(`Import interrupted. Error: Row-Level Security Violation.\n\nThis usually means your Admin Session has expired. Please LOG OUT of the admin panel and LOG BACK IN to refresh your secure session.`);
+        } else {
+          alert(`Import interrupted. Error: ${error.message}`);
+        }
         break;
       }
       successCount += chunk.length;
