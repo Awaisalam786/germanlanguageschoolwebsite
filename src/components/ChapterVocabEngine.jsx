@@ -103,11 +103,40 @@ export default function ChapterVocabEngine({
     // Combine all selected JSON arrays
     let combined = [];
     activeChapters.forEach(chap => {
-      combined = combined.concat(chap.json_data || []);
+      let parsedData = chap.json_data || [];
+      if (typeof parsedData === 'string') {
+        try { parsedData = JSON.parse(parsedData); } catch (e) { parsedData = []; }
+      }
+      if (!Array.isArray(parsedData)) parsedData = [];
+      
+      // Filter out any corrupted objects that don't have german/english keys
+      const cleanData = parsedData.filter(word => 
+        word && typeof word === 'object' && word.german && word.english
+      );
+
+      // Support new complex JSON structure by flattening it to the expected format
+      const normalizedData = cleanData.map(word => {
+        let normalizedWord = { ...word };
+        
+        if (typeof word.german === 'object' && word.german !== null) {
+          normalizedWord.german = word.german.word || '';
+          normalizedWord.article = word.german.article || word.article || null;
+          normalizedWord.accepted_german_answers = word.german.accepted || word.german.accepted_german_answers || [];
+        }
+        
+        if (typeof word.english === 'object' && word.english !== null) {
+          normalizedWord.english = word.english.primary || word.english.word || '';
+          normalizedWord.accepted_answers = word.english.accepted || [];
+        }
+        
+        return normalizedWord;
+      });
+      
+      combined = combined.concat(normalizedData);
     });
 
     if (combined.length === 0) {
-      alert("Selected chapters have no words!");
+      alert("Selected chapters have no valid words!");
       return;
     }
 
