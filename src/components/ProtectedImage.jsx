@@ -63,14 +63,14 @@ export default function ProtectedImage({
         <iframe
           src={`${watermarkedSrc}#toolbar=0&navpanes=0&scrollbar=0&view=Fit`}
           title={alt}
-          className="w-full aspect-[1/1.414] max-h-[85vh] border-none bg-white"
+          className="w-full aspect-[1/1.414] border-none bg-white"
           style={{ pointerEvents: isPrivateOriginal ? 'auto' : 'none' }}
         />
       ) : (
         <img
           src={watermarkedSrc}
           alt={alt}
-          className={`w-full h-auto max-h-[80vh] ${fitClass} select-none pointer-events-auto`}
+          className={`w-full h-auto ${fitClass} select-none pointer-events-auto`}
           onContextMenu={handlePrevent}
           onDragStart={handlePrevent}
         />
