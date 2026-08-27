@@ -88,7 +88,7 @@ export default function CertificateShowcase() {
           <div className="grid grid-cols-12 gap-3 sm:gap-8 items-center">
             
             {/* Left Image View */}
-            <div className="col-span-6 md:col-span-7 relative rounded-xl sm:rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 flex items-center justify-center p-1 sm:p-2 group shadow-inner">
+            <div className="col-span-6 md:col-span-7 relative aspect-[1/1.414] max-h-[80vh] mx-auto w-full max-w-lg rounded-xl sm:rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 flex items-center justify-center p-1 sm:p-2 group shadow-inner">
               <ProtectedImage
                 src={cert.imageUrl}
                 alt={congratsHeading}
