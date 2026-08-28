@@ -4,8 +4,8 @@ import { CheckCircle2, ArrowRight, ExternalLink, BookOpen, Mic, Headset, Edit3 }
 import SchemaMarkup from '../../src/components/SchemaMarkup';
 
 export const metadata = {
-  title: 'Goethe Exam Preparation Pakistan (A1–B2) | German Learning School',
-  description: 'Prepare for Goethe-Zertifikat exams with German Learning School. Explore A1–B2 preparation, exam modules, mock tests, speaking practice and study guidance in Pakistan.',
+  title: 'Goethe Exam Preparation Pakistan (A1-B2)',
+  description: 'Independent Goethe exam preparation classes in Pakistan. Mock tests, syllabus breakdowns, and intensive practice for A1, A2, B1, and B2 certifications.',
   alternates: {
     canonical: '/goethe-exam-preparation',
   },

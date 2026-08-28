@@ -5,14 +5,15 @@ import { notFound } from 'next/navigation';
 export const revalidate = 60; // Revalidate cache every 60 seconds
 
 export async function generateMetadata({ params }) {
-  const { data } = await supabase.from('blog_posts').select('*').eq('slug', params.slug).single();
+  const resolvedParams = await params;
+  const { data } = await supabase.from('blog_posts').select('*').eq('slug', resolvedParams.slug).single();
   if (!data) return { title: 'Post Not Found' };
   
   return {
     title: data.meta_title || data.title,
     description: data.meta_description || data.summary,
     alternates: {
-      canonical: `/blog/${params.slug}`,
+      canonical: `/blog/${resolvedParams.slug}`,
     },
     openGraph: {
       title: data.meta_title || data.title,
@@ -23,7 +24,8 @@ export async function generateMetadata({ params }) {
 }
 
 export default async function BlogPostPage({ params }) {
-  const { data: post } = await supabase.from('blog_posts').select('*').eq('slug', params.slug).single();
+  const resolvedParams = await params;
+  const { data: post } = await supabase.from('blog_posts').select('*').eq('slug', resolvedParams.slug).single();
   
   if (!post) {
     notFound();

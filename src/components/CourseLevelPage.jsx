@@ -57,7 +57,7 @@ export default async function CourseLevelPage({ level }) {
     if (course.price) {
       courseSchema.offers = {
         "@type": "Offer",
-        "price": course.price,
+        "price": String(course.price).replace(/[^\d.]/g, ''),
         "priceCurrency": "PKR",
         "category": "Paid"
       };
