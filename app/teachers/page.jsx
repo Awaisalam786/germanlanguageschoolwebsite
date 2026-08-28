@@ -3,6 +3,7 @@ import Teachers from '../../src/views/Teachers';
 import { useGlobalState } from '../../src/context/GlobalStateContext';
 import { useRouter } from 'next/navigation';
 
+
 export default function TeachersPage() {
   const { currentLang, setTrialModalOpen } = useGlobalState();
   const router = useRouter();

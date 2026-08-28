@@ -2,7 +2,7 @@ import React from 'react';
 import NounBuilderEngine from '../../../src/components/noun-builder/NounBuilderEngine';
 
 export const metadata = {
-  title: 'Noun Builder Practice - German Learning',
+  title: 'German Noun & Article Practice (der/die/das)',
   description: 'Master German nouns and their articles with our interactive Noun Builder practice module.',
 };
 

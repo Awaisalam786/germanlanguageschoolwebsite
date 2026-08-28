@@ -4,8 +4,12 @@ import { GlobalContentProvider } from '../src/context/GlobalContentContext';
 import AppLayoutWrapper from '../src/components/AppLayoutWrapper';
 
 export const metadata = {
-  title: 'Deutsch Akademie',
-  description: 'Learn German Online with Deutsch Akademie',
+  metadataBase: new URL('https://germanlearningschool.com'),
+  title: {
+    default: 'German Learning School | #1 Online German Course in Pakistan',
+    template: '%s | German Learning School',
+  },
+  description: "Pakistan's #1 online German language academy. Live Zoom classes for A1–B2, Goethe/telc/TestDaF exam prep, 98.4% pass rate. Enroll from anywhere in Pakistan.",
 };
 
 export default function RootLayout({ children }) {

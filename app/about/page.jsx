@@ -3,6 +3,7 @@ import About from '../../src/views/About';
 import { useGlobalState } from '../../src/context/GlobalStateContext';
 import { useRouter } from 'next/navigation';
 
+
 export default function AboutPage() {
   const { currentLang, setTrialModalOpen } = useGlobalState();
   const router = useRouter();

@@ -35,6 +35,7 @@ import NounBuilderAdmin from '../../src/admin/noun-builder/NounBuilderAdmin';
 import { useGlobalState } from '../../src/context/GlobalStateContext';
 import { useRouter } from 'next/navigation';
 
+
 export default function AdminPage() {
   const {
     currentLang,

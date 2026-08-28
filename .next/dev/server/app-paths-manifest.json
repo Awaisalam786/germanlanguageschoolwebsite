@@ -1,11 +1,14 @@
 {
   "/_not-found/page": "app/_not-found/page.js",
-  "/admin/noun-builder-demo/page": "app/admin/noun-builder-demo/page.js",
-  "/admin/page": "app/admin/page.js",
+  "/about/page": "app/about/page.js",
   "/api/admin-login/route": "app/api/admin-login/route.js",
-  "/noun-builder-demo/page": "app/noun-builder-demo/page.js",
+  "/books/page": "app/books/page.js",
+  "/contact/page": "app/contact/page.js",
+  "/courses/page": "app/courses/page.js",
+  "/founder/page": "app/founder/page.js",
+  "/gallery/page": "app/gallery/page.js",
   "/page": "app/page.js",
-  "/practice-tests/noun-builder/page": "app/practice-tests/noun-builder/page.js",
   "/practice-tests/page": "app/practice-tests/page.js",
-  "/translator/page": "app/translator/page.js"
+  "/teachers/page": "app/teachers/page.js",
+  "/testimonials/page": "app/testimonials/page.js"
 }

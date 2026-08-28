@@ -3,6 +3,7 @@ import Translator from '../../src/views/Translator';
 import { useGlobalState } from '../../src/context/GlobalStateContext';
 import { useRouter } from 'next/navigation';
 
+
 export default function TranslatorPage() {
   const { currentLang, setTrialModalOpen } = useGlobalState();
   const router = useRouter();
