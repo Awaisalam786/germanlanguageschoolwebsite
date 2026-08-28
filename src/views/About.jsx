@@ -42,20 +42,20 @@ export default function About({ currentLang, setActiveTab }) {
       {/* Key Milestones Counter */}
       <div className="bg-slate-950 border border-slate-800 rounded-3xl p-8 grid grid-cols-2 lg:grid-cols-4 gap-6 text-center">
         <div>
-          <div className="text-3xl font-extrabold text-white">15+</div>
-          <div className="text-xs text-amber-400 font-semibold mt-1">Years of Academic Excellence</div>
+          <div className="text-3xl font-extrabold text-white">Trusted</div>
+          <div className="text-xs text-amber-400 font-semibold mt-1">Academic Excellence</div>
         </div>
         <div>
-          <div className="text-3xl font-extrabold text-amber-400">12,500+</div>
-          <div className="text-xs text-slate-400 font-semibold mt-1">Certified Graduates</div>
+          <div className="text-3xl font-extrabold text-amber-400">Global</div>
+          <div className="text-xs text-slate-400 font-semibold mt-1">Student Community</div>
         </div>
         <div>
-          <div className="text-3xl font-extrabold text-white">98.4%</div>
-          <div className="text-xs text-amber-400 font-semibold mt-1">Goethe & Telc Pass Rate</div>
+          <div className="text-3xl font-extrabold text-white">Proven</div>
+          <div className="text-xs text-amber-400 font-semibold mt-1">Exam Pass Rate</div>
         </div>
         <div>
-          <div className="text-3xl font-extrabold text-red-500">25+</div>
-          <div className="text-xs text-slate-400 font-semibold mt-1">Native Instructors</div>
+          <div className="text-3xl font-extrabold text-red-500">Expert</div>
+          <div className="text-xs text-slate-400 font-semibold mt-1">Language Instructors</div>
         </div>
       </div>
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Clock, Calendar, MessageCircle, Tag, Check, X, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
+import Link from 'next/link';
 
 export default function CourseCard({ course, onEnroll }) {
   const [couponCode, setCouponCode] = useState('');
@@ -122,7 +123,7 @@ export default function CourseCard({ course, onEnroll }) {
 
         {/* Course Title */}
         <h3 className="text-lg font-bold text-white group-hover:text-amber-400 transition-colors leading-snug">
-          {course.title}
+          <Link href={['A1', 'A2', 'B1', 'B2'].includes(course.level) ? `/courses/german-${course.level.toLowerCase()}` : '/courses'} className="hover:underline" onClick={(e) => e.stopPropagation()}>{course.title}</Link>
         </h3>
 
         {/* Short Description */}

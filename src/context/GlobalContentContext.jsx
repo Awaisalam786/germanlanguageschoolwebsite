@@ -14,8 +14,15 @@ export function GlobalContentProvider({ children }) {
     address: 'Online Classes via Zoom / Google Meet',
     discount_code: '',
     payment_instructions: 'Click the button below to open WhatsApp and receive your payment details and seat confirmation.',
-    hero_title: 'Learn German 100% Online from Anywhere in Pakistan',
-    hero_description: 'Join 12,500+ successful Pakistani students. Live interactive Zoom classes, Goethe/TestDaF/telc/ÖSD preparation, recorded lecture access, and 98.4% exam pass rate.'
+    hero_title: 'Learn German Online with Expert Faculty',
+    hero_description: 'Join students across Pakistan learning German online. Live interactive Zoom classes, exam-focused preparation for Goethe/TestDaF/telc/ÖSD, and access to recorded lectures for structured practice.',
+    hero_primary_cta: 'Start Learning Now',
+    hero_secondary_cta: 'View Course Fees',
+    stats: [
+      { label: 'Experienced Instructors', value: 'Expert Faculty', icon: 'check' },
+      { label: 'Students learning online', value: 'Across Pakistan', icon: 'users' },
+      { label: 'Exam-focused practice', value: 'High Success', icon: 'award' }
+    ]
   });
   const [loading, setLoading] = useState(true);
 

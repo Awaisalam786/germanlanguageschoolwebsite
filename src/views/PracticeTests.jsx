@@ -956,6 +956,37 @@ export default function PracticeTests() {
           </div>
         </div>
       )}
+
+      {/* SEO Catalog - Visible to crawlers but unobtrusive */}
+      <div className="max-w-4xl mx-auto px-4 py-12 mt-12 border-t border-slate-800 text-slate-400">
+        <h2 className="text-2xl font-bold text-white mb-6">Explore Our Free German Practice Tests</h2>
+        <p className="mb-6 leading-relaxed">German Learning School provides interactive mock tests for all CEFR levels. Please log in or enter your student code above to access the full testing suite. Below is a catalog of the types of practice materials you will find inside:</p>
+        
+        <div className="grid md:grid-cols-2 gap-8">
+          <div>
+            <h3 className="text-lg font-bold text-white mb-3">By CEFR Level</h3>
+            <ul className="space-y-2 list-disc list-inside">
+              <li><strong><a href="/courses/german-a1" className="hover:text-amber-400 underline">A1 German Mock Tests</a>:</strong> Beginner level practice covering basic vocabulary, introductions, and present tense grammar.</li>
+              <li><strong><a href="/courses/german-a2" className="hover:text-amber-400 underline">A2 German Mock Tests</a>:</strong> Pre-intermediate practice including past tense, shopping scenarios, and local geography.</li>
+              <li><strong><a href="/courses/german-b1" className="hover:text-amber-400 underline">B1 German Mock Tests</a>:</strong> Intermediate challenges focusing on independent communication, work, and travel.</li>
+              <li><strong><a href="/courses/german-b2" className="hover:text-amber-400 underline">B2 German Mock Tests</a>:</strong> Upper-intermediate exams tailored for university entrance and professional fluency.</li>
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-lg font-bold text-white mb-3">By Exam Module</h3>
+            <ul className="space-y-2 list-disc list-inside">
+              <li><strong>Reading Practice (Lesen):</strong> Test your reading comprehension against Goethe exam formats.</li>
+              <li><strong>Listening Practice (Horen):</strong> Train your ear with authentic German audio snippets and questions.</li>
+              <li><strong>Grammar Practice:</strong> Target specific weak points like Cases (Nominativ, Akkusativ, Dativ) and verb conjugations.</li>
+            </ul>
+            <div className="mt-6">
+              <a href="/goethe-exam-preparation" className="text-amber-400 hover:text-amber-300 font-bold flex items-center gap-2">
+                View Goethe Exam Preparation Guide
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

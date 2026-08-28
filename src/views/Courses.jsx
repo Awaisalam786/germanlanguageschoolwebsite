@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { supabase } from '../lib/supabaseClient';
 import { translations } from '../i18n/translations';
 import { useGlobalContent } from '../context/GlobalContentContext';
@@ -93,6 +94,25 @@ export default function Courses({ currentLang, setActiveTab, onOpenTrialModal })
 
       {/* DEDICATED COURSE BUNDLES & PACKAGE SAVINGS SECTION */}
       <CourseBundles />
+
+      {/* SEO INTERNAL LINKS FOR DEDICATED LEVEL PAGES */}
+      <div className="pt-12 border-t border-slate-800 text-center">
+        <h2 className="text-xl font-bold text-white mb-6">Explore Detailed Course Information</h2>
+        <div className="flex flex-wrap justify-center items-center gap-4">
+          <Link href="/courses/german-a1" className="text-amber-400 hover:underline hover:text-amber-300 transition-colors">German A1 Course</Link>
+          <span className="text-slate-600 hidden sm:inline">|</span>
+          <Link href="/courses/german-a2" className="text-amber-400 hover:underline hover:text-amber-300 transition-colors">German A2 Course</Link>
+          <span className="text-slate-600 hidden sm:inline">|</span>
+          <Link href="/courses/german-b1" className="text-amber-400 hover:underline hover:text-amber-300 transition-colors">German B1 Course</Link>
+          <span className="text-slate-600 hidden sm:inline">|</span>
+          <Link href="/courses/german-b2" className="text-amber-400 hover:underline hover:text-amber-300 transition-colors">German B2 Course</Link>
+        </div>
+        <div className="mt-6">
+          <Link href="/goethe-exam-preparation" className="inline-block px-6 py-2 bg-slate-900 border border-slate-800 hover:border-emerald-500/50 text-emerald-400 rounded-full text-sm font-bold transition-all">
+            Goethe Exam Preparation Hub
+          </Link>
+        </div>
+      </div>
 
     </div>
   );

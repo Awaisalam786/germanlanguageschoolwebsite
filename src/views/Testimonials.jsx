@@ -23,7 +23,7 @@ export default function Testimonials({ currentLang, setActiveTab }) {
         </span>
         <h1 className="text-4xl font-extrabold text-white">What Our Graduates Say</h1>
         <p className="text-sm text-slate-300">
-          Discover how German Learning School helped over 12,500 students land jobs, pass university entrance exams, and settle in Germany.
+          Discover how German Learning School helped students across Pakistan land jobs, pass university entrance exams, and settle in Germany.
         </p>
       </div>
 

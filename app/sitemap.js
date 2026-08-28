@@ -6,6 +6,11 @@ export default async function sitemap() {
   const staticRoutes = [
     '',
     '/courses',
+    '/courses/german-a1',
+    '/courses/german-a2',
+    '/courses/german-b1',
+    '/courses/german-b2',
+    '/goethe-exam-preparation',
     '/about',
     '/contact',
     '/faq',

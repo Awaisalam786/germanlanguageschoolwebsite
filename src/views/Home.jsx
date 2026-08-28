@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { 
   GraduationCap, 
   Users, 
@@ -159,23 +160,38 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal }) {
 
 
 
-      {/* EXAM BODY CREDIBILITY LOGOS ROW */}
+      {/* EXAM PREPARATION SECTION */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 text-center">
+        <h2 className="text-3xl font-extrabold text-white mb-4">German Exam Preparation</h2>
+        <p className="text-slate-400 max-w-3xl mx-auto mb-8">
+          Prepare for German language examinations with structured practice for listening, reading, writing and speaking. We provide targeted preparation for Goethe, telc, TestDaF, and ÖSD exams to ensure our students from across Pakistan achieve top results.
+        </p>
+      </section>
       <ExamLogosRow />
 
-      {/* 2. COURSES LEVEL OVERVIEW (ALL 4 CEFR LEVELS: A1 TO B2 IN A SINGLE ROW OF 4 COLS) */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+      {/* 2. COURSES LEVEL OVERVIEW */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 pt-12">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <h2 className="text-xs font-bold uppercase tracking-widest text-amber-400 mb-2">Structured Online Curriculum</h2>
-            <h3 className="text-3xl font-extrabold text-white">German Language Levels (A1 to B2)</h3>
+            <h2 className="text-3xl font-extrabold text-white">German Courses A1–B2</h2>
           </div>
-          <button
-            onClick={() => setActiveTab('courses')}
-            className="text-amber-400 text-xs font-bold flex items-center gap-1 hover:underline"
-          >
-            <span>View All Course Details</span>
-            <ArrowRight className="w-4 h-4" />
-          </button>
+          <div className="flex flex-col gap-3 md:items-end">
+            <Link
+              href="/courses"
+              className="text-amber-400 text-xs font-bold flex items-center gap-1 hover:underline"
+            >
+              <span>View All Course Details</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+            <Link
+              href="/goethe-exam-preparation"
+              className="text-emerald-400 text-xs font-bold flex items-center gap-1 hover:underline"
+            >
+              <span>Goethe Exam Preparation</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
 
         {/* Responsive Course Grid */}
@@ -199,24 +215,116 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal }) {
 
         {/* DEDICATED COURSE BUNDLES SECTION */}
         <CourseBundles />
-
       </section>
 
-      {/* 3. REAL STUDENT CERTIFICATE SHOWCASE */}
-      <CertificateShowcase />
-
-      {/* 4. LIVE GOOGLE REVIEWS WIDGET */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <GoogleReviewsWidget />
+      {/* WHY LEARN GERMAN ONLINE WITH US */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl font-extrabold text-white mb-4">Why Learn German Online With Us</h2>
+          <p className="text-slate-400 max-w-2xl mx-auto">
+            Experience the most effective way to learn German from anywhere in Pakistan. Our <Link href="/about" className="text-amber-400 hover:underline">academy</Link> brings the classroom to your home.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+            <Video className="w-8 h-8 text-emerald-400 mb-4" />
+            <h3 className="text-xl font-bold text-white mb-2">Live Zoom Classes</h3>
+            <p className="text-slate-400 text-sm">Interactive, real-time sessions with our <Link href="/teachers" className="text-amber-400 hover:underline">expert faculty</Link>. Ask questions, practice speaking, and get instant feedback.</p>
+          </div>
+          <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+            <Laptop className="w-8 h-8 text-amber-400 mb-4" />
+            <h3 className="text-xl font-bold text-white mb-2">Recorded Lessons</h3>
+            <p className="text-slate-400 text-sm">Missed a class? No problem. Get access to recorded lectures to revise at your own pace from anywhere in Pakistan.</p>
+          </div>
+          <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
+            <GraduationCap className="w-8 h-8 text-red-500 mb-4" />
+            <h3 className="text-xl font-bold text-white mb-2">A1–B2 Curriculum</h3>
+            <p className="text-slate-400 text-sm">Follow a highly structured curriculum designed to take you from absolute beginner to advanced fluency efficiently.</p>
+          </div>
+        </div>
       </section>
 
-      {/* 5. SHORT-FORM VIDEO REELS */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <VideoTestimonialsReels />
+      {/* FREE GERMAN LEARNING TOOLS */}
+      <section className="bg-slate-900/50 border-y border-slate-800 py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-8">
+            <div className="md:w-1/2">
+              <h2 className="text-3xl font-extrabold text-white mb-4">Free German Learning Tools</h2>
+              <p className="text-slate-400 mb-6 leading-relaxed">
+                Practice German vocabulary and grammar with our free online tools before or alongside your course. Enhance your learning journey with our interactive resources.
+              </p>
+              <div className="flex flex-wrap gap-4">
+                <Link href="/practice-tests" className="px-6 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-white font-bold flex items-center gap-2 transition">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400" /> Practice Tests
+                </Link>
+                <Link href="/translator" className="px-6 py-3 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl text-white font-bold flex items-center gap-2 transition">
+                  <MessageCircle className="w-5 h-5 text-amber-400" /> German Translator
+                </Link>
+              </div>
+            </div>
+            <div className="md:w-1/2 text-center md:text-right">
+              <Link href="/blog" className="inline-block text-amber-400 hover:text-amber-300 font-bold underline underline-offset-4">
+                Read our German Learning Blog &amp; Exam Tips &rarr;
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* STUDENT SUCCESS / REVIEWS */}
+      <section className="pt-16">
+        <div className="text-center mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-extrabold text-white mb-4">Student Success / Reviews</h2>
+          <p className="text-slate-400 max-w-2xl mx-auto">
+            Join thousands of students who have successfully passed their German exams and transformed their careers.
+          </p>
+        </div>
+        
+        {/* 3. REAL STUDENT CERTIFICATE SHOWCASE */}
+        <CertificateShowcase />
+
+        {/* 4. LIVE GOOGLE REVIEWS WIDGET */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+          <GoogleReviewsWidget />
+        </div>
+
+        {/* 5. SHORT-FORM VIDEO REELS */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+          <VideoTestimonialsReels />
+        </div>
+      </section>
+
+      {/* FREQUENTLY ASKED QUESTIONS (SEO) */}
+      <section className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl font-extrabold text-white mb-4">Frequently Asked Questions</h2>
+          <Link href="/faq" className="text-amber-400 hover:underline text-sm font-bold">View all FAQs &rarr;</Link>
+        </div>
+        <div className="space-y-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
+            <h3 className="text-lg font-bold text-white mb-2">How can I learn German online in Pakistan?</h3>
+            <p className="text-slate-400 text-sm">You can learn German online from anywhere in Pakistan by enrolling in our interactive Zoom classes. We provide live lectures, study materials, and teacher support.</p>
+          </div>
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
+            <h3 className="text-lg font-bold text-white mb-2">Do you offer German A1, A2, B1 and B2 courses?</h3>
+            <p className="text-slate-400 text-sm">Yes, we offer comprehensive German language courses for all levels from A1 to B2, following the official CEFR standards.</p>
+          </div>
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
+            <h3 className="text-lg font-bold text-white mb-2">Are the German classes live or recorded?</h3>
+            <p className="text-slate-400 text-sm">Our primary focus is on live, interactive Zoom classes to ensure you practice speaking. We also provide recordings of these live classes so you can revise at any time.</p>
+          </div>
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
+            <h3 className="text-lg font-bold text-white mb-2">Do you provide Goethe exam preparation?</h3>
+            <p className="text-slate-400 text-sm">Absolutely. Our curriculum includes dedicated practice sessions and mock exams to prepare you for Goethe, telc, and TestDaF certifications.</p>
+          </div>
+        </div>
       </section>
 
       {/* 6. REUSABLE PREMIUM DARK DEMO CLASS BANNER */}
-      <DemoClassBanner onOpenTrialModal={onOpenTrialModal} />
+      <div className="pb-16">
+        <h2 className="sr-only">Start Learning German Today</h2>
+        <DemoClassBanner onOpenTrialModal={onOpenTrialModal} />
+      </div>
 
     </div>
   );
