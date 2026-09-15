@@ -6,7 +6,7 @@ const GlobalContentContext = createContext();
 
 export function GlobalContentProvider({ children }) {
   const [settings, setSettings] = useState({
-    logo_url: '/temp-logo.png',
+    logo_url: '/logo.png',
     tagline: 'Learn, Practice, Pass Goethe',
     whatsapp_number: '03421189593',
     support_email: 'germanlanguageschool1@gmail.com',
