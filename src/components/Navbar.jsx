@@ -18,7 +18,8 @@ import {
   ShieldCheck,
   ChevronDown,
   CheckSquare,
-  Languages
+  Languages,
+  Download
 } from 'lucide-react';
 import Link from 'next/link';
 import { translations } from '../i18n/translations';
@@ -76,6 +77,7 @@ export default function Navbar({
 
   // Dropdown 2: Resources Group
   const resourcesMenuItems = [
+    { id: 'resources', label: 'Free Resources', icon: Download, desc: 'Free vocabulary list & grammar cheat sheet' },
     { id: 'books', label: 'Books & Resources', icon: BookOpen, desc: 'Official study materials & exam prep books' },
     { id: 'translator', label: 'Free Translator', icon: Languages, desc: 'Translate German text instantly' },
     { id: 'howItWorks', label: t.nav.howItWorks, icon: Laptop, desc: 'Live Zoom & HD lecture archive' },
@@ -87,7 +89,7 @@ export default function Navbar({
   ];
 
   const isAboutActive = ['about', 'founder', 'teachers'].includes(activeTab);
-  const isResourcesActive = ['howItWorks', 'gallery', 'testimonials', 'faq', 'blog', 'books', 'translator'].includes(activeTab);
+  const isResourcesActive = ['howItWorks', 'gallery', 'testimonials', 'faq', 'blog', 'books', 'translator', 'resources'].includes(activeTab);
 
   return (
     <>

@@ -22,6 +22,7 @@ export default function AppLayoutWrapper({ children }) {
   else if (pathname === '/faq') activeTab = 'faq';
   else if (pathname === '/blog') activeTab = 'blog';
   else if (pathname === '/books') activeTab = 'books';
+  else if (pathname === '/resources') activeTab = 'resources';
   else if (pathname === '/translator') activeTab = 'translator';
   else if (pathname === '/howItWorks') activeTab = 'howItWorks';
   else if (pathname === '/teachers') activeTab = 'teachers';

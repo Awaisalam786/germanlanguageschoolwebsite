@@ -24,7 +24,8 @@ export default async function sitemap() {
     '/practice-tests',
     '/practice-tests/noun-builder',
     '/founder',
-    '/books'
+    '/books',
+    '/resources'
   ].map((route) => ({
     url: `${baseUrl}${route}`
   }));
