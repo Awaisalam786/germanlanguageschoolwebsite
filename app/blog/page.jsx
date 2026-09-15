@@ -1,23 +1,12 @@
-'use client';
+import { supabase } from '../../src/lib/supabaseClient';
 import Blog from '../../src/views/Blog';
-import { useGlobalState } from '../../src/context/GlobalStateContext';
-import { useRouter } from 'next/navigation';
 
+export default async function BlogPage() {
+  const { data: posts } = await supabase
+    .from('blog_posts')
+    .select('*')
+    .eq('status', 'Published')
+    .order('created_at', { ascending: false });
 
-export default function BlogPage() {
-  const { currentLang, setTrialModalOpen } = useGlobalState();
-  const router = useRouter();
-  
-  const setActiveTab = (tab) => {
-    if (tab === 'home') router.push('/');
-    else router.push('/' + tab);
-  };
-
-  return (
-    <Blog 
-      currentLang={currentLang} 
-      setActiveTab={setActiveTab} 
-      onOpenTrialModal={() => setTrialModalOpen(true)} 
-    />
-  );
+  return <Blog initialPosts={posts || []} />;
 }

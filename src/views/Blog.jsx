@@ -1,24 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Search, Calendar, Clock, User, ArrowRight, Tag, Loader2 } from 'lucide-react';
-import { supabase } from '../lib/supabaseClient';
+'use client';
+import React, { useState } from 'react';
+import { Search, Calendar, Clock, User, ArrowRight, Tag } from 'lucide-react';
 import Link from 'next/link';
 
-export default function Blog() {
+export default function Blog({ initialPosts = [] }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [posts] = useState(initialPosts);
 
   const categories = ['All', 'Exam Tips', 'Visa & Career', 'Healthcare'];
-
-  useEffect(() => {
-    const fetchPosts = async () => {
-      const { data } = await supabase.from('blog_posts').select('*').eq('status', 'Published').order('created_at', { ascending: false });
-      if (data) setPosts(data);
-      setLoading(false);
-    };
-    fetchPosts();
-  }, []);
 
   const filteredPosts = posts.filter(post => {
     const matchesCategory = selectedCategory === 'All' || post.category === selectedCategory;
@@ -75,12 +65,7 @@ export default function Blog() {
 
       {/* Blog Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {loading ? (
-          <div className="col-span-full text-center text-slate-400 py-12 flex flex-col items-center">
-            <Loader2 className="w-8 h-8 text-amber-500 animate-spin mb-4" />
-            Loading blog posts...
-          </div>
-        ) : filteredPosts.length === 0 ? (
+        {filteredPosts.length === 0 ? (
           <div className="col-span-full text-center text-slate-400 py-12">
             No blog posts found matching your criteria.
           </div>
