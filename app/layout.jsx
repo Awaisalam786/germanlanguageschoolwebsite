@@ -26,6 +26,9 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'Learn German Online in Pakistan | German Learning School',
     description: 'Learn German online in Pakistan with live Zoom classes for A1–B2. Prepare for Goethe, telc and TestDaF exams with structured lessons, practice and expert support.',
+  },
+  verification: {
+    google: 'GjivIzYmQiuTYSBSu5qg7KAt9ZiZe4_KbJvUHxbwDLc',
   }
 };
 
