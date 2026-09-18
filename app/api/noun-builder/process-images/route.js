@@ -65,9 +65,18 @@ export async function POST(request) {
           results.push({ id: noun.id, status: 'missing' });
           continue;
         }
-        const imgRes = await fetch(bestImage);
+        // Wikimedia's servers reject/throttle requests without a descriptive
+        // User-Agent (see https://meta.wikimedia.org/wiki/User-Agent_policy);
+        // the search call above sends one, but this raw file download didn't.
+        const imgRes = await fetch(bestImage, { headers: { 'User-Agent': 'NounBuilder/1.0 (germanlearningschool.com)' } });
+        if (!imgRes.ok) {
+          throw new Error(`Image download failed: HTTP ${imgRes.status} for ${bestImage}`);
+        }
         const buffer = await imgRes.arrayBuffer();
-        const webpBuffer = await sharp(buffer).resize(800, 800, { fit: 'inside', withoutEnlargement: true }).webp({ quality: 80 }).toBuffer();
+        if (!buffer || buffer.byteLength === 0) {
+          throw new Error(`Image download returned an empty body for ${bestImage}`);
+        }
+        const webpBuffer = await sharp(Buffer.from(buffer)).resize(800, 800, { fit: 'inside', withoutEnlargement: true }).webp({ quality: 80 }).toBuffer();
         let baseName = sanitizeFilename(noun.german_noun || 'noun');
         const filename = `${baseName}-${noun.id}.webp`;
         const { error: uploadError } = await adminSupabase.storage.from('noun-images').upload(filename, webpBuffer, { contentType: 'image/webp', upsert: true });
@@ -87,12 +96,16 @@ export async function POST(request) {
         }).eq('id', noun.id);
         results.push({ id: noun.id, status: 'ready' });
       } catch (err) {
+        // Logged so the real cause shows up in Vercel's function logs instead
+        // of every failure looking identical from the client's point of view.
+        console.error(`[noun-builder/process-images] "${noun.german_noun}" (${noun.id}) failed:`, err?.message || err);
         await adminSupabase.from('noun_builder_nouns').update({ image_status: 'failed' }).eq('id', noun.id);
-        results.push({ id: noun.id, status: 'failed' });
+        results.push({ id: noun.id, status: 'failed', error: err?.message || 'Unknown error' });
       }
     }
     return NextResponse.json({ success: true, results });
   } catch (err) {
-    return NextResponse.json({ error: 'Error' }, { status: 500 });
+    console.error('[noun-builder/process-images] Top-level error:', err?.message || err);
+    return NextResponse.json({ error: err?.message || 'Error' }, { status: 500 });
   }
 }

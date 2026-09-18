@@ -179,6 +179,7 @@ const NounBuilderAdmin = () => {
     setFetchingImages(true);
     const progress = { done: 0, total: missing.length, ready: 0, missing: 0, failed: 0 };
     setImageFetchProgress({ ...progress });
+    let firstFailureReason = null;
 
     for (let i = 0; i < missing.length; i += IMAGE_FETCH_BATCH_SIZE) {
       const batch = missing.slice(i, i + IMAGE_FETCH_BATCH_SIZE);
@@ -187,12 +188,19 @@ const NounBuilderAdmin = () => {
         (results || []).forEach(r => {
           if (r.status === 'ready') progress.ready += 1;
           else if (r.status === 'missing') progress.missing += 1;
-          else if (r.status === 'failed') progress.failed += 1;
+          else if (r.status === 'failed') {
+            progress.failed += 1;
+            if (r.error) {
+              console.error(`Image fetch failed for noun ${r.id}:`, r.error);
+              if (!firstFailureReason) firstFailureReason = r.error;
+            }
+          }
           // 'skipped' shouldn't happen here since we pre-filtered, but ignore if it does
         });
       } catch (err) {
         progress.failed += batch.length;
         console.error('Image batch failed:', err);
+        if (!firstFailureReason) firstFailureReason = err.message;
       }
       progress.done += batch.length;
       setImageFetchProgress({ ...progress });
@@ -200,7 +208,8 @@ const NounBuilderAdmin = () => {
 
     setFetchingImages(false);
     await fetchNouns();
-    alert(`Done. ${progress.ready} got an image, ${progress.missing} had no free image found, ${progress.failed} failed.`);
+    const summary = `Done. ${progress.ready} got an image, ${progress.missing} had no free image found, ${progress.failed} failed.`;
+    alert(firstFailureReason ? `${summary}\n\nExample error: ${firstFailureReason}` : summary);
     setImageFetchProgress(null);
   };
 
@@ -214,7 +223,7 @@ const NounBuilderAdmin = () => {
       } else if (result?.status === 'missing') {
         alert('No suitable free image found on Wikimedia Commons for this noun.');
       } else {
-        alert('Image fetch failed for this noun. Try again later.');
+        alert(result?.error ? `Image fetch failed: ${result.error}` : 'Image fetch failed for this noun. Try again later.');
       }
     } catch (err) {
       alert(err.message || 'Image fetch failed.');
