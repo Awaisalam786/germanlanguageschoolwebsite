@@ -90,7 +90,7 @@ export default function AdminLayout({
       )}
 
       {/* Sidebar - Desktop & Mobile */}
-      <aside className={`fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 lg:relative lg:translate-x-0 lg:flex flex-col w-64 bg-slate-900 border-r border-slate-800 shrink-0 h-[100dvh] lg:h-screen lg:sticky lg:top-0 ${
+      <aside className={`fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 lg:relative lg:translate-x-0 flex flex-col w-64 bg-slate-900 border-r border-slate-800 shrink-0 h-[100dvh] lg:h-screen lg:sticky lg:top-0 ${
         mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         
