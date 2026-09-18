@@ -37,13 +37,7 @@ const orgSchema = {
   "@type": "Organization",
   "name": "German Learning School",
   "url": "https://germanlearningschool.com",
-  "logo": "https://germanlearningschool.com/logo.png",
-  "aggregateRating": {
-    "@type": "AggregateRating",
-    "ratingValue": "4.9",
-    "reviewCount": "348",
-    "bestRating": "5"
-  }
+  "logo": "https://germanlearningschool.com/logo.png"
 };
 
 const websiteSchema = {
