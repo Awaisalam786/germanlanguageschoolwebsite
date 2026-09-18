@@ -5,11 +5,15 @@ import { NextResponse } from 'next/server';
 // a Wikimedia Commons search so we can see the raw response shape from a
 // browser (cross-origin fetch to Wikimedia is blocked by CORS/CSP from the
 // browser pane, but Vercel's server can reach it fine).
+//
+// ?q=book             -> uses default search construction (filetype OR + q)
+// ?raw=book           -> uses the raw string as-is for gsrsearch (fully encoded)
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const q = searchParams.get('q') || 'book';
+  const raw = searchParams.get('raw');
   const WIKI_USER_AGENT = 'NounBuilderBot/1.0 (https://germanlearningschool.com; contact: admin@germanlearningschool.com)';
-  const searchTerms = `filetype:bitmap OR filetype:drawing ${q}`;
+  const searchTerms = raw !== null ? raw : `filetype:bitmap OR filetype:drawing ${q}`;
   const apiUrl = `https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=pageimages|imageinfo&generator=search&gsrsearch=${encodeURIComponent(searchTerms)}&gsrlimit=5&iiprop=url|extmetadata`;
   try {
     const res = await fetch(apiUrl, { headers: { 'User-Agent': WIKI_USER_AGENT } });
@@ -23,7 +27,14 @@ export async function GET(request) {
       license: p.imageinfo?.[0]?.extmetadata?.LicenseShortName?.value ?? null,
       imageUrl: p.imageinfo?.[0]?.url ?? null,
     }));
-    return NextResponse.json({ status: res.status, ok: res.ok, summary, rawSnippet: rawText.slice(0, 500) });
+    return NextResponse.json({
+      searchTermsUsed: searchTerms,
+      apiUrlUsed: apiUrl,
+      status: res.status,
+      ok: res.ok,
+      summary,
+      rawSnippet: rawText.slice(0, 800),
+    });
   } catch (err) {
     return NextResponse.json({ error: err?.message || String(err) }, { status: 500 });
   }
