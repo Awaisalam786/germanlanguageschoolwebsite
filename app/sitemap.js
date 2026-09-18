@@ -1,5 +1,7 @@
 import { supabase } from '../src/lib/supabaseClient';
 
+export const revalidate = 3600; // Regenerate sitemap hourly so newly published blog posts get added automatically
+
 export default async function sitemap() {
   const baseUrl = 'https://germanlearningschool.com';
 
