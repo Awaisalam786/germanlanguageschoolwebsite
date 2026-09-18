@@ -1,8 +1,13 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Upload, Plus, Search, FileText, CheckCircle, XCircle, Trash2, Edit2, Info, Loader2 } from 'lucide-react';
+import { Upload, Plus, Search, FileText, CheckCircle, XCircle, Trash2, Edit2, Info, Loader2, ImagePlus, RefreshCw } from 'lucide-react';
 import { supabase } from '../../lib/supabaseClient';
+
+// How many nouns to send to /api/noun-builder/process-images per request.
+// Each noun triggers a Wikimedia search + image download + resize, so we
+// keep batches small to stay well under serverless function time limits.
+const IMAGE_FETCH_BATCH_SIZE = 8;
 
 const NounBuilderAdmin = () => {
   const [nouns, setNouns] = useState([]);
@@ -10,7 +15,12 @@ const NounBuilderAdmin = () => {
   const [importing, setImporting] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
-  
+
+  // Auto image-fetch states
+  const [fetchingImages, setFetchingImages] = useState(false);
+  const [imageFetchProgress, setImageFetchProgress] = useState(null); // { done, total, ready, missing, failed }
+  const [retryingImageId, setRetryingImageId] = useState(null);
+
   // Bulk import states
   const [csvData, setCsvData] = useState('');
   const [previewData, setPreviewData] = useState(null);
@@ -142,6 +152,77 @@ const NounBuilderAdmin = () => {
     alert(`Successfully imported ${successCount} nouns.`);
   };
 
+  // Calls the existing /api/noun-builder/process-images route (Wikimedia
+  // Commons lookup -> resize -> upload to Supabase Storage -> save image_url)
+  // in small batches for every noun that doesn't have an image yet.
+  const callProcessImages = async (nounIds) => {
+    const res = await fetch('/api/noun-builder/process-images', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nounIds }),
+    });
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({}));
+      throw new Error(body.error || `Request failed (${res.status})`);
+    }
+    return res.json();
+  };
+
+  const handleAutoFetchImages = async () => {
+    const missing = nouns.filter(n => !n.image_url || n.image_url.trim() === '');
+    if (missing.length === 0) {
+      alert('Every noun already has an image.');
+      return;
+    }
+    if (!confirm(`Fetch free images (from Wikimedia Commons) for ${missing.length} noun(s) without a picture?`)) return;
+
+    setFetchingImages(true);
+    const progress = { done: 0, total: missing.length, ready: 0, missing: 0, failed: 0 };
+    setImageFetchProgress({ ...progress });
+
+    for (let i = 0; i < missing.length; i += IMAGE_FETCH_BATCH_SIZE) {
+      const batch = missing.slice(i, i + IMAGE_FETCH_BATCH_SIZE);
+      try {
+        const { results } = await callProcessImages(batch.map(n => n.id));
+        (results || []).forEach(r => {
+          if (r.status === 'ready') progress.ready += 1;
+          else if (r.status === 'missing') progress.missing += 1;
+          else if (r.status === 'failed') progress.failed += 1;
+          // 'skipped' shouldn't happen here since we pre-filtered, but ignore if it does
+        });
+      } catch (err) {
+        progress.failed += batch.length;
+        console.error('Image batch failed:', err);
+      }
+      progress.done += batch.length;
+      setImageFetchProgress({ ...progress });
+    }
+
+    setFetchingImages(false);
+    await fetchNouns();
+    alert(`Done. ${progress.ready} got an image, ${progress.missing} had no free image found, ${progress.failed} failed.`);
+    setImageFetchProgress(null);
+  };
+
+  const handleRetryImage = async (noun) => {
+    setRetryingImageId(noun.id);
+    try {
+      const { results } = await callProcessImages([noun.id]);
+      const result = results && results[0];
+      if (result?.status === 'ready') {
+        await fetchNouns();
+      } else if (result?.status === 'missing') {
+        alert('No suitable free image found on Wikimedia Commons for this noun.');
+      } else {
+        alert('Image fetch failed for this noun. Try again later.');
+      }
+    } catch (err) {
+      alert(err.message || 'Image fetch failed.');
+    } finally {
+      setRetryingImageId(null);
+    }
+  };
+
   const handleDelete = async (id) => {
     if (!confirm('Are you sure you want to delete this noun?')) return;
     const { error } = await supabase.from('noun_builder_nouns').delete().eq('id', id);
@@ -193,7 +274,16 @@ const NounBuilderAdmin = () => {
           <p className="text-slate-400 mt-1">Manage modular vocabulary database independently.</p>
         </div>
         <div className="flex items-center gap-3">
-          <button 
+          <button
+            onClick={handleAutoFetchImages}
+            disabled={fetchingImages || loading}
+            className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-xl font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
+            title="Automatically finds a free, licensed image on Wikimedia Commons for every noun missing a picture"
+          >
+            {fetchingImages ? <Loader2 className="w-4 h-4 animate-spin" /> : <ImagePlus className="w-4 h-4" />}
+            {fetchingImages ? 'Fetching Images...' : 'Auto-Fetch Images'}
+          </button>
+          <button
             onClick={() => setActiveTab('bulk_import')}
             className="flex items-center gap-2 px-5 py-2.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/30 rounded-xl font-bold transition"
           >
@@ -204,6 +294,23 @@ const NounBuilderAdmin = () => {
           </button>
         </div>
       </div>
+
+      {imageFetchProgress && (
+        <div className="mb-6 bg-slate-900 border border-emerald-500/30 rounded-xl p-4">
+          <div className="flex justify-between text-xs font-semibold text-slate-400 mb-2">
+            <span>Fetching images: {imageFetchProgress.done} / {imageFetchProgress.total}</span>
+            <span className="text-emerald-400">
+              {imageFetchProgress.ready} ready · {imageFetchProgress.missing} no match · {imageFetchProgress.failed} failed
+            </span>
+          </div>
+          <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+            <div
+              className="bg-emerald-500 h-2 rounded-full transition-all duration-300 ease-out"
+              style={{ width: `${(imageFetchProgress.done / imageFetchProgress.total) * 100}%` }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="flex flex-wrap gap-2 mb-6 border-b border-slate-800 pb-4">
@@ -393,6 +500,16 @@ const NounBuilderAdmin = () => {
                       </td>
                       <td className="p-4 text-right">
                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
+                          {!noun.image_url && (
+                            <button
+                              onClick={() => handleRetryImage(noun)}
+                              disabled={retryingImageId === noun.id}
+                              className="p-2 hover:bg-emerald-500/10 hover:text-emerald-400 text-slate-400 rounded-lg transition disabled:opacity-50"
+                              title="Auto-fetch a free image for this noun"
+                            >
+                              {retryingImageId === noun.id ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                            </button>
+                          )}
                           <button onClick={() => openEditModal(noun)} className="p-2 hover:bg-blue-500/10 hover:text-blue-400 text-slate-400 rounded-lg transition">
                             <Edit2 className="w-4 h-4" />
                           </button>
