@@ -30,16 +30,41 @@ export async function POST(request) {
       return s.toLowerCase().replace(/[^a-z0-9]/g, '');
     };
     
+    // Wikimedia's API policy requires a descriptive User-Agent with contact
+    // info (https://meta.wikimedia.org/wiki/User-Agent_policy) — a bare
+    // "NounBuilder/1.0" gets throttled after a handful of requests, which is
+    // why every noun after the first few in a batch was failing with
+    // "Unexpected token 'Y', \"You are ma\"... is not valid JSON": Wikimedia
+    // was sending back a plain-text rate-limit message instead of JSON.
+    const WIKI_USER_AGENT = 'NounBuilderBot/1.0 (https://germanlearningschool.com; contact: admin@germanlearningschool.com)';
+    const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    let isFirstNoun = true;
     for (const noun of nouns) {
       if (noun.image_url && noun.image_url.trim() !== '') {
         results.push({ id: noun.id, status: 'skipped', reason: 'exists' });
         continue;
       }
+      // Space requests out so we don't hammer Wikimedia's API back-to-back
+      // and trip their rate limiter (this was the actual root cause of the
+      // mass failures — see WIKI_USER_AGENT comment above).
+      if (!isFirstNoun) await sleep(700);
+      isFirstNoun = false;
       try {
         const sq = encodeURIComponent(noun.english_meaning);
         const apiUrl = `https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=pageimages|imageinfo&generator=search&gsrsearch=filetype:bitmap|drawing ${sq}&gsrlimit=3&iiprop=url|extmetadata`;
-        const searchRes = await fetch(apiUrl, { headers: { 'User-Agent': 'NounBuilder/1.0' } });
-        const searchData = await searchRes.json();
+        const searchRes = await fetch(apiUrl, { headers: { 'User-Agent': WIKI_USER_AGENT } });
+        if (!searchRes.ok) {
+          const bodyText = await searchRes.text();
+          throw new Error(`Wikimedia search failed: HTTP ${searchRes.status} — ${bodyText.slice(0, 200)}`);
+        }
+        const rawText = await searchRes.text();
+        let searchData;
+        try {
+          searchData = JSON.parse(rawText);
+        } catch {
+          throw new Error(`Wikimedia search returned non-JSON (likely rate-limited): ${rawText.slice(0, 200)}`);
+        }
         let bestImage = null;
         let extMetadata = null;
         let sourceUrl = null;
@@ -65,10 +90,7 @@ export async function POST(request) {
           results.push({ id: noun.id, status: 'missing' });
           continue;
         }
-        // Wikimedia's servers reject/throttle requests without a descriptive
-        // User-Agent (see https://meta.wikimedia.org/wiki/User-Agent_policy);
-        // the search call above sends one, but this raw file download didn't.
-        const imgRes = await fetch(bestImage, { headers: { 'User-Agent': 'NounBuilder/1.0 (germanlearningschool.com)' } });
+        const imgRes = await fetch(bestImage, { headers: { 'User-Agent': WIKI_USER_AGENT } });
         if (!imgRes.ok) {
           throw new Error(`Image download failed: HTTP ${imgRes.status} for ${bestImage}`);
         }
