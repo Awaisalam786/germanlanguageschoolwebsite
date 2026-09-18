@@ -9,7 +9,8 @@ export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const q = searchParams.get('q') || 'book';
   const WIKI_USER_AGENT = 'NounBuilderBot/1.0 (https://germanlearningschool.com; contact: admin@germanlearningschool.com)';
-  const apiUrl = `https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=pageimages|imageinfo&generator=search&gsrsearch=filetype:bitmap|drawing ${encodeURIComponent(q)}&gsrlimit=5&iiprop=url|extmetadata`;
+  const searchTerms = `filetype:bitmap OR filetype:drawing ${q}`;
+  const apiUrl = `https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=pageimages|imageinfo&generator=search&gsrsearch=${encodeURIComponent(searchTerms)}&gsrlimit=5&iiprop=url|extmetadata`;
   try {
     const res = await fetch(apiUrl, { headers: { 'User-Agent': WIKI_USER_AGENT } });
     const rawText = await res.text();

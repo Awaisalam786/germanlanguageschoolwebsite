@@ -51,8 +51,16 @@ export async function POST(request) {
       if (!isFirstNoun) await sleep(700);
       isFirstNoun = false;
       try {
-        const sq = encodeURIComponent(noun.english_meaning);
-        const apiUrl = `https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=pageimages|imageinfo&generator=search&gsrsearch=filetype:bitmap|drawing ${sq}&gsrlimit=3&iiprop=url|extmetadata`;
+        // Two bugs here, found by inspecting Wikimedia's raw response (it was
+        // returning a bare {"batchcomplete":""} — zero matches, not "no free
+        // license found"):
+        //  1. "filetype:bitmap|drawing" is not valid CirrusSearch syntax —
+        //     the pipe needs to be a real OR: "filetype:bitmap OR filetype:drawing".
+        //  2. Only the noun word was URL-encoded; the rest of the gsrsearch
+        //     value (including a literal space) was sent raw, which breaks
+        //     the query on Wikimedia's end. Encode the whole search string.
+        const searchTerms = `filetype:bitmap OR filetype:drawing ${noun.english_meaning}`;
+        const apiUrl = `https://commons.wikimedia.org/w/api.php?action=query&format=json&prop=pageimages|imageinfo&generator=search&gsrsearch=${encodeURIComponent(searchTerms)}&gsrlimit=5&iiprop=url|extmetadata`;
         const searchRes = await fetch(apiUrl, { headers: { 'User-Agent': WIKI_USER_AGENT } });
         if (!searchRes.ok) {
           const bodyText = await searchRes.text();
