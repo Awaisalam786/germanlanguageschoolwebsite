@@ -1,23 +1,14 @@
-'use client';
-import Courses from '../../src/views/Courses';
-import { useGlobalState } from '../../src/context/GlobalStateContext';
-import { useRouter } from 'next/navigation';
+import { supabase } from '../../src/lib/supabaseClient';
+import CoursesClientPage from './CoursesClientPage';
 
+export const revalidate = 60;
 
-export default function CoursesPage() {
-  const { currentLang, setTrialModalOpen } = useGlobalState();
-  const router = useRouter();
-  
-  const setActiveTab = (tab) => {
-    if (tab === 'home') router.push('/');
-    else router.push('/' + tab);
-  };
-
-  return (
-    <Courses 
-      currentLang={currentLang} 
-      setActiveTab={setActiveTab} 
-      onOpenTrialModal={() => setTrialModalOpen(true)} 
-    />
-  );
+export default async function CoursesPage() {
+  const { data } = await supabase.from('courses').select('*').order('created_at', { ascending: true });
+  let sortedData = [];
+  if (data) {
+    const levelOrder = { 'A1': 1, 'A2': 2, 'B1': 3, 'B2': 4 };
+    sortedData = data.sort((a, b) => (levelOrder[a.level] || 99) - (levelOrder[b.level] || 99));
+  }
+  return <CoursesClientPage initialCourses={sortedData} />;
 }

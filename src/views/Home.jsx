@@ -24,13 +24,14 @@ import CourseCard from '../components/CourseCard';
 import CourseBundles from '../components/CourseBundles';
 import DemoClassBanner from '../components/DemoClassBanner';
 
-export default function Home({ currentLang, setActiveTab, onOpenTrialModal }) {
+export default function Home({ currentLang, setActiveTab, onOpenTrialModal, initialCourses = [] }) {
   const t = translations[currentLang];
   const { settings } = useGlobalContent();
-  const [courses, setCourses] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
+  const [courses, setCourses] = React.useState(initialCourses);
+  const [loading, setLoading] = React.useState(initialCourses.length === 0);
 
   React.useEffect(() => {
+      if (initialCourses.length > 0) return;
     const fetchCourses = async () => {
       const { data } = await supabase.from('courses').select('*').order('created_at', { ascending: true });
       if (data) {

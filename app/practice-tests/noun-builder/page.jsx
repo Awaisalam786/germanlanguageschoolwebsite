@@ -4,6 +4,9 @@ import NounBuilderEngine from '../../../src/components/noun-builder/NounBuilderE
 export const metadata = {
   title: 'German Noun & Article Practice (der/die/das)',
   description: 'Master German nouns and their articles with our interactive Noun Builder practice module.',
+  alternates: {
+    canonical: '/practice-tests/noun-builder',
+  },
 };
 
 export default function NounBuilderStudentPage() {

@@ -1,23 +1,9 @@
-'use client';
-import Teachers from '../../src/views/Teachers';
-import { useGlobalState } from '../../src/context/GlobalStateContext';
-import { useRouter } from 'next/navigation';
+import { supabase } from '../../src/lib/supabaseClient';
+import TeachersClientPage from './TeachersClientPage';
 
+export const revalidate = 60;
 
-export default function TeachersPage() {
-  const { currentLang, setTrialModalOpen } = useGlobalState();
-  const router = useRouter();
-  
-  const setActiveTab = (tab) => {
-    if (tab === 'home') router.push('/');
-    else router.push('/' + tab);
-  };
-
-  return (
-    <Teachers 
-      currentLang={currentLang} 
-      setActiveTab={setActiveTab} 
-      onOpenTrialModal={() => setTrialModalOpen(true)} 
-    />
-  );
+export default async function TeachersPage() {
+  const { data } = await supabase.from('teachers').select('*').order('created_at', { ascending: false });
+  return <TeachersClientPage initialTeachers={data || []} />;
 }

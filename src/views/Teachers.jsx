@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { ShieldCheck, Mail, BookOpen, Award, Star, Calendar, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 
-export default function Teachers({ currentLang, onOpenTrialModal }) {
-  const [teachers, setTeachers] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function Teachers({ currentLang, onOpenTrialModal, initialTeachers = [] }) {
+  const [teachers, setTeachers] = useState(initialTeachers);
+  const [loading, setLoading] = useState(initialTeachers.length === 0);
 
   useEffect(() => {
+    if (initialTeachers.length > 0) return;
     const fetchTeachers = async () => {
       const { data } = await supabase.from('teachers').select('*').order('created_at', { ascending: false });
       if (data) setTeachers(data);

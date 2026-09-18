@@ -7,15 +7,16 @@ import CourseCard from '../components/CourseCard';
 import CourseBundles from '../components/CourseBundles';
 import ScrollReveal from '../components/ScrollReveal';
 
-export default function Courses({ currentLang, setActiveTab, onOpenTrialModal }) {
+export default function Courses({ currentLang, setActiveTab, onOpenTrialModal, initialCourses = [] }) {
   const t = translations[currentLang];
   const { settings } = useGlobalContent();
   const formattedPhone = settings?.whatsapp_number?.replace(/^0/, '92') || '923421189593';
   const [selectedLevel, setSelectedLevel] = useState('All');
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [courses, setCourses] = useState(initialCourses);
+  const [loading, setLoading] = useState(initialCourses.length === 0);
 
   useEffect(() => {
+    if (initialCourses.length > 0) return;
     const fetchCourses = async () => {
       const { data } = await supabase.from('courses').select('*').order('created_at', { ascending: true });
       if (data) {
