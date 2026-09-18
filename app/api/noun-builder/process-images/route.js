@@ -6,7 +6,7 @@ import sharp from 'sharp';
 
 export async function POST(request) {
   try {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     const authClient = createServerClient(supabaseUrl, supabaseAnonKey, { cookies: { get(name) { return cookieStore.get(name)?.value; } } });
