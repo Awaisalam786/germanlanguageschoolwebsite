@@ -108,11 +108,13 @@ export default function Navbar({
             <div className="flex w-[48px] h-[48px] sm:w-[64px] sm:h-[64px] rounded-xl sm:rounded-2xl bg-gradient-to-tr from-slate-900 via-slate-800 to-slate-950 shadow-lg group-hover:scale-105 transition-transform duration-300 border border-amber-500/30 shrink-0">
               <div className="w-full h-full flex items-center justify-center bg-slate-950 rounded-[10px] sm:rounded-[14px] p-0">
                 {settings?.logo_url ? (
-                  <img 
-                    src={settings.logo_url} 
-                    alt="Logo" 
-                    className="w-full h-full object-contain scale-[1.4]" 
+                  <img
+                    src={settings.logo_url}
+                    alt="Logo"
+                    className="w-full h-full object-contain scale-[1.4]"
                     style={{ width: '100%', height: '100%' }}
+                    loading="eager"
+                    fetchPriority="high"
                   />
                 ) : (
                   <span className="text-2xl sm:text-4xl">🇩🇪</span>

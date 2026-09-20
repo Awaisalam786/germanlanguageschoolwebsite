@@ -26,9 +26,28 @@ export function GlobalContentProvider({ children }) {
   });
   const [loading, setLoading] = useState(true);
 
+  // On first mount, try to paint immediately from whatever we last fetched
+  // in this browser tab (sessionStorage), instead of always showing the
+  // hardcoded '/logo.png' default and then popping in the real branding
+  // logo once the Supabase query resolves. This is what caused the logo to
+  // look "delayed" — a fresh network round-trip (DB query + image fetch
+  // from a different origin) ran on every single page load before the
+  // configured logo could appear. The cached copy is only ever a stand-in
+  // for the first paint; fetchSettings() below still always runs and keeps
+  // the cache (and the live subscription) up to date.
   useEffect(() => {
+    try {
+      const cached = sessionStorage.getItem('gls_site_settings_cache');
+      if (cached) {
+        setSettings(prev => ({ ...prev, ...JSON.parse(cached) }));
+      }
+    } catch {
+      // sessionStorage unavailable (private mode, etc.) — fall back to the
+      // default state and the normal fetch below.
+    }
+
     fetchSettings();
-    
+
     // Subscribe to real-time changes
     const subscription = supabase
       .channel('site_settings_changes')
@@ -49,8 +68,16 @@ export function GlobalContentProvider({ children }) {
       data.forEach(item => {
         newSettings[item.key] = item.value;
       });
-      setSettings(prev => ({ ...prev, ...newSettings }));
-      
+      setSettings(prev => {
+        const merged = { ...prev, ...newSettings };
+        try {
+          sessionStorage.setItem('gls_site_settings_cache', JSON.stringify(newSettings));
+        } catch {
+          // ignore — caching is a pure optimization, never required
+        }
+        return merged;
+      });
+
       // Dynamically update favicon
       if (newSettings.logo_url) {
         let link = document.querySelector("link[rel~='icon']");
