@@ -5,10 +5,14 @@ import { cookies } from 'next/headers';
 import sharp from 'sharp';
 
 // Manual image upload — used when the Wikimedia auto-fetch pipeline can't
-// find a match. Takes a base64 image (generated locally, original artwork —
-// no licensing concerns) and a german_noun, resizes/converts it exactly like
-// the auto-fetch flow does, uploads to Supabase Storage, and updates the row.
-// Same auth pattern as /api/noun-builder/process-images.
+// find a match. Fetches a pre-generated original illustration from this same
+// site's own /temp-icons/<germanNoun>.png (public static asset — no
+// licensing concerns, created for this app), resizes/converts it exactly
+// like the auto-fetch flow does, uploads to Supabase Storage, and updates
+// the row. Fetching over HTTP (rather than reading public/ off the local
+// filesystem) avoids the same serverless-bundling pitfalls we hit with sharp
+// earlier. Only germanNoun is sent over the wire, so there's no large
+// payload per request.
 export async function POST(request) {
   try {
     const cookieStore = await cookies();
@@ -22,9 +26,9 @@ export async function POST(request) {
     const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     const adminSupabase = createClient(supabaseUrl, supabaseServiceKey, { auth: { autoRefreshToken: false, persistSession: false } });
 
-    const { germanNoun, imageBase64 } = await request.json();
-    if (!germanNoun || !imageBase64) {
-      return NextResponse.json({ error: 'germanNoun and imageBase64 are required' }, { status: 400 });
+    const { germanNoun } = await request.json();
+    if (!germanNoun) {
+      return NextResponse.json({ error: 'germanNoun is required' }, { status: 400 });
     }
 
     const { data: noun, error: fetchError } = await adminSupabase
@@ -35,13 +39,19 @@ export async function POST(request) {
     if (fetchError) return NextResponse.json({ error: 'Database fetch error: ' + fetchError.message }, { status: 500 });
     if (!noun) return NextResponse.json({ error: `No noun found matching "${germanNoun}"` }, { status: 404 });
 
+    const iconUrl = `https://germanlearningschool.com/temp-icons/${encodeURIComponent(germanNoun)}.png`;
+    const iconRes = await fetch(iconUrl);
+    if (!iconRes.ok) {
+      return NextResponse.json({ error: `No bundled icon found for "${germanNoun}" at ${iconUrl} (HTTP ${iconRes.status})` }, { status: 404 });
+    }
+    const inputBuffer = Buffer.from(await iconRes.arrayBuffer());
+
     const sanitizeFilename = (str) => {
       const charMap = { 'ä': 'ae', 'ö': 'oe', 'ü': 'ue', 'ß': 'ss', 'Ä': 'Ae', 'Ö': 'Oe', 'Ü': 'Ue' };
       let s = str.replace(/[äöüßÄÖÜ]/g, m => charMap[m]);
       return s.toLowerCase().replace(/[^a-z0-9]/g, '');
     };
 
-    const inputBuffer = Buffer.from(imageBase64, 'base64');
     const webpBuffer = await sharp(inputBuffer).resize(800, 800, { fit: 'inside', withoutEnlargement: true }).webp({ quality: 85 }).toBuffer();
 
     const baseName = sanitizeFilename(noun.german_noun || 'noun');
