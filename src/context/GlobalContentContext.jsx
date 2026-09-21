@@ -27,9 +27,17 @@ export function GlobalContentProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    try {
+      const cached = sessionStorage.getItem('gls_site_settings_cache');
+      if (cached) {
+        setSettings(prev => ({ ...prev, ...JSON.parse(cached) }));
+      }
+    } catch {
+      // sessionStorage unavailable — fall back to default state
+    }
+
     fetchSettings();
-    
-    // Subscribe to real-time changes
+
     const subscription = supabase
       .channel('site_settings_changes')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'site_settings' }, () => {
@@ -49,9 +57,16 @@ export function GlobalContentProvider({ children }) {
       data.forEach(item => {
         newSettings[item.key] = item.value;
       });
-      setSettings(prev => ({ ...prev, ...newSettings }));
-      
-      // Dynamically update favicon
+      setSettings(prev => {
+        const merged = { ...prev, ...newSettings };
+        try {
+          sessionStorage.setItem('gls_site_settings_cache', JSON.stringify(newSettings));
+        } catch {
+          // ignore
+        }
+        return merged;
+      });
+
       if (newSettings.logo_url) {
         let link = document.querySelector("link[rel~='icon']");
         if (!link) {
