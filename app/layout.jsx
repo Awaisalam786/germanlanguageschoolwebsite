@@ -21,13 +21,11 @@ export const metadata = {
     siteName: 'German Learning School',
     locale: 'en_PK',
     type: 'website',
-    images: ['/og-image.jpg'],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Learn German Online in Pakistan | German Learning School',
     description: 'Learn German online in Pakistan with live Zoom classes for A1–B2. Prepare for Goethe, telc and TestDaF exams with structured lessons, practice and expert support.',
-    images: ['/og-image.jpg'],
   },
   verification: {
     google: 'GjivIzYmQiuTYSBSu5qg7KAt9ZiZe4_KbJvUHxbwDLc',
@@ -53,6 +51,8 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
+        <link rel="preconnect" href="https://owczimivgmivvmsqxpko.supabase.co" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://owczimivgmivvmsqxpko.supabase.co" />
         <SchemaMarkup schema={orgSchema} />
         <SchemaMarkup schema={websiteSchema} />
       </head>
