@@ -104,7 +104,7 @@ export default function Navbar({
           
           {/* Brand Logo */}
           <Link href="/"
-            className="flex items-center space-x-2 sm:space-x-3 cursor-pointer group shrink-0 min-w-0"
+            className="flex items-center space-x-2 sm:space-x-3 cursor-pointer group min-w-0"
           >
             <div className="flex w-[48px] h-[48px] sm:w-[64px] sm:h-[64px] rounded-xl sm:rounded-2xl bg-gradient-to-tr from-slate-900 via-slate-800 to-slate-950 shadow-lg group-hover:scale-105 transition-transform duration-300 border border-amber-500/30 shrink-0">
               <div className="w-full h-full flex items-center justify-center bg-slate-950 rounded-[10px] sm:rounded-[14px] p-0">
