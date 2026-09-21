@@ -40,6 +40,7 @@ export default function Navbar({
   const dropdownRef = useRef(null);
   const t = translations[currentLang];
   const { settings } = useGlobalContent();
+  const waNumber = (settings?.whatsapp_number || '03421189593').replace(/^0/, '92');
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -364,151 +365,246 @@ export default function Navbar({
         />
       )}
 
-      {/* Sliding Mobile Sidebar */}
+      {/* Sliding Mobile Sidebar — professionally redesigned: branded header,
+          language switcher, sectioned nav, and a conversion-focused footer
+          so the menu does more than list links. */}
       <div 
         className={`lg:hidden fixed top-0 right-0 w-80 sm:w-96 h-[100dvh] bg-slate-950 border-l border-slate-800 shadow-[0_0_50px_rgba(0,0,0,0.5)] z-[9999] transform transition-transform duration-300 ease-in-out flex flex-col ${
           mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="flex items-center justify-between p-6 border-b border-slate-800">
-          <span className="text-xl font-bold text-white tracking-tight">Menu</span>
+        {/* German Flag Accent Strip */}
+        <div className="h-1 w-full german-flag-strip shrink-0"></div>
+
+        {/* Branded Header */}
+        <div className="flex items-center justify-between gap-3 p-5 border-b border-slate-800 shrink-0">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="flex w-11 h-11 rounded-xl bg-gradient-to-tr from-slate-900 via-slate-800 to-slate-950 shadow-lg border border-amber-500/30 shrink-0">
+              <div className="w-full h-full flex items-center justify-center bg-slate-950 rounded-[9px] p-0">
+                {settings?.logo_url ? (
+                  <img
+                    src={settings.logo_url}
+                    alt="Logo"
+                    className="w-full h-full object-contain scale-[1.4]"
+                    style={{ width: '100%', height: '100%' }}
+                    loading="eager"
+                  />
+                ) : (
+                  <span className="text-xl">🇩🇪</span>
+                )}
+              </div>
+            </div>
+            <div className="min-w-0">
+              <div className="text-sm font-extrabold text-white leading-tight truncate">
+                German <span className="text-red-500">Learning School</span>
+              </div>
+              <div className="text-[9px] tracking-widest text-slate-400 uppercase font-bold truncate mt-0.5">
+                {settings?.tagline || 'Learn, Practice, Pass Goethe'}
+              </div>
+            </div>
+          </div>
           <button 
             onClick={() => setMobileMenuOpen(false)}
-            className="p-2 rounded-xl bg-slate-900 text-slate-400 hover:text-white transition"
+            className="p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white hover:border-red-500/50 transition shrink-0"
+            aria-label="Close menu"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
-          
-          {/* Mobile Direct Link: Home */}
-          <Link
-            href="/" onClick={() => setMobileMenuOpen(false)}
-            className={`w-full text-left px-5 py-4 rounded-2xl text-lg font-bold flex items-center gap-4 transition-all ${
-              activeTab === 'home' 
-                ? 'bg-red-600/20 text-white border border-red-500/40' 
-                : 'text-slate-300 hover:bg-slate-900 border border-transparent'
-            }`}
-          >
-            <BookOpen className="w-6 h-6 text-red-500 shrink-0" />
-            <span>{t.nav.home}</span>
-          </Link>
-
-          {/* Mobile Direct Link: Courses & Fees */}
-          <Link
-            href="/courses" onClick={() => setMobileMenuOpen(false)}
-            className={`w-full text-left px-5 py-4 rounded-2xl text-lg font-bold flex items-center gap-4 transition-all ${
-              activeTab === 'courses' 
-                ? 'bg-red-600/20 text-white border border-red-500/40' 
-                : 'text-slate-300 hover:bg-slate-900 border border-transparent'
-            }`}
-          >
-            <GraduationCap className="w-6 h-6 text-red-500 shrink-0" />
-            <span>{t.nav.courses}</span>
-          </Link>
-
-          {/* Mobile Accordion 1: About */}
-          <div className="border border-slate-800/80 rounded-2xl overflow-hidden bg-slate-900/40">
+        {/* Mobile Language Switcher */}
+        <div className="px-5 pt-4 shrink-0">
+          <div className="flex items-center bg-slate-900 border border-slate-800 rounded-xl p-1 text-xs shadow-inner">
+            <Globe className="w-3.5 h-3.5 text-slate-400 ml-1.5 mr-2 shrink-0" />
             <button
-              onClick={() => setMobileAboutExpanded(!mobileAboutExpanded)}
-              className="w-full text-left px-5 py-4 text-lg font-bold text-slate-200 flex items-center justify-between"
+              onClick={() => setLanguage('en')}
+              className={`flex-1 py-1.5 rounded-lg font-bold transition-all duration-200 ${
+                currentLang === 'en' ? 'bg-red-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
+              }`}
             >
-              <div className="flex items-center gap-4">
-                <Users className="w-6 h-6 text-red-500 shrink-0" />
-                <span>About</span>
-              </div>
-              <ChevronDown className={`w-5 h-5 text-red-500 transition-transform shrink-0 ${mobileAboutExpanded ? 'rotate-180' : ''}`} />
+              EN
             </button>
+            <button
+              onClick={() => setLanguage('de')}
+              className={`flex-1 py-1.5 rounded-lg font-bold transition-all duration-200 ${
+                currentLang === 'de' ? 'bg-red-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              DE
+            </button>
+            <button
+              onClick={() => setLanguage('ur')}
+              className={`flex-1 py-1.5 rounded-lg font-bold transition-all duration-200 font-urdu ${
+                currentLang === 'ur' ? 'bg-red-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              اردو
+            </button>
+          </div>
+        </div>
 
-            {mobileAboutExpanded && (
-              <div className="bg-slate-950 p-4 border-t border-slate-800 space-y-2">
-                {aboutMenuItems.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = activeTab === item.id;
+        {/* Nav Links, grouped into sections */}
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
 
-                  return (
-                    <Link
-                      key={item.id}
-                      href={'/' + item.id} onClick={() => setMobileMenuOpen(false)}
-                      className={`group text-left p-3 rounded-xl transition-all flex items-center gap-3 border ${
-                        isActive
-                          ? 'border-red-500/40 bg-red-900/20'
-                          : 'border-slate-800 bg-slate-900/50'
-                      }`}
-                    >
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
-                        isActive ? 'bg-red-500/20 text-red-500' : 'bg-slate-800 text-slate-300'
-                      }`}>
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="text-sm font-bold text-slate-200">{item.label}</div>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
+          <div className="space-y-1.5">
+            <div className="px-1 pb-1 text-[10px] font-bold tracking-widest text-slate-500 uppercase">Main</div>
+
+            {/* Mobile Direct Link: Home */}
+            <Link
+              href="/" onClick={() => setMobileMenuOpen(false)}
+              className={`w-full text-left px-4 py-3.5 rounded-xl text-base font-bold flex items-center gap-3.5 transition-all ${
+                activeTab === 'home' 
+                  ? 'bg-red-600/20 text-white border border-red-500/40' 
+                  : 'text-slate-300 hover:bg-slate-900 border border-transparent'
+              }`}
+            >
+              <BookOpen className="w-5 h-5 text-red-500 shrink-0" />
+              <span>{t.nav.home}</span>
+            </Link>
+
+            {/* Mobile Direct Link: Courses & Fees */}
+            <Link
+              href="/courses" onClick={() => setMobileMenuOpen(false)}
+              className={`w-full text-left px-4 py-3.5 rounded-xl text-base font-bold flex items-center gap-3.5 transition-all ${
+                activeTab === 'courses' 
+                  ? 'bg-red-600/20 text-white border border-red-500/40' 
+                  : 'text-slate-300 hover:bg-slate-900 border border-transparent'
+              }`}
+            >
+              <GraduationCap className="w-5 h-5 text-red-500 shrink-0" />
+              <span>{t.nav.courses}</span>
+            </Link>
           </div>
 
-          {/* Mobile Accordion 2: Resources */}
-          <div className="border border-slate-800/80 rounded-2xl overflow-hidden bg-slate-900/40">
-            <button
-              onClick={() => setMobileResourcesExpanded(!mobileResourcesExpanded)}
-              className="w-full text-left px-5 py-4 text-lg font-bold text-slate-200 flex items-center justify-between"
-            >
-              <div className="flex items-center gap-4">
-                <Laptop className="w-6 h-6 text-red-500 shrink-0" />
-                <span>Resources</span>
-              </div>
-              <ChevronDown className={`w-5 h-5 text-red-500 transition-transform shrink-0 ${mobileResourcesExpanded ? 'rotate-180' : ''}`} />
-            </button>
+          <div className="space-y-1.5">
+            <div className="px-1 pb-1 text-[10px] font-bold tracking-widest text-slate-500 uppercase">Explore</div>
 
-            {mobileResourcesExpanded && (
-              <div className="bg-slate-950 p-4 border-t border-slate-800 space-y-2">
-                {resourcesMenuItems.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = activeTab === item.id;
+            {/* Mobile Accordion 1: About */}
+            <div className="border border-slate-800/80 rounded-xl overflow-hidden bg-slate-900/40">
+              <button
+                onClick={() => setMobileAboutExpanded(!mobileAboutExpanded)}
+                className="w-full text-left px-4 py-3.5 text-base font-bold text-slate-200 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3.5">
+                  <Users className="w-5 h-5 text-red-500 shrink-0" />
+                  <span>About</span>
+                </div>
+                <ChevronDown className={`w-4 h-4 text-red-500 transition-transform shrink-0 ${mobileAboutExpanded ? 'rotate-180' : ''}`} />
+              </button>
 
-                  return (
-                    <Link
-                      key={item.id}
-                      href={'/' + item.id} onClick={() => setMobileMenuOpen(false)}
-                      className={`group text-left p-3 rounded-xl transition-all flex items-center gap-3 border ${
-                        isActive
-                          ? 'border-red-500/40 bg-red-900/20'
-                          : 'border-slate-800 bg-slate-900/50'
-                      }`}
-                    >
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${
-                        isActive ? 'bg-red-500/20 text-red-500' : 'bg-slate-800 text-slate-300'
-                      }`}>
-                        <Icon className="w-5 h-5" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="text-sm font-bold text-slate-200">{item.label}</div>
-                      </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
+              {mobileAboutExpanded && (
+                <div className="bg-slate-950 p-3 border-t border-slate-800 space-y-2">
+                  {aboutMenuItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = activeTab === item.id;
+
+                    return (
+                      <Link
+                        key={item.id}
+                        href={'/' + item.id} onClick={() => setMobileMenuOpen(false)}
+                        className={`group text-left p-2.5 rounded-lg transition-all flex items-center gap-3 border ${
+                          isActive
+                            ? 'border-red-500/40 bg-red-900/20'
+                            : 'border-slate-800 bg-slate-900/50'
+                        }`}
+                      >
+                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                          isActive ? 'bg-red-500/20 text-red-500' : 'bg-slate-800 text-slate-300'
+                        }`}>
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="text-sm font-bold text-slate-200">{item.label}</div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* Mobile Accordion 2: Resources */}
+            <div className="border border-slate-800/80 rounded-xl overflow-hidden bg-slate-900/40">
+              <button
+                onClick={() => setMobileResourcesExpanded(!mobileResourcesExpanded)}
+                className="w-full text-left px-4 py-3.5 text-base font-bold text-slate-200 flex items-center justify-between"
+              >
+                <div className="flex items-center gap-3.5">
+                  <Laptop className="w-5 h-5 text-red-500 shrink-0" />
+                  <span>Resources</span>
+                </div>
+                <ChevronDown className={`w-4 h-4 text-red-500 transition-transform shrink-0 ${mobileResourcesExpanded ? 'rotate-180' : ''}`} />
+              </button>
+
+              {mobileResourcesExpanded && (
+                <div className="bg-slate-950 p-3 border-t border-slate-800 space-y-2">
+                  {resourcesMenuItems.map((item) => {
+                    const Icon = item.icon;
+                    const isActive = activeTab === item.id;
+
+                    return (
+                      <Link
+                        key={item.id}
+                        href={'/' + item.id} onClick={() => setMobileMenuOpen(false)}
+                        className={`group text-left p-2.5 rounded-lg transition-all flex items-center gap-3 border ${
+                          isActive
+                            ? 'border-red-500/40 bg-red-900/20'
+                            : 'border-slate-800 bg-slate-900/50'
+                        }`}
+                      >
+                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
+                          isActive ? 'bg-red-500/20 text-red-500' : 'bg-slate-800 text-slate-300'
+                        }`}>
+                          <Icon className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="text-sm font-bold text-slate-200">{item.label}</div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           </div>
 
-          {/* Mobile Direct Link: Contact Us */}
-          <Link
-            href="/contact" onClick={() => setMobileMenuOpen(false)}
-            className={`w-full text-left px-5 py-4 rounded-2xl text-lg font-bold flex items-center gap-4 transition-all ${
-              activeTab === 'contact' 
-                ? 'bg-red-600/20 text-white border border-red-500/40' 
-                : 'text-slate-300 hover:bg-slate-900 border border-transparent'
-            }`}
-          >
-            <PhoneCall className="w-6 h-6 text-red-500 shrink-0" />
-            <span>{t.nav.contact}</span>
-          </Link>
+          <div className="space-y-1.5">
+            <div className="px-1 pb-1 text-[10px] font-bold tracking-widest text-slate-500 uppercase">Get in touch</div>
 
+            {/* Mobile Direct Link: Contact Us */}
+            <Link
+              href="/contact" onClick={() => setMobileMenuOpen(false)}
+              className={`w-full text-left px-4 py-3.5 rounded-xl text-base font-bold flex items-center gap-3.5 transition-all ${
+                activeTab === 'contact' 
+                  ? 'bg-red-600/20 text-white border border-red-500/40' 
+                  : 'text-slate-300 hover:bg-slate-900 border border-transparent'
+              }`}
+            >
+              <PhoneCall className="w-5 h-5 text-red-500 shrink-0" />
+              <span>{t.nav.contact}</span>
+            </Link>
+          </div>
+        </div>
+
+        {/* Conversion Footer: the two primary actions, always reachable */}
+        <div className="p-5 pt-4 border-t border-slate-800 space-y-2.5 shrink-0 bg-slate-950">
+          <a
+            href={`https://wa.me/${waNumber}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => setMobileMenuOpen(false)}
+            className="w-full py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-white font-bold flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition"
+          >
+            <MessageCircle className="w-5 h-5" />
+            Enroll on WhatsApp
+          </a>
+          <button
+            onClick={() => { setMobileMenuOpen(false); onOpenTrialModal && onOpenTrialModal(); }}
+            className="w-full py-3.5 rounded-xl border-2 border-red-500/50 text-white font-bold flex items-center justify-center gap-2 hover:bg-red-600/10 transition"
+          >
+            <Play className="w-4 h-4 text-red-500" />
+            Book Free Demo Class
+          </button>
         </div>
       </div>
     </>
