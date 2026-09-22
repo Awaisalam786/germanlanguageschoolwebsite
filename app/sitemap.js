@@ -12,6 +12,7 @@ export default async function sitemap() {
     '/courses/german-a2',
     '/courses/german-b1',
     '/courses/german-b2',
+    '/german-a1-syllabus',
     '/goethe-exam-preparation',
     '/telc-exam-preparation',
     '/testdaf-preparation',
