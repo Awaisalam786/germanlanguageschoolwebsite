@@ -3,7 +3,7 @@ import Courses from '../../src/views/Courses';
 import { useGlobalState } from '../../src/context/GlobalStateContext';
 import { useRouter } from 'next/navigation';
 
-export default function CoursesClientPage({ initialCourses }) {
+export default function CoursesClientPage({ initialCourses, initialBundles }) {
   const { currentLang, setTrialModalOpen } = useGlobalState();
   const router = useRouter();
   
@@ -18,6 +18,7 @@ export default function CoursesClientPage({ initialCourses }) {
       setActiveTab={setActiveTab} 
       onOpenTrialModal={() => setTrialModalOpen(true)} 
       initialCourses={initialCourses}
+      initialBundles={initialBundles}
     />
   );
 }

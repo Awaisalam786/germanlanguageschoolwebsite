@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { Star, Quote, Award, CheckCircle, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 
@@ -53,9 +54,11 @@ export default function Testimonials({ currentLang, setActiveTab }) {
             </div>
 
             <div className="pt-6 mt-6 border-t border-slate-800 flex items-center gap-3">
-              <img
+              <Image
                 src={t.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'}
                 alt={t.name}
+                width={48}
+                height={48}
                 className="w-12 h-12 rounded-full object-cover border border-amber-500/40 shrink-0"
               />
               <div className="text-xs">

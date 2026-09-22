@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from 'react';
+import Image from 'next/image';
 import { ShieldCheck, Mail, BookOpen, Award, Star, Calendar, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 
-export default function Teachers({ currentLang, onOpenTrialModal, initialTeachers = [] }) {
-  const [teachers, setTeachers] = useState(initialTeachers);
-  const [loading, setLoading] = useState(initialTeachers.length === 0);
+export default function Teachers({ currentLang, onOpenTrialModal, initialTeachers = null }) {
+  const [teachers, setTeachers] = useState(initialTeachers || []);
+  const [loading, setLoading] = useState(initialTeachers === null);
 
   useEffect(() => {
-    if (initialTeachers.length > 0) return;
+    if (initialTeachers !== null) return;
     const fetchTeachers = async () => {
       const { data } = await supabase.from('teachers').select('*').order('created_at', { ascending: false });
       if (data) setTeachers(data);
       setLoading(false);
     };
     fetchTeachers();
-  }, []);
+  }, [initialTeachers]);
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
       
@@ -34,14 +36,18 @@ export default function Teachers({ currentLang, onOpenTrialModal, initialTeacher
             <Loader2 className="w-8 h-8 text-amber-500 animate-spin mb-4" />
             Loading teachers...
           </div>
+        ) : teachers.length === 0 ? (
+          <div className="col-span-full text-center py-12 text-slate-400">No instructors found.</div>
         ) : teachers.map((teacher) => (
           <div 
             key={teacher.id}
             className="bg-slate-900 border border-slate-800 rounded-2xl p-6 hover:border-amber-500/40 transition duration-300 flex flex-col md:flex-row gap-6 items-start"
           >
-            <img
+            <Image
               src={teacher.image}
               alt={teacher.name}
+              width={176}
+              height={192}
               className="w-full md:w-44 h-48 rounded-xl object-cover border border-slate-700 shrink-0"
             />
             

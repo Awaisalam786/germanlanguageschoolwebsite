@@ -22,14 +22,14 @@ export default function GoogleReviewsWidget() {
     );
   }
 
-  // If the API failed entirely (no cache available)
-  if (liveData?.error || !liveData) {
+  // If the live Google Places API is not configured or fails, gracefully hide to avoid fabricated ratings
+  if (!liveData || liveData.error || !liveData.isConfigured || !liveData.averageRating) {
     return null;
   }
 
-  const rating = liveData?.averageRating || 4.9;
-  const totalReviews = liveData?.totalReviews || 348;
-  const reviewsList = liveData?.reviews && liveData.reviews.length > 0 ? liveData.reviews : [];
+  const rating = liveData.averageRating;
+  const totalReviews = liveData.totalReviews || 0;
+  const reviewsList = liveData.reviews && liveData.reviews.length > 0 ? liveData.reviews : [];
 
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-6 shadow-xl">

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { Play, X, Video, Award } from 'lucide-react';
 import { videoReelsData } from '../mockData/seedData';
 
@@ -24,9 +25,11 @@ export default function VideoTestimonialsReels() {
             className="w-full max-w-full box-border group bg-slate-900 border border-slate-800 rounded-3xl overflow-hidden cursor-pointer hover:border-amber-500/50 transition duration-300 relative shadow-xl flex flex-col"
           >
             <div className="w-full max-w-full box-border h-72 overflow-hidden relative">
-              <img
+              <Image
                 src={reel.thumbnail}
                 alt={reel.studentName}
+                fill
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 className="w-full h-full max-w-full box-border object-cover group-hover:scale-105 transition duration-500"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent box-border"></div>
@@ -64,7 +67,7 @@ export default function VideoTestimonialsReels() {
             </div>
 
             <div className="h-80 rounded-2xl overflow-hidden border border-slate-800 relative bg-slate-950 flex items-center justify-center">
-              <img src={activeReel.thumbnail} alt={activeReel.studentName} className="w-full h-full object-cover opacity-60" />
+              <Image src={activeReel.thumbnail} alt={activeReel.studentName} fill sizes="(max-width: 768px) 100vw, 672px" className="w-full h-full object-cover opacity-60" />
               <div className="absolute inset-0 flex items-center justify-center text-center p-6 bg-slate-950/70">
                 <div className="space-y-2">
                   <Video className="w-12 h-12 text-amber-400 mx-auto animate-pulse" />

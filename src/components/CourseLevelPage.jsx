@@ -142,7 +142,7 @@ export default async function CourseLevelPage({ level }) {
                 {course && <p><strong>Duration:</strong> {course.duration || 'Check current batch details'}</p>}
                 {course && <p><strong>Schedule:</strong> {course.schedule || 'Check current batch details'}</p>}
                 <p><strong>Recordings:</strong> Full access to class recordings for revision from anywhere in Pakistan.</p>
-                <p><strong>Fees:</strong> {course ? `PKR ${course.price}` : 'Check the latest fee details on our Courses page.'}</p>
+                <p><strong>Fees:</strong> {course ? (String(course.price).includes('PKR') || String(course.price).includes('₨') ? course.price : `PKR ${course.price}`) : 'Check the latest fee details on our Courses page.'}</p>
               </div>
             </section>
             

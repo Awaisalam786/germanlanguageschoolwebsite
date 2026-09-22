@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { 
   GraduationCap, 
   Users, 
@@ -24,14 +25,14 @@ import CourseCard from '../components/CourseCard';
 import CourseBundles from '../components/CourseBundles';
 import DemoClassBanner from '../components/DemoClassBanner';
 
-export default function Home({ currentLang, setActiveTab, onOpenTrialModal, initialCourses = [] }) {
+export default function Home({ currentLang, setActiveTab, onOpenTrialModal, initialCourses = null, initialBundles = null }) {
   const t = translations[currentLang];
   const { settings } = useGlobalContent();
-  const [courses, setCourses] = React.useState(initialCourses);
-  const [loading, setLoading] = React.useState(initialCourses.length === 0);
+  const [courses, setCourses] = React.useState(initialCourses || []);
+  const [loading, setLoading] = React.useState(initialCourses === null);
 
   React.useEffect(() => {
-      if (initialCourses.length > 0) return;
+    if (initialCourses !== null) return;
     const fetchCourses = async () => {
       const { data } = await supabase.from('courses').select('*').order('created_at', { ascending: true });
       if (data) {
@@ -42,7 +43,7 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal, init
       setLoading(false);
     };
     fetchCourses();
-  }, []);
+  }, [initialCourses]);
 
   const handleWhatsAppEnroll = (courseName = "German Language Course") => {
     const formattedPhone = settings?.whatsapp_number?.replace(/^0/, '92') || '923421189593';
@@ -125,9 +126,12 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal, init
             {/* Right Hero Video / Image Mock Card */}
             <div className="lg:col-span-5 relative">
               <div className="relative rounded-2xl overflow-hidden border border-slate-700/80 shadow-2xl group">
-                <img
+                <Image
                   src="https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?auto=format&fit=crop&w=800&q=80"
                   alt="Pakistani Students in Live Zoom German Class"
+                  width={800}
+                  height={420}
+                  priority
                   className="w-full h-[420px] object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent"></div>
@@ -215,7 +219,7 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal, init
         </div>
 
         {/* DEDICATED COURSE BUNDLES SECTION */}
-        <CourseBundles />
+        <CourseBundles initialBundles={initialBundles} />
       </section>
 
       {/* WHY LEARN GERMAN ONLINE WITH US */}

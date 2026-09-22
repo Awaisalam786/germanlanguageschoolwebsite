@@ -1,9 +1,14 @@
 import React, { useState } from 'react';
-import { Mail, Phone, MapPin, Send, MessageSquare, CheckCircle, Clock } from 'lucide-react';
+import { Mail, Phone, MapPin, Send, MessageSquare, CheckCircle, Clock, Video } from 'lucide-react';
 import { translations } from '../i18n/translations';
+import { useGlobalContent } from '../context/GlobalContentContext';
 
 export default function Contact({ currentLang }) {
   const t = translations[currentLang];
+  const { settings } = useGlobalContent();
+  const whatsappNumber = settings?.whatsapp_number || '03421189593';
+  const supportEmail = settings?.support_email || 'germanlanguageschool1@gmail.com';
+  const formattedPhone = whatsappNumber.replace(/^0/, '92');
   const [formData, setFormData] = useState({
     first_name: '',
     last_name: '',
@@ -135,50 +140,50 @@ export default function Contact({ currentLang }) {
           )}
         </div>
 
-        {/* Contact Info & Map Mock */}
+        {/* Admissions & Contact Info */}
         <div className="lg:col-span-5 space-y-6">
           
           <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-            <h4 className="text-base font-bold text-white border-l-2 border-amber-500 pl-2">Berlin Campus Location</h4>
+            <h4 className="text-base font-bold text-white border-l-2 border-amber-500 pl-2">Online German Language Academy</h4>
             
-            <ul className="space-y-3 text-xs text-slate-300">
+            <ul className="space-y-3.5 text-xs text-slate-300">
               <li className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <span>Friedrichstraße 140, 10117 Berlin, Germany</span>
+                <Video className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                <span>Live classes conducted 100% online via Zoom & Google Meet</span>
               </li>
               <li className="flex items-center gap-3">
-                <Phone className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>+49 (0) 30 9988-7700</span>
+                <MessageSquare className="w-4 h-4 text-amber-400 shrink-0" />
+                <span>WhatsApp: <a href={`https://wa.me/${formattedPhone}`} target="_blank" rel="noopener noreferrer" className="text-amber-400 font-bold hover:underline">{whatsappNumber}</a></span>
               </li>
               <li className="flex items-center gap-3">
                 <Mail className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>germanlanguageschool1@gmail.com</span>
+                <span>Email: <a href={`mailto:${supportEmail}`} className="text-amber-400 hover:underline">{supportEmail}</a></span>
               </li>
               <li className="flex items-center gap-3">
                 <Clock className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>Mon - Fri: 08:30 - 20:00 CEST | Sat: 09:00 - 15:00</span>
+                <span>Student Support: Mon - Sat (09:00 - 21:00 PKT)</span>
               </li>
             </ul>
           </div>
 
-          {/* Interactive Google Map Mock Card */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg relative">
-            <div className="h-56 bg-slate-950 relative flex items-center justify-center p-4">
-              <div className="absolute inset-0 opacity-40 bg-[radial-gradient(#334155_1px,transparent_1px)] [background-size:16px_16px]"></div>
-              
-              <div className="relative z-10 bg-slate-900/90 border border-amber-500/50 p-4 rounded-xl text-center space-y-1">
-                <MapPin className="w-8 h-8 text-red-500 mx-auto animate-bounce" />
-                <div className="text-xs font-bold text-white">German Learning School Admissions</div>
-                <div className="text-[10px] text-slate-400">100% Live Online Academy — Serving Students Across Pakistan</div>
-                <a
-                  href="https://maps.google.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-block mt-1 text-[10px] font-bold text-amber-400 underline"
-                >
-                  Open in Google Maps
-                </a>
-              </div>
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-3 text-xs text-slate-400">
+            <div className="flex items-center gap-2 text-white font-bold text-sm">
+              <CheckCircle className="w-4 h-4 text-emerald-400" />
+              <span>Serving Students Across Pakistan</span>
+            </div>
+            <p className="leading-relaxed text-slate-300">
+              Students can contact our admissions & support team directly on WhatsApp and email for batch timings, Goethe & telc exam preparation guidance, and fee details.
+            </p>
+            <div className="pt-2">
+              <a
+                href={`https://wa.me/${formattedPhone}?text=${encodeURIComponent("Hi, I would like to inquire about German language courses.")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold rounded-xl text-xs transition-colors"
+              >
+                <MessageSquare className="w-3.5 h-3.5 fill-current" />
+                <span>Chat on WhatsApp</span>
+              </a>
             </div>
           </div>
 

@@ -2,7 +2,18 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: [],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'owczimivgmivvmsqxpko.supabase.co',
+        pathname: '/storage/v1/object/public/**',
+      },
+    ],
   },
   // Without this, Vercel's serverless bundler can fail to load sharp's
   // native binary at runtime (used by /api/noun-builder/process-images

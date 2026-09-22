@@ -27,18 +27,14 @@ export default function Founder({ setActiveTab }) {
         
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
           
-          {/* Founder Image */}
-          <div className="md:col-span-5 relative rounded-2xl overflow-hidden border border-slate-700">
-            <img
-              src={founderData.image}
-              alt={founderData.name}
-              className="w-full h-[400px] object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent"></div>
-            
-            <div className="absolute bottom-4 left-4 right-4 bg-slate-900/90 backdrop-blur border border-amber-500/30 p-3 rounded-xl">
-              <span className="text-amber-400 font-bold text-xs block">{founderData.name}</span>
-              <span className="text-[11px] text-slate-400 block">{founderData.credentials}</span>
+          {/* Founder Avatar Placeholder */}
+          <div className="md:col-span-5 relative rounded-2xl overflow-hidden border border-slate-800 bg-slate-950/80 flex flex-col items-center justify-center p-8 min-h-[380px] shadow-xl">
+            <div className="w-28 h-28 rounded-full bg-gradient-to-tr from-amber-500/20 via-slate-900 to-slate-950 border border-amber-500/30 flex items-center justify-center mb-6 shadow-lg shadow-amber-500/5">
+              <GraduationCap className="w-14 h-14 text-amber-400" />
+            </div>
+            <div className="text-center space-y-1.5">
+              <span className="text-amber-400 font-bold text-sm block">{founderData.name}</span>
+              <span className="text-xs text-slate-400 block max-w-xs leading-relaxed">{founderData.credentials}</span>
             </div>
           </div>
 

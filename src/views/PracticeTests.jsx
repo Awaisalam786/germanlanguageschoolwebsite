@@ -957,34 +957,88 @@ export default function PracticeTests() {
         </div>
       )}
 
-      {/* SEO Catalog - Visible to crawlers but unobtrusive */}
-      <div className="max-w-4xl mx-auto px-4 py-12 mt-12 border-t border-slate-800 text-slate-400">
-        <h2 className="text-2xl font-bold text-white mb-6">Explore Our Free German Practice Tests</h2>
-        <p className="mb-6 leading-relaxed">German Learning School provides interactive mock tests for all CEFR levels. Please log in or enter your student code above to access the full testing suite. Below is a catalog of the types of practice materials you will find inside:</p>
-        
-        <div className="grid md:grid-cols-2 gap-8">
-          <div>
-            <h3 className="text-lg font-bold text-white mb-3">By CEFR Level</h3>
-            <ul className="space-y-2 list-disc list-inside">
-              <li><strong><a href="/courses/german-a1" className="hover:text-amber-400 underline">A1 German Mock Tests</a>:</strong> Beginner level practice covering basic vocabulary, introductions, and present tense grammar.</li>
-              <li><strong><a href="/courses/german-a2" className="hover:text-amber-400 underline">A2 German Mock Tests</a>:</strong> Pre-intermediate practice including past tense, shopping scenarios, and local geography.</li>
-              <li><strong><a href="/courses/german-b1" className="hover:text-amber-400 underline">B1 German Mock Tests</a>:</strong> Intermediate challenges focusing on independent communication, work, and travel.</li>
-              <li><strong><a href="/courses/german-b2" className="hover:text-amber-400 underline">B2 German Mock Tests</a>:</strong> Upper-intermediate exams tailored for university entrance and professional fluency.</li>
-            </ul>
+      {/* Level-Specific Practice Tests & Course Navigation */}
+      <div className="max-w-5xl mx-auto px-4 py-12 mt-12 border-t border-slate-800 text-slate-400 w-full">
+        <div className="text-center max-w-2xl mx-auto mb-8 space-y-2">
+          <h2 className="text-2xl font-bold text-white">Level-Specific Practice Tests &amp; Online Courses</h2>
+          <p className="text-sm text-slate-400 leading-relaxed">
+            Practice for each CEFR milestone with our free interactive tests, or join our structured live classes for guided preparation.
+          </p>
+        </div>
+
+        {/* 4 Level Practice Links */}
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <Link
+            href="/practice-tests/german-a1"
+            className="p-5 bg-slate-900 border border-slate-800 hover:border-amber-500/50 rounded-2xl transition-all group block text-left shadow-lg"
+          >
+            <div className="text-amber-400 font-extrabold text-xs uppercase tracking-wider mb-1">Beginner</div>
+            <h3 className="text-base font-bold text-white group-hover:text-amber-400 transition-colors flex items-center justify-between">
+              German A1 Practice Test
+              <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-amber-400 group-hover:translate-x-1 transition-all" />
+            </h3>
+            <p className="text-xs text-slate-400 mt-1.5">Vocabulary, basic greetings, and present tense drills.</p>
+          </Link>
+
+          <Link
+            href="/practice-tests/german-a2"
+            className="p-5 bg-slate-900 border border-slate-800 hover:border-blue-500/50 rounded-2xl transition-all group block text-left shadow-lg"
+          >
+            <div className="text-blue-400 font-extrabold text-xs uppercase tracking-wider mb-1">Elementary</div>
+            <h3 className="text-base font-bold text-white group-hover:text-blue-400 transition-colors flex items-center justify-between">
+              German A2 Practice Test
+              <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-blue-400 group-hover:translate-x-1 transition-all" />
+            </h3>
+            <p className="text-xs text-slate-400 mt-1.5">Past tense, daily conversations, and sentence structure.</p>
+          </Link>
+
+          <Link
+            href="/practice-tests/german-b1"
+            className="p-5 bg-slate-900 border border-slate-800 hover:border-emerald-500/50 rounded-2xl transition-all group block text-left shadow-lg"
+          >
+            <div className="text-emerald-400 font-extrabold text-xs uppercase tracking-wider mb-1">Intermediate</div>
+            <h3 className="text-base font-bold text-white group-hover:text-emerald-400 transition-colors flex items-center justify-between">
+              German B1 Practice Test
+              <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-emerald-400 group-hover:translate-x-1 transition-all" />
+            </h3>
+            <p className="text-xs text-slate-400 mt-1.5">Independent grammar, reading, and exam preparation.</p>
+          </Link>
+
+          <Link
+            href="/practice-tests/german-b2"
+            className="p-5 bg-slate-900 border border-slate-800 hover:border-purple-500/50 rounded-2xl transition-all group block text-left shadow-lg"
+          >
+            <div className="text-purple-400 font-extrabold text-xs uppercase tracking-wider mb-1">Upper Intermediate</div>
+            <h3 className="text-base font-bold text-white group-hover:text-purple-400 transition-colors flex items-center justify-between">
+              German B2 Practice Test
+              <ArrowRight className="w-4 h-4 text-slate-500 group-hover:text-purple-400 group-hover:translate-x-1 transition-all" />
+            </h3>
+            <p className="text-xs text-slate-400 mt-1.5">Advanced vocabulary, academic texts, and professional skills.</p>
+          </Link>
+        </div>
+
+        {/* Course CTA Banner */}
+        <div className="p-6 bg-slate-900/80 border border-slate-800 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-center sm:text-left">
+            <h3 className="text-base font-bold text-white">Need structured lessons with certified teachers?</h3>
+            <p className="text-xs text-slate-400 mt-0.5">Live online Zoom batches covering A1 to B2 with exam preparation and personalized feedback.</p>
           </div>
-          <div>
-            <h3 className="text-lg font-bold text-white mb-3">By Exam Module</h3>
-            <ul className="space-y-2 list-disc list-inside">
-              <li><strong>Reading Practice (Lesen):</strong> Test your reading comprehension against Goethe exam formats.</li>
-              <li><strong>Listening Practice (Horen):</strong> Train your ear with authentic German audio snippets and questions.</li>
-              <li><strong>Grammar Practice:</strong> Target specific weak points like Cases (Nominativ, Akkusativ, Dativ) and verb conjugations.</li>
-            </ul>
-            <div className="mt-6">
-              <a href="/goethe-exam-preparation" className="text-amber-400 hover:text-amber-300 font-bold flex items-center gap-2">
-                View Goethe Exam Preparation Guide
-              </a>
-            </div>
-          </div>
+          <Link
+            href="/courses"
+            className="px-6 py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs sm:text-sm rounded-xl transition-all shrink-0 flex items-center gap-1.5"
+          >
+            Explore German Courses <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        {/* Exam Guides Links */}
+        <div className="mt-8 pt-6 border-t border-slate-800/80 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-400">
+          <span className="font-semibold text-slate-300">Exam Preparation Guides:</span>
+          <Link href="/goethe-exam-preparation" className="hover:text-amber-400 transition-colors">Goethe Exam Preparation</Link>
+          <span className="text-slate-700">•</span>
+          <Link href="/telc-exam-preparation" className="hover:text-amber-400 transition-colors">telc Exam Preparation</Link>
+          <span className="text-slate-700">•</span>
+          <Link href="/testdaf-preparation" className="hover:text-amber-400 transition-colors">TestDaF Preparation</Link>
         </div>
       </div>
     </div>

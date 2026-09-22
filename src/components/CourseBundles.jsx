@@ -10,13 +10,14 @@ import { supabase } from '../lib/supabaseClient';
 import { useGlobalContent } from '../context/GlobalContentContext';
 import ScrollReveal from './ScrollReveal';
 
-export default function CourseBundles() {
+export default function CourseBundles({ initialBundles = null }) {
   const { settings } = useGlobalContent();
   const formattedPhone = settings?.whatsapp_number?.replace(/^0/, '92') || '923421189593';
-  const [bundles, setBundles] = React.useState([]);
-  const [loading, setLoading] = React.useState(true);
+  const [bundles, setBundles] = React.useState(initialBundles || []);
+  const [loading, setLoading] = React.useState(initialBundles === null);
 
   React.useEffect(() => {
+    if (initialBundles !== null) return;
     const fetchBundles = async () => {
       const { data } = await supabase.from('course_bundles').select('*').order('created_at', { ascending: true });
       if (data) {
@@ -25,7 +26,7 @@ export default function CourseBundles() {
       setLoading(false);
     };
     fetchBundles();
-  }, []);
+  }, [initialBundles]);
 
   const handleWhatsAppEnrollBundle = (bundleTitle) => {
     const msg = encodeURIComponent(`Hi, I want to enroll in the ${bundleTitle}. Please share payment details.`);

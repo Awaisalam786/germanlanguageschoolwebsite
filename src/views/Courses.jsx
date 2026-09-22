@@ -7,16 +7,16 @@ import CourseCard from '../components/CourseCard';
 import CourseBundles from '../components/CourseBundles';
 import ScrollReveal from '../components/ScrollReveal';
 
-export default function Courses({ currentLang, setActiveTab, onOpenTrialModal, initialCourses = [] }) {
+export default function Courses({ currentLang, setActiveTab, onOpenTrialModal, initialCourses = null, initialBundles = null }) {
   const t = translations[currentLang];
   const { settings } = useGlobalContent();
   const formattedPhone = settings?.whatsapp_number?.replace(/^0/, '92') || '923421189593';
   const [selectedLevel, setSelectedLevel] = useState('All');
-  const [courses, setCourses] = useState(initialCourses);
-  const [loading, setLoading] = useState(initialCourses.length === 0);
+  const [courses, setCourses] = useState(initialCourses || []);
+  const [loading, setLoading] = useState(initialCourses === null);
 
   useEffect(() => {
-    if (initialCourses.length > 0) return;
+    if (initialCourses !== null) return;
     const fetchCourses = async () => {
       const { data } = await supabase.from('courses').select('*').order('created_at', { ascending: true });
       if (data) {
@@ -27,7 +27,7 @@ export default function Courses({ currentLang, setActiveTab, onOpenTrialModal, i
       setLoading(false);
     };
     fetchCourses();
-  }, []);
+  }, [initialCourses]);
 
   const filteredCourses = selectedLevel === 'All' 
     ? courses 
@@ -94,7 +94,7 @@ export default function Courses({ currentLang, setActiveTab, onOpenTrialModal, i
       </div>
 
       {/* DEDICATED COURSE BUNDLES & PACKAGE SAVINGS SECTION */}
-      <CourseBundles />
+      <CourseBundles initialBundles={initialBundles} />
 
       {/* SEO INTERNAL LINKS FOR DEDICATED LEVEL PAGES */}
       <div className="pt-12 border-t border-slate-800 text-center">

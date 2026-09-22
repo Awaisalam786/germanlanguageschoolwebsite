@@ -65,17 +65,27 @@ export default function Footer({ currentLang, setActiveTab }) {
               Online CEFR Batches
             </h4>
             <ul className="space-y-2.5 text-xs">
-              <li className="flex items-center justify-between bg-slate-900/60 p-2 rounded border border-slate-800">
-                <span className="font-semibold text-white">A1 & A2 Beginner</span>
-                <span className="text-amber-400 text-[10px]">₨35,000 / €120</span>
+              <li className="flex items-center justify-between bg-slate-900/60 p-2 rounded border border-slate-800 hover:border-amber-500/30 transition-colors">
+                <Link href="/courses/german-a1" className="font-semibold text-white hover:text-amber-400 transition-colors">
+                  A1 & A2 Beginner
+                </Link>
+                <Link href="/courses" className="text-amber-400 hover:underline text-[10px]">
+                  View Details &rarr;
+                </Link>
               </li>
-              <li className="flex items-center justify-between bg-slate-900/60 p-2 rounded border border-slate-800">
-                <span className="font-semibold text-white">B1 & B2 Intermediate</span>
-                <span className="text-amber-400 text-[10px]">₨48,000 / €160</span>
+              <li className="flex items-center justify-between bg-slate-900/60 p-2 rounded border border-slate-800 hover:border-amber-500/30 transition-colors">
+                <Link href="/courses/german-b1" className="font-semibold text-white hover:text-amber-400 transition-colors">
+                  B1 & B2 Intermediate
+                </Link>
+                <Link href="/courses" className="text-amber-400 hover:underline text-[10px]">
+                  View Details &rarr;
+                </Link>
               </li>
-              <li className="flex items-center justify-between bg-slate-900/60 p-2 rounded border border-slate-800">
-                <span className="font-semibold text-white">Goethe & telc Exam Prep</span>
-                <span className="text-amber-400 text-[10px]">100% Online</span>
+              <li className="flex items-center justify-between bg-slate-900/60 p-2 rounded border border-slate-800 hover:border-amber-500/30 transition-colors">
+                <Link href="/goethe-exam-preparation" className="font-semibold text-white hover:text-amber-400 transition-colors">
+                  Goethe & telc Exam Prep
+                </Link>
+                <span className="text-emerald-400 text-[10px] font-bold">100% Online</span>
               </li>
             </ul>
           </div>

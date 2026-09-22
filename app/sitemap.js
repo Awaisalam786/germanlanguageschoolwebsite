@@ -13,6 +13,8 @@ export default async function sitemap() {
     '/courses/german-b1',
     '/courses/german-b2',
     '/goethe-exam-preparation',
+    '/telc-exam-preparation',
+    '/testdaf-preparation',
     '/about',
     '/contact',
     '/faq',
@@ -25,6 +27,10 @@ export default async function sitemap() {
     '/translator',
     '/practice-tests',
     '/practice-tests/noun-builder',
+    '/practice-tests/german-a1',
+    '/practice-tests/german-a2',
+    '/practice-tests/german-b1',
+    '/practice-tests/german-b2',
     '/founder',
     '/books',
     '/resources'
@@ -36,14 +42,14 @@ export default async function sitemap() {
   try {
     const { data: posts } = await supabase
       .from('blog_posts')
-      .select('slug, created_at, updated_at')
+      .select('*')
       .eq('status', 'Published');
 
     if (posts) {
       blogRoutes = posts.map((post) => {
         const routeObj = { url: `${baseUrl}/blog/${post.slug}` };
-        if (post.updated_at) routeObj.lastModified = post.updated_at;
-        else if (post.created_at) routeObj.lastModified = post.created_at;
+        const dateVal = post.updated_at || post.published_at || post.created_at;
+        if (dateVal) routeObj.lastModified = new Date(dateVal);
         return routeObj;
       });
     }

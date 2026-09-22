@@ -4,17 +4,17 @@ import ProtectedImage from '../components/ProtectedImage';
 import { supabase } from '../lib/supabaseClient';
 import { useGlobalContent } from '../context/GlobalContentContext';
 
-export default function Gallery({ initialGallery = [] }) {
+export default function Gallery({ initialGallery = null }) {
   const { settings } = useGlobalContent();
-  const [gallery, setGallery] = useState(initialGallery);
-  const [loading, setLoading] = useState(initialGallery.length === 0);
+  const [gallery, setGallery] = useState(initialGallery || []);
+  const [loading, setLoading] = useState(initialGallery === null);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [lightboxImage, setLightboxImage] = useState(null);
 
   const categories = ['All', 'Live Classes', 'Certificates', 'Webinars'];
 
   useEffect(() => {
-    if (initialGallery.length > 0) return;
+    if (initialGallery !== null) return;
     const fetchGallery = async () => {
       const { data } = await supabase.from('gallery').select('*').order('created_at', { ascending: false });
       if (data) {

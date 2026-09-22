@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Search, Calendar, Clock, User, ArrowRight, Tag } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Blog({ initialPosts = [] }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -77,10 +78,12 @@ export default function Blog({ initialPosts = [] }) {
           >
             <div>
               <div className="h-48 overflow-hidden relative">
-                <img
+                <Image
                   src={post.image}
                   alt={post.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+                  fill
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover group-hover:scale-105 transition duration-500"
                 />
                 <span className="absolute top-3 left-3 bg-slate-950/80 backdrop-blur border border-amber-500/40 text-amber-400 text-[10px] font-bold px-2.5 py-1 rounded-md">
                   {post.category}

@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { ArrowLeft, Calendar, Clock, User, Share2, Tag } from 'lucide-react';
 
 export default function BlogPostDetail({ post, onBack }) {
@@ -41,9 +42,11 @@ export default function BlogPostDetail({ post, onBack }) {
         </div>
       </div>
 
-      <img
+      <Image
         src={post.image}
         alt={post.title}
+        width={800}
+        height={320}
         className="w-full h-80 object-cover rounded-2xl border border-slate-800 shadow-2xl"
       />
 

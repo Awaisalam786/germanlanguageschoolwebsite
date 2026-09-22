@@ -3,6 +3,7 @@
 import React from 'react';
 import { Calendar, Clock, User, ArrowLeft, Tag, ArrowRight, BookOpen } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function BlogPost({ post, relatedPosts }) {
   if (!post) return null;
@@ -12,10 +13,13 @@ export default function BlogPost({ post, relatedPosts }) {
       {/* Hero Section */}
       <div className="relative w-full h-[50vh] min-h-[400px]">
         {post.image ? (
-          <img
+          <Image
             src={post.image}
             alt={post.title}
-            className="w-full h-full object-cover"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover"
           />
         ) : (
           <div className="w-full h-full bg-slate-900 border-b border-slate-800 flex items-center justify-center">
@@ -92,9 +96,9 @@ export default function BlogPost({ post, relatedPosts }) {
                   relatedPosts.map(rp => (
                     <Link href={`/blog/${rp.slug}`} key={rp.id} className="block group">
                       <div className="flex gap-4">
-                        <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0 border border-slate-800">
+                        <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0 border border-slate-800 relative">
                           {rp.image ? (
-                            <img src={rp.image} alt={rp.title} className="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
+                            <Image src={rp.image} alt={rp.title} width={80} height={80} className="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
                           ) : (
                             <div className="w-full h-full bg-slate-950 flex items-center justify-center">
                               <BookOpen className="w-6 h-6 text-slate-800" />

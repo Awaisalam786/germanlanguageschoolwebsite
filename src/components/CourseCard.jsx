@@ -215,9 +215,13 @@ export default function CourseCard({ course, onEnroll }) {
           <div className="flex flex-col gap-0">
             <div className="text-[9px] sm:text-xs text-slate-400 font-semibold tracking-wide">Course Fee</div>
             <div className="flex items-baseline gap-1 sm:gap-1.5">
-              <span className="text-sm sm:text-lg font-extrabold text-white">PKR {finalPricePKR}</span>
+              <span className="text-sm sm:text-lg font-extrabold text-white">
+                {String(finalPricePKR).includes('PKR') || String(finalPricePKR).includes('₨') ? finalPricePKR : `PKR ${finalPricePKR}`}
+              </span>
               {appliedCoupon && course.feesPKR !== finalPricePKR && (
-                <span className="text-[8px] sm:text-[10px] text-slate-500 line-through">PKR {course.feesPKR}</span>
+                <span className="text-[8px] sm:text-[10px] text-slate-500 line-through">
+                  {String(course.feesPKR).includes('PKR') || String(course.feesPKR).includes('₨') ? course.feesPKR : `PKR ${course.feesPKR}`}
+                </span>
               )}
             </div>
             <div className="text-[8px] sm:text-[10px] text-slate-500 font-medium tracking-wide">

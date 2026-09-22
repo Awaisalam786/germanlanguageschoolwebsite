@@ -198,7 +198,7 @@ export default function CourseManagement() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div><label className="block text-xs font-bold text-slate-400 mb-1">Duration</label><input type="text" required value={courseFormData.duration} onChange={e => setCourseFormData({...courseFormData, duration: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white" /></div>
-                <div><label className="block text-xs font-bold text-slate-400 mb-1">Price</label><input type="text" required value={courseFormData.price} onChange={e => setCourseFormData({...courseFormData, price: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white" /></div>
+                <div><label className="block text-xs font-bold text-slate-400 mb-1">Price (e.g. ₨30,000 PKR)</label><input type="text" required placeholder="e.g. ₨30,000 PKR" value={courseFormData.price} onChange={e => setCourseFormData({...courseFormData, price: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white" /></div>
               </div>
               <div><label className="block text-xs font-bold text-slate-400 mb-1">Schedule</label><input type="text" required value={courseFormData.schedule} onChange={e => setCourseFormData({...courseFormData, schedule: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white" /></div>
               <div className="flex gap-4">
