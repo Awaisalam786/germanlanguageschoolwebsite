@@ -603,13 +603,13 @@ export default function GermanA1SyllabusPage() {
             </Link>
 
             <Link 
-              href="/blog/german-a1-syllabus"
+              href="/german-a1-syllabus"
               className="p-5 bg-slate-950/80 border border-slate-800 hover:border-amber-500/50 rounded-2xl transition-colors group block"
             >
               <h3 className="font-bold text-white group-hover:text-amber-400 text-sm sm:text-base mb-1">
-                A1 Syllabus Blog Guide
+                German A1 Complete Syllabus
               </h3>
-              <p className="text-xs text-slate-400">Read in-depth study breakdowns and beginner advice.</p>
+              <p className="text-xs text-slate-400">Bookmark this comprehensive CEFR curriculum and grammar overview.</p>
             </Link>
           </div>
         </section>

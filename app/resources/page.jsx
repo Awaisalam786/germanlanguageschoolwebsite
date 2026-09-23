@@ -350,9 +350,9 @@ export default function ResourcesPage() {
               </p>
               
               <div className="space-y-3">
-                <Link href="/blog/german-a1-syllabus" className="p-4 bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl transition-colors flex items-center justify-between block group">
+                <Link href="/german-a1-syllabus" className="p-4 bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl transition-colors flex items-center justify-between block group">
                   <div>
-                    <h3 className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors">German A1 Syllabus Explained: Grammar &amp; Vocabulary</h3>
+                    <h3 className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors">German A1 Syllabus: Complete Course Guide</h3>
                     <p className="text-xs text-slate-400 mt-0.5">A complete breakdown of topics tested on the Goethe A1 examination.</p>
                   </div>
                   <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-amber-400 shrink-0 ml-4" />

@@ -34,6 +34,11 @@ const nextConfig = {
         destination: '/german-a1-syllabus',
         permanent: true,
       },
+      {
+        source: '/blog/german-a1-syllabus',
+        destination: '/german-a1-syllabus',
+        permanent: true,
+      },
     ];
   },
 };

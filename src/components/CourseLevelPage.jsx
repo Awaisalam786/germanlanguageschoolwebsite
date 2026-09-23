@@ -197,9 +197,9 @@ export default async function CourseLevelPage({ level }) {
               <div className="space-y-3">
                 {level === 'A1' && (
                   <>
-                    <Link href="/blog/german-a1-syllabus" className="p-4 bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl transition flex items-center justify-between group block">
+                    <Link href="/german-a1-syllabus" className="p-4 bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl transition flex items-center justify-between group block">
                       <div>
-                        <h3 className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors">German A1 Syllabus Explained: Grammar &amp; Vocabulary</h3>
+                        <h3 className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors">German A1 Syllabus: Complete Course Guide</h3>
                         <p className="text-xs text-slate-400 mt-0.5">Complete breakdown of grammar rules and vocabulary domains tested in Goethe A1.</p>
                       </div>
                       <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-amber-400 shrink-0 ml-4" />

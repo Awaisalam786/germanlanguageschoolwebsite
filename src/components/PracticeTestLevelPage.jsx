@@ -378,7 +378,7 @@ export default function PracticeTestLevelPage({ level }) {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {level === 'A1' && (
               <>
-                <Link href="/blog/german-a1-syllabus" className="p-4 bg-slate-950 border border-slate-800 hover:border-slate-700 rounded-xl transition flex items-center justify-between group block">
+                <Link href="/german-a1-syllabus" className="p-4 bg-slate-950 border border-slate-800 hover:border-slate-700 rounded-xl transition flex items-center justify-between group block">
                   <div>
                     <h3 className="text-sm font-bold text-white group-hover:text-amber-400">German A1 Syllabus: What to Expect</h3>
                     <p className="text-xs text-slate-400 mt-0.5">Essential grammar structures and vocabulary topics tested in A1.</p>

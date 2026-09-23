@@ -423,7 +423,7 @@ export default function GoetheExamPreparation() {
                   <span>Goethe vs telc vs TestDaF Comparison</span>
                   <ArrowRight className="w-3.5 h-3.5 shrink-0" />
                 </Link>
-                <Link href="/blog/german-a1-syllabus" className="text-slate-300 hover:text-amber-400 flex items-center justify-between py-1 border-b border-slate-800">
+                <Link href="/german-a1-syllabus" className="text-slate-300 hover:text-amber-400 flex items-center justify-between py-1 border-b border-slate-800">
                   <span>German A1 Exam Syllabus &amp; Topics</span>
                   <ArrowRight className="w-3.5 h-3.5 shrink-0" />
                 </Link>
