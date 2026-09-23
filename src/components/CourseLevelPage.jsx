@@ -102,6 +102,11 @@ export default async function CourseLevelPage({ level }) {
               <Link href={`/practice-tests/german-${level.toLowerCase()}`} className="text-sm font-bold text-amber-400 hover:text-amber-300 flex items-center gap-2 underline underline-offset-4">
                 <ArrowRight className="w-4 h-4 text-amber-400" /> Free German {level} Practice Test
               </Link>
+              {level === 'A1' && (
+                <Link href="/german-a1-syllabus" className="text-sm font-bold text-amber-400 hover:text-amber-300 flex items-center gap-2 underline underline-offset-4">
+                  <ArrowRight className="w-4 h-4 text-amber-400" /> German A1 Syllabus
+                </Link>
+              )}
             </div>
           </div>
 
@@ -136,6 +141,17 @@ export default async function CourseLevelPage({ level }) {
                   </div>
                 ))}
               </div>
+              {level === 'A1' && (
+                <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <p className="text-xs sm:text-sm text-slate-300">
+                    Review the full CEFR beginner curriculum including all 17 grammar topics, vocabulary lists, and exam requirements in our comprehensive guide.
+                  </p>
+                  <Link href="/german-a1-syllabus" className="shrink-0 text-xs sm:text-sm font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1.5 underline underline-offset-4">
+                    <span>German A1 syllabus</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </Link>
+                </div>
+              )}
             </section>
 
             <section className="space-y-4">

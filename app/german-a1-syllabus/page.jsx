@@ -510,7 +510,7 @@ export default function GermanA1SyllabusPage() {
           </div>
 
           <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-            If you want structured guidance to master the complete German A1 syllabus, our live online courses provide everything you need from day one:
+            If you want structured guidance to master the complete syllabus with certified instructors, enroll in our live online <Link href="/courses/german-a1" className="text-amber-400 hover:underline font-semibold">German A1 course</Link> featuring real-time interactive Zoom classes:
           </p>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 text-xs sm:text-sm">
