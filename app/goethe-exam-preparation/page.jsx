@@ -190,7 +190,7 @@ export default function GoetheExamPreparation() {
                   <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">CEFR A1 • Beginner</span>
                   <h3 className="text-lg font-bold text-white">Goethe-Zertifikat A1 (Start Deutsch 1)</h3>
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    Required for the German Spouse / Family Reunion Visa (Ehegattennachzug) and Au Pair applications. Demonstrates basic everyday communication.
+                    Required for the German Spouse / Family Reunion Visa (Ehegattennachzug) and Au Pair applications. Demonstrates basic everyday communication aligned with the <Link href="/german-a1-syllabus" className="text-amber-400 hover:underline">German A1 syllabus</Link>.
                   </p>
                 </div>
                 <div className="p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
