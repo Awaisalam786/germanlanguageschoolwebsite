@@ -218,6 +218,10 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal, init
           </div>
         </div>
 
+        <p className="text-sm sm:text-base text-slate-400 max-w-4xl leading-relaxed">
+          Our online German language course program follows the structured CEFR roadmap from beginner to upper-intermediate levels (A1, A2, B1, and B2). All classes are conducted 100% live online via Zoom with recorded lecture access, <Link href="/goethe-exam-preparation" className="text-slate-200 font-semibold hover:text-amber-400 underline">Goethe and telc exam preparation</Link>, and flexible morning, evening, and weekend batches. Typical durations span 6–8 weeks for A1–A2 foundational levels and approximately 10–12 weeks for B1–B2 intermediate levels. Explore full <Link href="/courses" className="text-slate-200 font-semibold hover:text-amber-400 underline">course details and fees</Link> below.
+        </p>
+
         {/* Quick Level Navigation Bar (Crawlable HTML Links) */}
         <div className="flex flex-wrap gap-2.5 sm:gap-3 items-center">
           <span className="text-xs text-slate-400 font-semibold mr-1">Browse by Level:</span>
