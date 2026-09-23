@@ -27,6 +27,15 @@ const nextConfig = {
   outputFileTracingIncludes: {
     '/api/noun-builder/process-images': ['node_modules/sharp/**/*', 'node_modules/@img/**/*'],
   },
+  async redirects() {
+    return [
+      {
+        source: '/blog/german-a1-syllabus-explained',
+        destination: '/german-a1-syllabus',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

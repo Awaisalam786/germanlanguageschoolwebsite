@@ -1,12 +1,35 @@
 'use client';
 
 import React from 'react';
-import { Calendar, Clock, User, ArrowLeft, Tag, ArrowRight, BookOpen } from 'lucide-react';
+import { 
+  Calendar, 
+  Clock, 
+  User, 
+  ArrowLeft, 
+  Tag, 
+  ArrowRight, 
+  BookOpen, 
+  GraduationCap, 
+  CheckSquare, 
+  Compass 
+} from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 export default function BlogPost({ post, relatedPosts }) {
   if (!post) return null;
+
+  // Determine contextual pathway links based on post title/slug/category
+  const slug = post.slug.toLowerCase();
+  const text = `${post.title} ${post.summary || ''} ${post.category || ''}`.toLowerCase();
+
+  const isA1 = text.includes('a1') || slug.includes('a1');
+  const isA2 = text.includes('a2') || slug.includes('a2');
+  const isB1 = text.includes('b1') || slug.includes('b1');
+  const isB2 = text.includes('b2') || slug.includes('b2');
+  const isGoethe = text.includes('goethe') || slug.includes('goethe');
+  const isTelc = text.includes('telc') || slug.includes('telc');
+  const isTestdaf = text.includes('testdaf') || slug.includes('testdaf');
 
   return (
     <article className="pb-20">
@@ -44,8 +67,8 @@ export default function BlogPost({ post, relatedPosts }) {
             </span>
             <div className="flex items-center gap-3 text-xs text-slate-300 font-medium">
               <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5 text-amber-400" /> {new Date(post.created_at).toLocaleDateString()}</span>
-              <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-amber-400" /> {post.read_time}</span>
-              <span className="flex items-center gap-1"><User className="w-3.5 h-3.5 text-amber-400" /> {post.author}</span>
+              {post.read_time && <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-amber-400" /> {post.read_time}</span>}
+              <span className="flex items-center gap-1"><User className="w-3.5 h-3.5 text-amber-400" /> {post.author || 'German Learning School Team'}</span>
             </div>
           </div>
           
@@ -60,7 +83,7 @@ export default function BlogPost({ post, relatedPosts }) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           
           {/* Main Article */}
-          <div className="lg:col-span-8">
+          <div className="lg:col-span-8 space-y-8">
             <div 
               className="prose prose-invert prose-amber max-w-none prose-lg
                          prose-headings:font-extrabold prose-headings:text-white
@@ -72,62 +95,155 @@ export default function BlogPost({ post, relatedPosts }) {
 
             {/* Tags */}
             {post.tags && post.tags.length > 0 && (
-              <div className="mt-12 pt-8 border-t border-slate-800 flex flex-wrap items-center gap-2">
+              <div className="pt-6 border-t border-slate-800 flex flex-wrap items-center gap-2">
                 <Tag className="w-4 h-4 text-slate-500 mr-2" />
                 {post.tags.map(tag => (
-                  <span key={tag} className="px-3 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 text-xs font-bold hover:text-white hover:border-slate-700 transition cursor-pointer">
+                  <span key={tag} className="px-3 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 text-xs font-bold hover:text-white hover:border-slate-700 transition">
                     #{tag}
                   </span>
                 ))}
               </div>
             )}
+
+            {/* Contextual Course & Exam Next Steps Callout */}
+            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xl">
+              <div className="flex items-center gap-2.5 text-amber-400 font-bold text-sm">
+                <GraduationCap className="w-5 h-5" />
+                <span>Recommended Next Steps &amp; Pathways</span>
+              </div>
+              <h3 className="text-xl font-bold text-white">Continue Your German Journey</h3>
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                Take the next practical step toward your study or work goals in Germany with our structured courses and free testing tools:
+              </p>
+              
+              <div className="grid sm:grid-cols-2 gap-3 pt-2">
+                {isA1 && (
+                  <Link href="/courses/german-a1" className="p-3.5 bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl transition flex items-center justify-between group">
+                    <span className="text-xs font-bold text-white group-hover:text-amber-400">German A1 Online Course</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
+                  </Link>
+                )}
+                {isA1 && (
+                  <Link href="/practice-tests/german-a1" className="p-3.5 bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl transition flex items-center justify-between group">
+                    <span className="text-xs font-bold text-white group-hover:text-amber-400">German A1 Practice Test</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
+                  </Link>
+                )}
+                {isA2 && (
+                  <Link href="/courses/german-a2" className="p-3.5 bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl transition flex items-center justify-between group">
+                    <span className="text-xs font-bold text-white group-hover:text-amber-400">German A2 Online Course</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
+                  </Link>
+                )}
+                {isB1 && (
+                  <Link href="/courses/german-b1" className="p-3.5 bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl transition flex items-center justify-between group">
+                    <span className="text-xs font-bold text-white group-hover:text-amber-400">German B1 Classes &amp; Course</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
+                  </Link>
+                )}
+                {isB2 && (
+                  <Link href="/courses/german-b2" className="p-3.5 bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl transition flex items-center justify-between group">
+                    <span className="text-xs font-bold text-white group-hover:text-amber-400">German B2 Online Course</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
+                  </Link>
+                )}
+                {isGoethe && (
+                  <Link href="/goethe-exam-preparation" className="p-3.5 bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl transition flex items-center justify-between group">
+                    <span className="text-xs font-bold text-white group-hover:text-amber-400">Goethe Exam Preparation</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
+                  </Link>
+                )}
+                {isTelc && (
+                  <Link href="/telc-exam-preparation" className="p-3.5 bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl transition flex items-center justify-between group">
+                    <span className="text-xs font-bold text-white group-hover:text-amber-400">telc Exam Preparation</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
+                  </Link>
+                )}
+                {isTestdaf && (
+                  <Link href="/testdaf-preparation" className="p-3.5 bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl transition flex items-center justify-between group">
+                    <span className="text-xs font-bold text-white group-hover:text-amber-400">TestDaF Preparation</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
+                  </Link>
+                )}
+                <Link href="/resources" className="p-3.5 bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl transition flex items-center justify-between group">
+                  <span className="text-xs font-bold text-white group-hover:text-amber-400">German Learning Resources</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
+                </Link>
+                <Link href="/practice-tests" className="p-3.5 bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl transition flex items-center justify-between group">
+                  <span className="text-xs font-bold text-white group-hover:text-amber-400">Free Practice Tests Portal</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
+                </Link>
+              </div>
+            </div>
           </div>
 
-          {/* Right Sidebar - Related Posts */}
+          {/* Right Sidebar - Related Posts & Resources */}
           <div className="lg:col-span-4 space-y-8">
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sticky top-24">
-              <h3 className="text-lg font-extrabold text-white mb-6 flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-amber-400" />
-                Related Articles
-              </h3>
-              
-              <div className="space-y-6">
-                {relatedPosts && relatedPosts.length > 0 ? (
-                  relatedPosts.map(rp => (
-                    <Link href={`/blog/${rp.slug}`} key={rp.id} className="block group">
-                      <div className="flex gap-4">
-                        <div className="w-20 h-20 rounded-xl overflow-hidden shrink-0 border border-slate-800 relative">
-                          {rp.image ? (
-                            <Image src={rp.image} alt={rp.title} width={80} height={80} className="w-full h-full object-cover group-hover:scale-110 transition duration-500" />
-                          ) : (
-                            <div className="w-full h-full bg-slate-950 flex items-center justify-center">
-                              <BookOpen className="w-6 h-6 text-slate-800" />
+            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sticky top-24 space-y-6">
+              <div>
+                <h3 className="text-lg font-extrabold text-white mb-4 flex items-center gap-2">
+                  <BookOpen className="w-5 h-5 text-amber-400" />
+                  Related Articles
+                </h3>
+                
+                <div className="space-y-4">
+                  {relatedPosts && relatedPosts.length > 0 ? (
+                    relatedPosts.map(rp => (
+                      <Link href={`/blog/${rp.slug}`} key={rp.id} className="block group">
+                        <div className="flex gap-3">
+                          <div className="w-16 h-16 rounded-xl overflow-hidden shrink-0 border border-slate-800 relative bg-slate-950">
+                            {rp.image ? (
+                              <Image src={rp.image} alt={rp.title} fill sizes="64px" className="object-cover group-hover:scale-110 transition duration-500" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <BookOpen className="w-5 h-5 text-slate-700" />
+                              </div>
+                            )}
+                          </div>
+                          <div className="space-y-1">
+                            <h4 className="text-xs font-bold text-white group-hover:text-amber-400 transition-colors leading-snug line-clamp-2">
+                              {rp.title}
+                            </h4>
+                            <div className="text-[10px] text-slate-400">
+                              {new Date(rp.created_at).toLocaleDateString()}
                             </div>
-                          )}
-                        </div>
-                        <div className="space-y-1">
-                          <h4 className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors leading-snug line-clamp-2">
-                            {rp.title}
-                          </h4>
-                          <div className="text-[10px] text-slate-400 font-medium">
-                            {new Date(rp.created_at).toLocaleDateString()}
                           </div>
                         </div>
-                      </div>
-                    </Link>
-                  ))
-                ) : (
-                  <p className="text-sm text-slate-400">No related articles found.</p>
-                )}
+                      </Link>
+                    ))
+                  ) : (
+                    <p className="text-xs text-slate-400">No related articles found.</p>
+                  )}
+                </div>
               </div>
-              
-              <div className="mt-8 pt-6 border-t border-slate-800">
+
+              {/* Sidebar Quick Links to Core Learning Hubs */}
+              <div className="pt-4 border-t border-slate-800 space-y-2 text-xs">
+                <span className="font-bold text-slate-400 uppercase tracking-wider block mb-2">Core Learning Links</span>
+                <Link href="/courses" className="flex items-center justify-between text-slate-300 hover:text-amber-400 py-1">
+                  <span>German Courses Overview</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                <Link href="/practice-tests" className="flex items-center justify-between text-slate-300 hover:text-amber-400 py-1">
+                  <span>Free Practice Tests (A1–B2)</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                <Link href="/goethe-exam-preparation" className="flex items-center justify-between text-slate-300 hover:text-amber-400 py-1">
+                  <span>Goethe Exam Preparation</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                <Link href="/resources" className="flex items-center justify-between text-slate-300 hover:text-amber-400 py-1">
+                  <span>Free German Resources &amp; Tables</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
+
+              <div className="pt-4 border-t border-slate-800">
                 <Link href="/blog" className="flex items-center justify-between text-xs font-bold text-amber-400 group">
                   <span>View All Articles</span>
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Link>
               </div>
-
             </div>
           </div>
 

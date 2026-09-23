@@ -27,7 +27,7 @@ export default function VideoTestimonialsReels() {
             <div className="w-full max-w-full box-border h-72 overflow-hidden relative">
               <Image
                 src={reel.thumbnail}
-                alt={reel.studentName}
+                alt={`${reel.studentName} - German student story from ${reel.city}`}
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 className="w-full h-full max-w-full box-border object-cover group-hover:scale-105 transition duration-500"

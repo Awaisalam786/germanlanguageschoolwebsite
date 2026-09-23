@@ -7,16 +7,16 @@ import SchemaMarkup from '../src/components/SchemaMarkup';
 export const metadata = {
   metadataBase: new URL('https://germanlearningschool.com'),
   title: {
-    default: 'Learn German Online in Pakistan | German Learning School',
+    default: 'German Language Course Online in Pakistan | German Learning School',
     template: '%s | German Learning School',
   },
-  description: 'Learn German online in Pakistan with live Zoom classes for A1–B2. Prepare for Goethe, telc and TestDaF exams with structured lessons, practice and expert support.',
+  description: 'Join live online German language courses in Pakistan for A1, A2, B1, and B2. Goethe exam preparation, native teacher support, mock tests, and affordable fees.',
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: 'Learn German Online in Pakistan | German Learning School',
-    description: 'Learn German online in Pakistan with live Zoom classes for A1–B2. Prepare for Goethe, telc and TestDaF exams with structured lessons, practice and expert support.',
+    title: 'German Language Course Online in Pakistan | German Learning School',
+    description: 'Join live online German language courses in Pakistan for A1, A2, B1, and B2. Goethe exam preparation, native teacher support, mock tests, and affordable fees.',
     url: 'https://germanlearningschool.com',
     siteName: 'German Learning School',
     locale: 'en_PK',
@@ -24,8 +24,8 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Learn German Online in Pakistan | German Learning School',
-    description: 'Learn German online in Pakistan with live Zoom classes for A1–B2. Prepare for Goethe, telc and TestDaF exams with structured lessons, practice and expert support.',
+    title: 'German Language Course Online in Pakistan | German Learning School',
+    description: 'Join live online German language courses in Pakistan for A1, A2, B1, and B2. Goethe exam preparation, native teacher support, mock tests, and affordable fees.',
   },
   verification: {
     google: 'GjivIzYmQiuTYSBSu5qg7KAt9ZiZe4_KbJvUHxbwDLc',

@@ -24,7 +24,7 @@ export const translations = {
     hero: {
       badge: '🇩🇪 #1 Online German Learning School in Pakistan',
       title: 'Learn German Online in Pakistan',
-      desc: 'Join live online German classes from A1 to B2 with structured lessons, practice and exam preparation. Learn from anywhere in Pakistan through interactive Zoom classes.',
+      desc: "Join Pakistan's leading online German language institute. Live interactive classes for German A1, A2, B1, and B2 courses with Goethe exam preparation, practice tests, and transparent fees.",
       ctaPrimary: 'Explore Online Courses',
       ctaSecondary: 'Book Free Demo Class',
       ctaWhatsApp: 'Enroll on WhatsApp',

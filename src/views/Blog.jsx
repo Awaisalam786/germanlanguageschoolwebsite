@@ -21,14 +21,21 @@ export default function Blog({ initialPosts = [] }) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
       
+      {/* Breadcrumbs */}
+      <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs sm:text-sm text-slate-400">
+        <Link href="/" className="hover:text-amber-400 transition-colors">Home</Link>
+        <span>&rsaquo;</span>
+        <span className="text-slate-200 font-medium">Blog</span>
+      </nav>
+
       {/* Header */}
       <div className="text-center max-w-3xl mx-auto space-y-3">
         <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-bold border border-amber-500/30">
-          German Language & Culture Insights
+          German Language &amp; Culture Insights
         </span>
-        <h1 className="text-4xl font-extrabold text-white">Blog & Exam Guidance</h1>
+        <h1 className="text-4xl font-extrabold text-white">German Learning Blog &amp; Exam Guidance</h1>
         <p className="text-sm text-slate-300">
-          Expert articles on clearing Goethe & Telc exams, visa requirements, job-seeker tips, and living in Germany.
+          Educational articles on clearing Goethe and telc exams, visa requirements, study timelines, and learning German in Pakistan.
         </p>
       </div>
 

@@ -104,7 +104,7 @@ export default function Courses({ currentLang, setActiveTab, onOpenTrialModal, i
           <span className="text-slate-600 hidden sm:inline">|</span>
           <Link href="/courses/german-a2" className="text-amber-400 hover:underline hover:text-amber-300 transition-colors">German A2 Course</Link>
           <span className="text-slate-600 hidden sm:inline">|</span>
-          <Link href="/courses/german-b1" className="text-amber-400 hover:underline hover:text-amber-300 transition-colors">German B1 Course</Link>
+          <Link href="/courses/german-b1" className="text-amber-400 hover:underline hover:text-amber-300 transition-colors">German B1 Classes &amp; Course</Link>
           <span className="text-slate-600 hidden sm:inline">|</span>
           <Link href="/courses/german-b2" className="text-amber-400 hover:underline hover:text-amber-300 transition-colors">German B2 Course</Link>
         </div>

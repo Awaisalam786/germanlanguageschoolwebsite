@@ -2,18 +2,22 @@ export const practiceTestData = {
   'A1': {
     level: 'A1',
     slug: 'german-a1',
-    h1: 'German A1 Practice Test',
-    intro: 'Test and strengthen your beginner German language skills with our interactive A1 practice exercises. Designed specifically for beginners in Pakistan preparing for daily communication and Goethe/telc A1 certification.',
+    h1: 'German A1 Practice Test Online',
+    intro: 'Test your beginner German skills with our free German A1 practice test online. Designed according to the CEFR A1 standard, this interactive mock test helps you assess basic German grammar, everyday vocabulary, and reading comprehension. Whether you are learning German independently or preparing for the Goethe-Zertifikat A1 (Start Deutsch 1) exam, this test provides instant scoring and answer feedback to identify areas for improvement. Please note: this is an independent learning and practice tool and not an official Goethe-Institut or telc examination.',
+    overview: 'The German A1 practice test evaluates foundational language competence required for basic daily interactions. At the CEFR A1 level, learners are expected to understand simple sentences, identify common nouns with their correct articles (der, die, das), conjugate regular and irregular present-tense verbs, and extract essential information from short notices and messages.',
+    grammarVocab: 'The A1 test focuses on fundamental grammar structures including the Nominative and Accusative cases, personal pronouns, basic question words (W-Fragen), and modal verbs (können, möchten). Vocabulary topics cover greetings, family members, food and beverages, shopping, housing, telling time, numbers, and days of the week.',
+    examPrepText: 'Consistent mock testing helps reduce test anxiety and reinforces vocabulary retention. While this test is an independent preparation resource, it closely mirrors the types of grammar questions and reading comprehension challenges encountered in official CEFR examinations like the Goethe-Zertifikat A1 and telc Deutsch A1.',
+    ctaText: 'Prepare for German A1 with our live online German A1 course.',
     targetAudience: 'Absolute beginners, students preparing for German family reunion (spousal) visas, and anyone starting their German language journey from scratch.',
     topics: [
-      { title: 'Basic Vocabulary', desc: 'Everyday words for family, food, shopping, home, and hobbies.' },
-      { title: 'German Articles (der, die, das)', desc: 'Definite and indefinite articles in the Nominative and Accusative cases.' },
-      { title: 'Personal Information & Greetings', desc: 'Introducing yourself, asking questions, and sharing contact details.' },
-      { title: 'Numbers, Time & Dates', desc: 'Counting, telling the time, calendar days, months, and prices.' },
-      { title: 'Basic Sentence Structure', desc: 'Subject-Verb-Object word order and question formation (W-Fragen & Ja/Nein-Fragen).' },
-      { title: 'Common Verbs & Conjugation', desc: 'Regular and irregular present-tense verbs (haben, sein, möchten, etc.).' },
-      { title: 'Everyday Expressions', desc: 'Polite formulas, making appointments, and simple directions.' },
-      { title: 'Basic Reading Comprehension', desc: 'Extracting key facts from short notes, emails, signs, and schedules.' }
+      { title: 'Basic Everyday Vocabulary', desc: 'High-frequency words for family, food, shopping, home, daily routines, and leisure activities.' },
+      { title: 'German Articles (der, die, das)', desc: 'Definite and indefinite articles in both Nominative and Accusative cases.' },
+      { title: 'Personal Information & Greetings', desc: 'Introductions, asking simple questions, and exchanging contact details in German.' },
+      { title: 'Numbers, Time & Dates', desc: 'Counting, telling the time, calendar days, months, and understanding prices.' },
+      { title: 'Sentence Structure & Word Order', desc: 'Subject-Verb-Object syntax and question formation (W-Fragen and Ja/Nein questions).' },
+      { title: 'Verb Conjugation (Present Tense)', desc: 'Regular verbs and essential irregular verbs including haben, sein, and möchten.' },
+      { title: 'Modal Verbs in Context', desc: 'Applying basic modal verbs like können and müssen in simple everyday sentences.' },
+      { title: 'Basic Reading Comprehension', desc: 'Extracting key facts from short notes, emails, public signs, and announcements.' }
     ],
     whoShouldUse: [
       'Candidates preparing for the Goethe-Zertifikat A1 (Start Deutsch 1) or telc Deutsch A1 exams.',
@@ -23,46 +27,50 @@ export const practiceTestData = {
     ],
     faqs: [
       {
-        q: 'What is the German A1 level?',
-        a: 'A1 is the breakthrough beginner level under the Common European Framework of Reference for Languages (CEFR). At this level, you can understand and use familiar everyday expressions and very basic phrases aimed at the satisfaction of needs of a concrete type.'
+        q: 'What level is this German test?',
+        a: 'This test is designed for the CEFR A1 (breakthrough/beginner) level, representing foundational competence in the German language.'
       },
       {
-        q: 'What topics are included in an A1 German practice test?',
-        a: 'An A1 practice test covers basic greetings, personal introductions, regular and irregular verb conjugations in the present tense, noun genders (der, die, das), accusative case basics, numbers, time, and short reading comprehension passages.'
+        q: 'Is this an official Goethe exam?',
+        a: 'No. This is an independent educational practice test created by German Learning School to help learners self-assess their skills. It is not affiliated with or endorsed by the Goethe-Institut, telc gGmbH, or ÖSD.'
       },
       {
-        q: 'Is this German A1 practice test free to use?',
-        a: 'Yes, our online interactive practice modules and vocabulary drills are accessible for free, enabling students across Pakistan to test their readiness without upfront costs.'
+        q: 'How many questions are included and what format is used?',
+        a: 'The test features multiple-choice and fill-in questions covering grammar, vocabulary, and reading passages. You can practice at your own pace with instant scoring and explanation feedback.'
       },
       {
-        q: 'Can complete beginners use this practice test?',
-        a: 'Yes, if you have covered introductory lessons or the German alphabet, you can start testing your vocabulary and basic grammar immediately to reinforce what you have learned.'
+        q: 'What topics are tested in this German A1 practice test?',
+        a: 'The test evaluates core A1 skills including noun genders (der, die, das), present-tense verb conjugations, Accusative case articles, question formation, and essential everyday vocabulary.'
       },
       {
-        q: 'How does this practice test help with the Goethe A1 exam?',
-        a: 'The exercises focus on the exact linguistic competencies tested in the Goethe-Zertifikat A1 (Start Deutsch 1) exam, helping you become comfortable with common question formats, core vocabulary, and reading tasks.'
+        q: 'Is this German A1 practice test free?',
+        a: 'Yes, our online German A1 practice test and interactive exercises are 100% free to use with no login or subscription required.'
       },
       {
-        q: 'What should I do after completing the A1 practice test?',
-        a: 'Once you achieve consistent scores on A1 drills, you can advance to German A2 practice tests or join our live Zoom A2 batches to build conversational fluency.'
+        q: 'How should I prepare after taking the test?',
+        a: 'Review your incorrect answers to identify specific grammar or vocabulary gaps. You can re-take the test, practice noun genders with our Der/Die/Das Noun Builder, or enroll in our live online German A1 course for instructor-led guidance.'
       }
     ]
   },
   'A2': {
     level: 'A2',
     slug: 'german-a2',
-    h1: 'German A2 Practice Test',
-    intro: 'Elevate your basic German skills to pre-intermediate fluency. Practice core grammar, expanded everyday vocabulary, and conversational reading comprehension designed for practical communication and A2 exam prep.',
+    h1: 'German A2 Practice Test Online',
+    intro: 'Evaluate your elementary German proficiency with our free German A2 practice test online. Built according to the CEFR A2 framework, this interactive diagnostic test examines your grasp of conversational past tenses (Perfekt & Präteritum), the Dative case, two-way prepositions, and practical everyday vocabulary. It is an ideal self-assessment tool for students working toward the Goethe-Zertifikat A2 or telc Deutsch A2 certificate. Please note: this is an independent learning resource, not an official Goethe-Institut or telc exam.',
+    overview: 'The German A2 practice test assesses pre-intermediate language competence needed for routine social, work, and travel situations. At the CEFR A2 level, learners are expected to understand sentences related to areas of immediate relevance (family, shopping, employment, local geography) and navigate multi-clause compound sentences.',
+    grammarVocab: 'Grammar tested at A2 includes the Dative case (indirect objects), two-way prepositions (Wechselpräpositionen), the Perfekt tense with haben and sein, separable verbs (trennbare Verben), reflexive verbs, and subordinating conjunctions (weil, dass, wenn). Vocabulary covers professional routines, healthcare visits, transport, leisure, and housing.',
+    examPrepText: 'Testing your skills regularly with mock exercises builds confidence for official CEFR certifications. While this interactive test is an independent study tool, its content directly aligns with the grammar benchmarks of the Goethe-Zertifikat A2 and telc Deutsch A2 exams.',
+    ctaText: 'Prepare for German A2 with our live online German A2 course.',
     targetAudience: 'Students with basic German knowledge, Chancenkarte (Opportunity Card) applicants needing +1 point, and learners preparing for Goethe or telc A2 certification.',
     topics: [
-      { title: 'Everyday Vocabulary & Routines', desc: 'Words for work environments, education, local geography, and leisure activities.' },
-      { title: 'Grammar Fundamentals & Dative Case', desc: 'Understanding direct vs. indirect objects and two-way prepositions (Wechselpräpositionen).' },
-      { title: 'Past Tense Basics (Perfekt & Präteritum)', desc: 'Forming past tense sentences with haben and sein auxiliary verbs.' },
-      { title: 'Modal Verbs in Context', desc: 'Using können, müssen, dürfen, sollen, wollen in past and present tenses.' },
-      { title: 'Separable & Inseparable Verbs', desc: 'Mastering prefix placement (trennbare Verben) in clauses.' },
-      { title: 'Everyday Reading & Short Dialogues', desc: 'Understanding workplace announcements, newspaper snippets, and formal letters.' },
-      { title: 'Short Conversations & Directions', desc: 'Responding to everyday customer service, travel, and social situations.' },
-      { title: 'Practical Sentence Connectors', desc: 'Using weil, denn, aber, and und to form compound sentences.' }
+      { title: 'Everyday Vocabulary & Routines', desc: 'Expanded vocabulary for the workplace, education, health, local geography, and leisure.' },
+      { title: 'Dative Case & Indirect Objects', desc: 'Distinguishing between direct Accusative objects and indirect Dative objects.' },
+      { title: 'Two-Way Prepositions (Wechselpräpositionen)', desc: 'Applying an, auf, in, and über with Dative (location) vs. Accusative (motion).' },
+      { title: 'Past Tenses (Perfekt & Präteritum)', desc: 'Forming conversational past tense with haben/sein auxiliaries and modal Präteritum.' },
+      { title: 'Subordinating Conjunctions', desc: 'Using weil, dass, wenn, and ob with correct subordinate clause verb-final word order.' },
+      { title: 'Reflexive & Separable Verbs', desc: 'Correct usage of reflexive pronouns and separable verb prefixes in sentences.' },
+      { title: 'Adjective Declension Basics', desc: 'Understanding adjective endings after definite, indefinite, and negative articles.' },
+      { title: 'Everyday Reading Comprehension', desc: 'Interpreting workplace notes, emails, public service announcements, and event schedules.' }
     ],
     whoShouldUse: [
       'Applicants seeking +1 point for the German Opportunity Card (Chancenkarte).',
@@ -72,42 +80,50 @@ export const practiceTestData = {
     ],
     faqs: [
       {
-        q: 'What is the German A2 level?',
-        a: 'A2 is the elementary stage of the CEFR standard. At A2, you can understand sentences and frequently used expressions related to areas of most immediate relevance (such as personal and family information, shopping, local geography, and employment).'
+        q: 'What level is this German test?',
+        a: 'This test is aligned with CEFR A2 (elementary level), testing your ability to communicate in routine, familiar situations.'
       },
       {
-        q: 'What grammar topics are tested in an A2 practice test?',
-        a: 'An A2 practice test emphasizes the Dative case, prepositions with Accusative/Dative, the Perfekt conversational past tense, modal verbs, reflexive verbs, and subordinating conjunctions like weil and dass.'
+        q: 'Is this an official Goethe exam?',
+        a: 'No. This is an independent practice tool developed by German Learning School. It is not an official Goethe-Institut or telc examination.'
       },
       {
-        q: 'How does German A2 help with the German Chancenkarte visa?',
-        a: 'Under Germany’s Opportunity Card (Chancenkarte) immigration rules, certified A2 German proficiency awards applicants 1 point toward their eligibility score.'
+        q: 'How many questions are included and what format is used?',
+        a: 'The test consists of interactive multiple-choice and text-selection questions designed to evaluate grammar accuracy and reading comprehension with real-time feedback.'
       },
       {
-        q: 'How long does it take to prepare for the A2 exam?',
-        a: 'For students who have already passed A1, preparing for A2 typically takes around 8 weeks of consistent study and practice with live instruction.'
+        q: 'What topics are tested in this German A2 practice test?',
+        a: 'Key topics include the Perfekt tense, Dative case, two-way prepositions, modal verbs, reflexive constructions, and practical everyday vocabulary.'
       },
       {
-        q: 'Are the practice tests timed?',
-        a: 'Our interactive practice modules allow you to test at your own pace so you can review explanations and understand grammar rules thoroughly.'
+        q: 'Is this German A2 practice test free?',
+        a: 'Yes, the test is completely free to take online from any device without registration or fees.'
+      },
+      {
+        q: 'How should I prepare after taking the test?',
+        a: 'Review the explanations for any missed questions, solidify your Dative prepositions, and consider enrolling in our live online German A2 or B1 courses to practice speaking and writing.'
       }
     ]
   },
   'B1': {
     level: 'B1',
     slug: 'german-b1',
-    h1: 'German B1 Practice Test',
-    intro: 'Assess your intermediate German proficiency. Practice the grammar, vocabulary, and reading skills required for independent communication, German vocational training (Ausbildung), and the Goethe/telc B1 certificate.',
+    h1: 'German B1 Practice Test Online',
+    intro: 'Assess your intermediate German proficiency with our free German B1 practice test online. Based on the CEFR B1 standard, this interactive test challenges your mastery of complex grammar, including relative clauses, the passive voice, Subjunctive II (Konjunktiv II), and nuanced vocabulary. It is an essential diagnostic resource for students preparing for the Goethe-Zertifikat B1 or telc Deutsch B1 exam for German vocational training (Ausbildung), university prep (Studienkolleg), or work visas. Please note: this is an independent practice test and not an official Goethe-Institut or telc exam.',
+    overview: 'The German B1 practice test evaluates independent language use (selbstständige Sprachverwendung). At the B1 stage, learners are expected to understand the main points of clear standard input on familiar matters encountered in work, school, and leisure, and produce connected text on topics of personal interest.',
+    grammarVocab: 'The B1 level examines sophisticated sentence mechanics: relative clauses (Relativsätze) in all cases, the passive voice (Passiv) in present and past tenses, Subjunctive II (Konjunktiv II) for polite requests and hypothetical conditions, the Genitive case, infinitive clauses with zu, and two-part conjunctions (sowohl...als auch, nicht nur...sondern auch). Vocabulary spans public affairs, environmental issues, career, and travel.',
+    examPrepText: 'The Goethe-Zertifikat B1 is a modular exam testing Reading, Listening, Writing, and Speaking. While this online practice test is an independent tool for self-evaluation, it directly reinforces the grammatical precision and reading speed needed to pass official B1 certification modules.',
+    ctaText: 'Prepare for German B1 with our live online German B1 course.',
     targetAudience: 'Intermediate learners, Ausbildung candidates, job seeker visa applicants, and students preparing for the official Goethe-Zertifikat B1 or telc Deutsch B1 exams.',
     topics: [
-      { title: 'Intermediate Vocabulary', desc: 'Specialized vocabulary for work, current events, social discussions, and public life.' },
-      { title: 'Subordinate Clauses & Connectors', desc: 'Complex sentences with obwohl, damit, um...zu, während, and da.' },
-      { title: 'Past, Present & Future Forms', desc: 'Seamlessly switching between Präteritum, Perfekt, and Futur I.' },
-      { title: 'Passive Voice (Passiv)', desc: 'Forming passive sentences in present and past tenses for formal communication.' },
-      { title: 'Genitive Case & Prepositions', desc: 'Mastering the Genitive case and prepositions like wegen, trotz, während.' },
-      { title: 'In-Depth Reading Comprehension', desc: 'Analyzing articles, business correspondence, and multi-paragraph reports.' },
-      { title: 'Everyday & Workplace German', desc: 'Writing formal emails, complaints, and professional inquiries.' },
-      { title: 'Expressing Opinions & Arguments', desc: 'Stating viewpoints, giving pros and cons, and suggesting solutions.' }
+      { title: 'Intermediate Vocabulary', desc: 'Nuanced terms for careers, current events, consumer issues, public life, and social topics.' },
+      { title: 'Relative Clauses (Relativsätze)', desc: 'Constructing relative clauses with relative pronouns in Nominative, Accusative, and Dative.' },
+      { title: 'Passive Voice (Vorgangspassiv)', desc: 'Forming passive constructions using werden + Partizip II in present and past tenses.' },
+      { title: 'Subjunctive II (Konjunktiv II)', desc: 'Expressing wishes, hypothetical conditions, and polite requests with wäre, hätte, and würde.' },
+      { title: 'Genitive Case & Prepositions', desc: 'Using the Genitive case with prepositions such as wegen, trotz, während, and statt.' },
+      { title: 'Infinitive Clauses with zu', desc: 'Mastering um...zu, ohne...zu, and standard infinitive clause complements.' },
+      { title: 'Two-Part Conjunctions', desc: 'Applying connectors like sowohl...als auch, weder...noch, and entweder...oder.' },
+      { title: 'Extended Reading Comprehension', desc: 'Analyzing multi-paragraph articles, commentary pieces, and official correspondence.' }
     ],
     whoShouldUse: [
       'Pakistani candidates preparing for German vocational training (Ausbildung) programs where B1 is mandatory.',
@@ -117,42 +133,50 @@ export const practiceTestData = {
     ],
     faqs: [
       {
-        q: 'Why is German B1 such an important level?',
-        a: 'B1 represents the threshold of independent language proficiency. It is the minimum required level for most German vocational training (Ausbildung) programs, naturalization/citizenship, and skilled worker visas.'
+        q: 'What level is this German test?',
+        a: 'This test is designed for CEFR B1 (intermediate level), representing independent communication skills in German.'
       },
       {
-        q: 'What skills are tested in a German B1 practice test?',
-        a: 'A B1 practice test evaluates your ability to understand main points in clear standard language, interpret informational texts, apply complex clause structures, use passive voice, and express cohesive opinions.'
+        q: 'Is this an official Goethe exam?',
+        a: 'No. This practice test is an independent resource created by German Learning School and is not an official examination issued by the Goethe-Institut or telc.'
       },
       {
-        q: 'Can I practice individual modules (like Reading or Grammar)?',
-        a: 'Yes, our practice test platform provides categorized modules allowing you to focus specifically on vocabulary drills, reading comprehension passages, or grammar challenges.'
+        q: 'How many questions are included and what format is used?',
+        a: 'The test includes interactive multiple-choice questions assessing intermediate grammar rules, sentence structure, and reading comprehension with immediate results.'
       },
       {
-        q: 'How difficult is the transition from A2 to B1?',
-        a: 'B1 requires a notable step up in vocabulary breadth and grammatical flexibility (such as passive voice and complex connectors). Regular practice tests are essential to identify gaps before the exam.'
+        q: 'What topics are tested in this German B1 practice test?',
+        a: 'Topics include relative clauses, the passive voice, Konjunktiv II, Genitive prepositions, infinitive clauses with zu, and intermediate vocabulary.'
       },
       {
-        q: 'Does this test guarantee passing the official Goethe B1 exam?',
-        a: 'These tests serve as diagnostic practice tools to reinforce your knowledge. For comprehensive preparation including speaking and writing evaluations, we recommend pairing practice tests with our live instructor-led B1 course.'
+        q: 'Is this German B1 practice test free?',
+        a: 'Yes, this online German B1 practice test is 100% free to access without any registration or hidden fees.'
+      },
+      {
+        q: 'How should I prepare after taking the test?',
+        a: 'Analyze your results to pinpoint difficult grammar areas. For complete modular exam training including speaking and letter-writing feedback, explore our live online German B1 course.'
       }
     ]
   },
   'B2': {
     level: 'B2',
     slug: 'german-b2',
-    h1: 'German B2 Practice Test',
-    intro: 'Challenge your upper-intermediate German skills. Practice advanced grammar structures, technical reading comprehension, and professional communication needed for university admission, engineering careers, and medical Approbation in Germany.',
+    h1: 'German B2 Practice Test Online',
+    intro: 'Challenge your upper-intermediate German fluency with our free German B2 practice test online. Developed according to the CEFR B2 framework, this mock test evaluates advanced sentence architecture, nominal style, complex passive variations, and formal academic/professional vocabulary. It is ideal for candidates preparing for the Goethe-Zertifikat B2, telc Deutsch B2, or TestDaF exams for German university admission, engineering employment, or medical Approbation. Please note: this is an independent self-assessment tool and not an official Goethe-Institut or telc exam.',
+    overview: 'The German B2 practice test measures upper-intermediate proficiency (kompetente Sprachverwendung). At this level, learners are expected to understand the main ideas of complex text on both concrete and abstract topics, including technical discussions in their field of specialization, and communicate fluently without strain.',
+    grammarVocab: 'The B2 level covers advanced grammatical structures: participle clauses (Partizipialattribute), passive alternatives (sein + zu + Infinitiv, lassen sich), nominalization (Nominalstil), subjunctive forms for indirect speech, fixed noun-verb collocations (Nomen-Verb-Verbindungen), and sophisticated connectors (insofern, anstatt dass, je...desto). Vocabulary covers scientific, economic, legal, and medical domains.',
+    examPrepText: 'Achieving B2 certification is a prerequisite for professional recognition (such as the medical Fachsprachprüfung) and degree study in Germany. While this practice test is an independent diagnostic instrument, it strengthens the syntactic agility and analytical reading required for the Goethe B2, telc B2, and TestDaF exams.',
+    ctaText: 'Prepare for German B2 with our live online German B2 course.',
     targetAudience: 'Advanced students, doctors and nurses preparing for medical licensure (Approbation), engineers, and university applicants needing Goethe B2 or telc B2/Medizin certification.',
     topics: [
-      { title: 'Advanced & Academic Vocabulary', desc: 'Sophisticated terminology for academic essays, professional debates, and technical fields.' },
-      { title: 'Complex Sentence Structures', desc: 'Participle constructions, extended modifiers, and nuanced clause sequences.' },
-      { title: 'Subjunctive II (Konjunktiv II)', desc: 'Hypothetical situations, polite requests, irreal conditions, and indirect speech.' },
-      { title: 'Advanced Passive Voice & Substitutes', desc: 'Passiv with modal verbs, Zustandspassiv, and passive alternatives (sein + zu + Infinitiv).' },
-      { title: 'Nominal Style (Nominalstil)', desc: 'Transforming verbal phrases into formal academic and administrative noun constructions.' },
-      { title: 'Complex Reading Comprehension', desc: 'Comprehending dense editorials, specialized articles, scientific summaries, and official regulations.' },
-      { title: 'Formal Register & Discourse Markers', desc: 'Distinguishing subtle nuances in tone, register, and argument connectors.' },
-      { title: 'Argumentation & Evaluation', desc: 'Structuring detailed presentations, counterarguments, and analytical conclusions.' }
+      { title: 'Advanced Academic & Professional Vocabulary', desc: 'Formal terminology for technical debates, academic reports, and professional business contexts.' },
+      { title: 'Participle Constructions (Partizipialattribute)', desc: 'Expanding and deconstructing complex participle attributes (Partizip I and Partizip II).' },
+      { title: 'Advanced Passive Variations', desc: 'Zustandspassiv and passive substitutes (e.g. lässt sich machen, ist zu erledigen).' },
+      { title: 'Nominal Style (Nominalstil)', desc: 'Transforming verbal phrases into formal academic noun phrases with prepositions.' },
+      { title: 'Subjunctive for Indirect Speech (Konjunktiv I & II)', desc: 'Reporting statements, wishes, and hypotheses in formal journalism and academic texts.' },
+      { title: 'Fixed Nomen-Verb-Verbindungen', desc: 'Mastering idiomatic collocations like zur Verfügung stehen, in Betracht ziehen, and Einfluss nehmen.' },
+      { title: 'Complex Connectors & Register', desc: 'Using connectors like je...desto, insofern...als, and anstatt zu with proper clause order.' },
+      { title: 'Dense Reading Comprehension', desc: 'Extracting subtle arguments from specialized articles, official regulations, and academic abstracts.' }
     ],
     whoShouldUse: [
       'Pakistani doctors and healthcare professionals preparing for the telc Deutsch B2-C1 Medizin or Fachsprachenprüfung (FSP).',
@@ -162,24 +186,28 @@ export const practiceTestData = {
     ],
     faqs: [
       {
-        q: 'What is required to reach German B2 level?',
-        a: 'B2 signifies upper-intermediate fluency where you can understand the main ideas of complex text on both concrete and abstract topics, interact with native speakers with fluency and spontaneity, and produce clear, detailed text on a wide range of subjects.'
+        q: 'What level is this German test?',
+        a: 'This test is aligned with CEFR B2 (upper-intermediate level), testing professional and academic fluency in German.'
       },
       {
-        q: 'Why do medical professionals need German B2?',
-        a: 'German state medical councils (Landesprüfungsamt) require doctors and dentists to present at least a certified B2 general certificate before taking the clinical language exam (Fachsprachenprüfung) for their medical license (Approbation).'
+        q: 'Is this an official Goethe exam?',
+        a: 'No. This practice test is an independent prep tool developed by German Learning School and is not an official examination from the Goethe-Institut, telc, or TestDaF-Institut.'
       },
       {
-        q: 'What advanced grammar is included in a B2 practice test?',
-        a: 'B2 practice tests cover Konjunktiv II, indirect speech (Konjunktiv I basics), passive variations, nominalization, prepositional phrases with Genitive, and connectors like insofern, anstatt dass, and je...desto.'
+        q: 'How many questions are included and what format is used?',
+        a: 'The test contains interactive exercises testing advanced grammar, sentence restructuring, vocabulary collocations, and reading comprehension with detailed explanations.'
       },
       {
-        q: 'How should I divide my preparation time for B2?',
-        a: 'B2 demands balanced mastery of all 4 skills. You should dedicate equal time to reading analytical articles, practicing formal written argumentation, listening to spoken podcasts/lectures, and participating in live speaking debates.'
+        q: 'What topics are tested in this German B2 practice test?',
+        a: 'Key topics include participle attributes, passive alternatives, nominal style, Nomen-Verb-Verbindungen, Konjunktiv, and complex connectors.'
       },
       {
-        q: 'Can I take the practice test on mobile?',
-        a: 'Yes, our practice testing portal is fully responsive and accessible from smartphones, tablets, laptops, and desktop computers across Pakistan.'
+        q: 'Is this German B2 practice test free?',
+        a: 'Yes, our German B2 practice test is completely free to take online from any device.'
+      },
+      {
+        q: 'How should I prepare after taking the test?',
+        a: 'Review the grammar explanations carefully. To prepare for university admission, medical licensing (FSP), or TestDaF, consider joining our live online German B2 course or TestDaF preparation program.'
       }
     ]
   }
