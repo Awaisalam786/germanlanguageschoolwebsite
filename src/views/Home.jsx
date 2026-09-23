@@ -237,7 +237,7 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal, init
             href="/courses/german-b1"
             className="px-3.5 py-1.5 rounded-full bg-slate-900 border border-slate-800 hover:border-amber-500/50 text-slate-300 hover:text-amber-400 text-xs font-semibold transition"
           >
-            German B1 Course
+            German B1 Classes &amp; Course in Pakistan
           </Link>
           <Link
             href="/courses/german-b2"
