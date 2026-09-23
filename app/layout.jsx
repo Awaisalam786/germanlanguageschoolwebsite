@@ -7,17 +7,17 @@ import SchemaMarkup from '../src/components/SchemaMarkup';
 export const metadata = {
   metadataBase: new URL('https://germanlearningschool.com'),
   title: {
-    default: 'German Language Course Online in Pakistan | German Learning School',
+    default: 'German Language Course in Pakistan | German Learning School',
     template: '%s | German Learning School',
   },
-  description: 'Join live online German language courses in Pakistan for A1, A2, B1, and B2. Goethe exam preparation, native teacher support, mock tests, and affordable fees.',
+  description: 'Learn German online in Pakistan with live A1–B2 classes, expert teachers, exam preparation, practice sessions and flexible batches at German Learning School.',
   alternates: {
-    canonical: '/',
+    canonical: 'https://germanlearningschool.com/',
   },
   openGraph: {
-    title: 'German Language Course Online in Pakistan | German Learning School',
-    description: 'Join live online German language courses in Pakistan for A1, A2, B1, and B2. Goethe exam preparation, native teacher support, mock tests, and affordable fees.',
-    url: 'https://germanlearningschool.com',
+    title: 'German Language Course in Pakistan | German Learning School',
+    description: 'Learn German online in Pakistan with live A1–B2 classes, expert teachers, exam preparation, practice sessions and flexible batches at German Learning School.',
+    url: 'https://germanlearningschool.com/',
     siteName: 'German Learning School',
     locale: 'en_PK',
     type: 'website',
