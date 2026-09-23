@@ -155,7 +155,7 @@ export default function BlogPost({ post, relatedPosts }) {
                 )}
                 {isTelc && (
                   <Link href="/telc-exam-preparation" className="p-3.5 bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl transition flex items-center justify-between group">
-                    <span className="text-xs font-bold text-white group-hover:text-amber-400">telc Exam Preparation</span>
+                    <span className="text-xs font-bold text-white group-hover:text-amber-400">telc Exam Preparation in Pakistan</span>
                     <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
                   </Link>
                 )}

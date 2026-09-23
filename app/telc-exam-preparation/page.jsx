@@ -154,7 +154,7 @@ export default function TelcExamPreparation() {
             <section className="bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-4 shadow-xl">
               <h2 className="text-2xl sm:text-3xl font-extrabold text-white">telc Exam Preparation in Pakistan</h2>
               <p className="text-slate-300 leading-relaxed text-sm sm:text-base">
-                telc (The European Language Certificates) examinations are internationally recognized standardized tests aligned with the Common European Framework of Reference for Languages (CEFR). telc certificates are widely accepted by German universities, employers, and immigration authorities for visa applications, vocational training (Ausbildung), job search, and professional licensing.
+                telc (The European Language Certificates) examinations are internationally recognized standardized tests aligned with the Common European Framework of Reference for Languages (CEFR). telc certificates are widely accepted by German universities, employers, and immigration authorities for visa applications, vocational training (Ausbildung), job search, and professional licensing. If you are comparing certification options, read our complete guide on <Link href="/blog/goethe-vs-telc-which-german-exam-should-you-choose-in-pakistan" className="text-amber-400 hover:underline font-semibold">Goethe vs telc: Which German Exam Should You Choose in Pakistan?</Link>.
               </p>
               <p className="text-slate-300 leading-relaxed text-sm sm:text-base">
                 To help learners plan effectively, we clearly distinguish between standard German courses, specialized telc preparation, online practice quizzes, and the official telc examination:
