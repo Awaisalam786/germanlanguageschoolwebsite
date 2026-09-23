@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 import { Video, Smartphone, Wifi, PlayCircle, HelpCircle, CheckCircle2, ShieldCheck, ArrowRight } from 'lucide-react';
 
 export default function HowOnlineWorks({ setActiveTab, onOpenTrialModal }) {
@@ -10,7 +11,7 @@ export default function HowOnlineWorks({ setActiveTab, onOpenTrialModal }) {
         <span className="px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-xs font-bold border border-amber-500/30">
           Seamless Distance Learning Across Pakistan
         </span>
-        <h1 className="text-4xl font-extrabold text-white">How 100% Online Classes Work</h1>
+        <h1 className="text-4xl font-extrabold text-white">How Online German Classes Work in Pakistan</h1>
         <p className="text-sm text-slate-300">
           Learn German effectively from your home in Karachi, Lahore, Islamabad, Rawalpindi, Peshawar, Quetta, or anywhere in Pakistan.
         </p>
@@ -23,7 +24,11 @@ export default function HowOnlineWorks({ setActiveTab, onOpenTrialModal }) {
             step: '01',
             icon: Video,
             title: 'Live Interactive Zoom Classes',
-            desc: 'Join live HD sessions with native German & certified Pakistani teachers. Speak, practice dialogues, and ask questions in real-time.'
+            desc: (
+              <>
+                Join live HD sessions with native German &amp; certified Pakistani teachers. Speak, practice dialogues, and explore our structured <Link href="/courses" className="text-amber-400 hover:underline font-medium">A1–B2 German courses</Link> in real-time.
+              </>
+            )
           },
           {
             step: '02',
@@ -41,7 +46,11 @@ export default function HowOnlineWorks({ setActiveTab, onOpenTrialModal }) {
             step: '04',
             icon: ShieldCheck,
             title: 'Goethe Exam Mock Drills',
-            desc: 'Rigorous Goethe-Zertifikat A1-C1 mock exams under realistic time limits with individual examiner feedback.'
+            desc: (
+              <>
+                Rigorous mock exams under realistic time limits with individual examiner feedback as part of our targeted <Link href="/goethe-exam-preparation" className="text-amber-400 hover:underline font-medium">Goethe exam preparation</Link>.
+              </>
+            )
           }
         ].map((item) => {
           const Icon = item.icon;
@@ -84,6 +93,34 @@ export default function HowOnlineWorks({ setActiveTab, onOpenTrialModal }) {
             <h4 className="text-base font-bold text-white">Software App</h4>
             <p className="text-xs text-slate-400">
               Free Zoom Cloud Meetings app downloaded on your device.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Online vs. Offline German Classes in Pakistan */}
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-6">
+        <h2 className="text-2xl font-bold text-white text-center">Online vs. Offline German Classes in Pakistan</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-2">
+            <h3 className="text-base font-bold text-white">No Commuting</h3>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              Students can attend live classes from their own location anywhere across Pakistan without travel time or city traffic delays.
+            </p>
+          </div>
+
+          <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-2">
+            <h3 className="text-base font-bold text-white">Lecture Recordings for Review</h3>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              Every lecture is recorded and available for review, ensuring students never miss lessons due to load shedding or schedule conflicts.
+            </p>
+          </div>
+
+          <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-2">
+            <h3 className="text-base font-bold text-white">Morning, Evening &amp; Weekend Batches</h3>
+            <p className="text-xs text-slate-400 leading-relaxed">
+              Flexible morning, evening, and weekend batches accommodate university students and working professionals across all schedules.
             </p>
           </div>
         </div>
