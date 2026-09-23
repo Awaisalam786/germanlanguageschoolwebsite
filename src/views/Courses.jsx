@@ -102,15 +102,20 @@ export default function Courses({ currentLang, setActiveTab, onOpenTrialModal, i
         <div className="flex flex-wrap justify-center items-center gap-4">
           <Link href="/courses/german-a1" className="text-amber-400 hover:underline hover:text-amber-300 transition-colors">German A1 Course</Link>
           <span className="text-slate-600 hidden sm:inline">|</span>
+          <Link href="/german-a1-syllabus" className="text-amber-400 hover:underline hover:text-amber-300 transition-colors">German A1 Syllabus</Link>
+          <span className="text-slate-600 hidden sm:inline">|</span>
           <Link href="/courses/german-a2" className="text-amber-400 hover:underline hover:text-amber-300 transition-colors">German A2 Course</Link>
           <span className="text-slate-600 hidden sm:inline">|</span>
           <Link href="/courses/german-b1" className="text-amber-400 hover:underline hover:text-amber-300 transition-colors">German B1 Classes &amp; Course</Link>
           <span className="text-slate-600 hidden sm:inline">|</span>
           <Link href="/courses/german-b2" className="text-amber-400 hover:underline hover:text-amber-300 transition-colors">German B2 Course</Link>
         </div>
-        <div className="mt-6">
+        <div className="mt-6 flex flex-wrap justify-center items-center gap-4">
           <Link href="/goethe-exam-preparation" className="inline-block px-6 py-2 bg-slate-900 border border-slate-800 hover:border-emerald-500/50 text-emerald-400 rounded-full text-sm font-bold transition-all">
             Goethe Exam Preparation Hub
+          </Link>
+          <Link href="/telc-exam-preparation" className="inline-block px-6 py-2 bg-slate-900 border border-slate-800 hover:border-emerald-500/50 text-emerald-400 rounded-full text-sm font-bold transition-all">
+            telc Exam Preparation Hub
           </Link>
         </div>
       </div>

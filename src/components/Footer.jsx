@@ -82,9 +82,11 @@ export default function Footer({ currentLang, setActiveTab }) {
                 </Link>
               </li>
               <li className="flex items-center justify-between bg-slate-900/60 p-2 rounded border border-slate-800 hover:border-amber-500/30 transition-colors">
-                <Link href="/goethe-exam-preparation" className="font-semibold text-white hover:text-amber-400 transition-colors">
-                  Goethe & telc Exam Prep
-                </Link>
+                <div className="flex items-center gap-1.5 font-semibold text-white">
+                  <Link href="/goethe-exam-preparation" className="hover:text-amber-400 transition-colors">Goethe Prep</Link>
+                  <span className="text-slate-600">•</span>
+                  <Link href="/telc-exam-preparation" className="hover:text-amber-400 transition-colors">telc Prep</Link>
+                </div>
                 <span className="text-emerald-400 text-[10px] font-bold">100% Online</span>
               </li>
             </ul>
