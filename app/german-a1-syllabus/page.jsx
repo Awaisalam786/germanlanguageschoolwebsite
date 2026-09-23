@@ -473,6 +473,110 @@ export default function GermanA1SyllabusPage() {
               </div>
             </div>
 
+            {/* A1 German Exam Pattern & Timing Table */}
+            <div className="space-y-3 pt-2">
+              <h3 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+                <span>A1 German Exam Pattern &amp; Timing Breakdown</span>
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                Both Goethe-Zertifikat A1 (Start Deutsch 1) and telc Deutsch A1 evaluate all four CEFR language competencies with a maximum score of 100 points (25 points per module) and a 60% passing mark (60/100 points). Notice the slight differences in written module grouping and timing:
+              </p>
+
+              <div className="overflow-x-auto rounded-2xl border border-slate-800">
+                <table className="w-full text-left text-xs sm:text-sm text-slate-300 border-collapse">
+                  <thead>
+                    <tr className="bg-slate-950/90 border-b border-slate-800 text-slate-200">
+                      <th className="p-3 sm:p-4 font-bold text-amber-400">Exam Module</th>
+                      <th className="p-3 sm:p-4 font-bold">Goethe-Zertifikat A1 (Start Deutsch 1)</th>
+                      <th className="p-3 sm:p-4 font-bold">telc Deutsch A1</th>
+                      <th className="p-3 sm:p-4 font-bold">Weight &amp; Points</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-800/60 bg-slate-950/40">
+                    <tr>
+                      <td className="p-3 sm:p-4 font-semibold text-white whitespace-nowrap">
+                        <span className="text-amber-400 block font-bold">Hören</span>
+                        Listening
+                      </td>
+                      <td className="p-3 sm:p-4">
+                        <span className="font-semibold text-white block">~20 minutes</span>
+                        3 parts (15 questions: short dialogues, phone messages, public announcements; played twice or once).
+                      </td>
+                      <td className="p-3 sm:p-4">
+                        <span className="font-semibold text-white block">~20 minutes</span>
+                        3 parts (15 questions: daily conversations, announcements, phone notes).
+                      </td>
+                      <td className="p-3 sm:p-4 whitespace-nowrap">
+                        <span className="font-semibold text-white">25 points</span>
+                        <span className="block text-slate-500 text-xs">(25% of exam)</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 sm:p-4 font-semibold text-white whitespace-nowrap">
+                        <span className="text-amber-400 block font-bold">Lesen</span>
+                        Reading
+                      </td>
+                      <td className="p-3 sm:p-4">
+                        <span className="font-semibold text-white block">25 minutes</span>
+                        3 parts (15 questions: personal letters, notices, advertisements, signs; multiple-choice &amp; true/false).
+                      </td>
+                      <td className="p-3 sm:p-4" rowSpan={2}>
+                        <div className="space-y-1">
+                          <span className="inline-block px-2 py-0.5 rounded bg-amber-500/10 text-amber-400 font-semibold text-xs border border-amber-500/20 mb-1">Combined Block</span>
+                          <span className="font-semibold text-white block">50 minutes total</span>
+                          <p className="text-slate-400">Reading (~30 min, 15 items: signs, ads, letters) and Writing (~20 min, form + message) are administered together without a break.</p>
+                        </div>
+                      </td>
+                      <td className="p-3 sm:p-4 whitespace-nowrap">
+                        <span className="font-semibold text-white">25 points</span>
+                        <span className="block text-slate-500 text-xs">(25% of exam)</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 sm:p-4 font-semibold text-white whitespace-nowrap">
+                        <span className="text-amber-400 block font-bold">Schreiben</span>
+                        Writing
+                      </td>
+                      <td className="p-3 sm:p-4">
+                        <span className="font-semibold text-white block">20 minutes</span>
+                        2 parts (Part 1: filling a 5-item registration form; Part 2: writing a short ~30-word personal email or note).
+                      </td>
+                      <td className="p-3 sm:p-4 whitespace-nowrap">
+                        <span className="font-semibold text-white">25 points</span>
+                        <span className="block text-slate-500 text-xs">(25% of exam)</span>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 sm:p-4 font-semibold text-white whitespace-nowrap">
+                        <span className="text-amber-400 block font-bold">Sprechen</span>
+                        Speaking
+                      </td>
+                      <td className="p-3 sm:p-4">
+                        <span className="font-semibold text-white block">~15 minutes (Group of 3–4)</span>
+                        3 parts: self-introduction with spelling &amp; numbers; asking &amp; answering daily questions with word cards; making requests &amp; reacting with picture cards.
+                      </td>
+                      <td className="p-3 sm:p-4">
+                        <span className="font-semibold text-white block">~15 minutes (Group of 3–4)</span>
+                        3 parts (no preparation time): introducing yourself; asking for and sharing everyday information; formulating requests and responding.
+                      </td>
+                      <td className="p-3 sm:p-4 whitespace-nowrap">
+                        <span className="font-semibold text-white">25 points</span>
+                        <span className="block text-slate-500 text-xs">(25% of exam)</span>
+                      </td>
+                    </tr>
+                  </tbody>
+                  <tfoot className="border-t border-slate-800 bg-slate-950/80 font-medium">
+                    <tr>
+                      <td className="p-3 sm:p-4 font-bold text-white">Total Timing</td>
+                      <td className="p-3 sm:p-4 font-bold text-amber-400">Written: ~65 min | Oral: ~15 min</td>
+                      <td className="p-3 sm:p-4 font-bold text-amber-400">Written: ~70 min | Oral: ~15 min</td>
+                      <td className="p-3 sm:p-4 font-bold text-emerald-400 whitespace-nowrap">Pass: 60% (60/100)</td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+            </div>
+
             <div className="p-4 bg-slate-950/90 rounded-2xl border border-amber-500/20 text-xs sm:text-sm text-slate-300 space-y-2">
               <span className="font-bold text-amber-400">Official Certification Notice:</span>
               <p className="leading-relaxed">
