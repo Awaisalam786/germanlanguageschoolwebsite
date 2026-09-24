@@ -2,11 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import { Megaphone } from 'lucide-react';
 
+const DEFAULT_ANNOUNCEMENT = 'WELCOME TO GERMAN LEARNING SCHOOL';
+
 export default function AnnouncementTicker() {
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    try {
+      const cached = sessionStorage.getItem('gls_announcements_cache');
+      if (cached) {
+        const cachedMessages = JSON.parse(cached);
+        if (Array.isArray(cachedMessages)) setAnnouncements(cachedMessages.filter(message => typeof message === 'string' && message.trim()));
+      }
+    } catch {
+      // The ticker still renders its built-in message if storage is unavailable.
+    }
+
     const fetchAnnouncements = async () => {
       try {
         const { data, error } = await supabase
@@ -17,10 +29,20 @@ export default function AnnouncementTicker() {
           .order('created_at', { ascending: false });
 
         if (!error && data) {
-          setAnnouncements(data.map((item) => item.message_text));
+          const messages = data.map((item) => item.message_text).filter(Boolean);
+          setAnnouncements(messages);
+          try {
+            sessionStorage.setItem('gls_announcements_cache', JSON.stringify(messages));
+          } catch {
+            // Caching is only an optimization; the live announcements still render.
+          }
+        } else if (error) {
+          console.error('Failed to fetch announcements:', error);
+          setAnnouncements(current => current.length ? current : [DEFAULT_ANNOUNCEMENT]);
         }
       } catch (err) {
         console.error('Failed to fetch announcements:', err);
+        setAnnouncements(current => current.length ? current : [DEFAULT_ANNOUNCEMENT]);
       } finally {
         setLoading(false);
       }
@@ -40,14 +62,18 @@ export default function AnnouncementTicker() {
     };
   }, []);
 
-  if (loading || announcements.length === 0) {
-    return null;
-  }
+  // Keep the bar in the first paint while Supabase fetches live copy.
+  // This avoids a blank strip followed by a visible layout shift on refresh.
+  const visibleAnnouncements = announcements.length > 0
+    ? announcements
+    : loading ? [DEFAULT_ANNOUNCEMENT] : [];
+
+  if (visibleAnnouncements.length === 0) return null;
 
   // To create a seamless infinite marquee, duplicate the array
   const tickerContent = (
     <div className="flex items-center shrink-0 space-x-2 md:space-x-6">
-      {announcements.map((msg, index) => (
+      {visibleAnnouncements.map((msg, index) => (
         <div key={index} className="flex items-center space-x-2 md:space-x-6">
           <span className="font-bold text-amber-400 uppercase tracking-widest whitespace-nowrap text-[9px] md:text-[11px]">
             {msg}
