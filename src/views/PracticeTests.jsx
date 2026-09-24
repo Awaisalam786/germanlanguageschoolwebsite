@@ -39,7 +39,7 @@ export default function PracticeTests() {
 
   // Practice Test Navigation
   const [materials, setMaterials] = useState([]);
-  const [readingPassages, setReadingPassages] = useState([]); const [progressAttempts, setProgressAttempts] = useState([]); useEffect(() => { if (step !== 3 || userType !== 'free' || !storedFreeUser?.email) { setProgressAttempts([]); return; } let active = true; fetch(`/api/my-progress?email=${encodeURIComponent(storedFreeUser.email)}`).then(res => res.json()).then(data => { if (active) setProgressAttempts(data.attempts || []); }).catch(() => {}); return () => { active = false; }; }, [step, userType, storedFreeUser?.email]); = useState([]);
+  const [readingPassages, setReadingPassages] = useState([]); const [progressAttempts, setProgressAttempts] = useState([]); useEffect(() => { if (step !== 3 || userType !== 'free' || !storedFreeUser?.email) { setProgressAttempts([]); return; } let active = true; fetch(`/api/my-progress?email=${encodeURIComponent(storedFreeUser.email)}`).then(res => res.json()).then(data => { if (active) setProgressAttempts(data.attempts || []); }).catch(() => {}); return () => { active = false; }; }, [step, userType, storedFreeUser?.email]);
   const [selectedLevel, setSelectedLevel] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null); // 'Vocab Test', 'Grammar Test', 'Reading Test', 'Speaking Test'
   const [selectedMaterial, setSelectedMaterial] = useState(null);
