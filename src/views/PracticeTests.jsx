@@ -582,7 +582,7 @@ export default function PracticeTests() {
                   className={'group relative flex min-h-64 flex-col overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-800/90 to-slate-950 p-5 text-left shadow-lg transition duration-200 hover:-translate-y-1 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ' + tones}
                   aria-label={'Choose ' + lvl + ' ' + levelInfo.name + ' German practice'}
                 >
-                  <div className="flex items-start justify-between rounded-xl border border-slate-700/70 bg-gradient-to-br from-emerald-500/25 to-slate-900 p-4">
+                  <div className={'flex items-start justify-between rounded-xl border border-slate-700/70 bg-gradient-to-br ' + (levelInfo.color === 'emerald' ? 'from-emerald-500/30 via-emerald-950/20' : levelInfo.color === 'blue' ? 'from-sky-500/30 via-blue-950/20' : levelInfo.color === 'amber' ? 'from-amber-500/30 via-amber-950/20' : 'from-violet-500/30 via-violet-950/20') + ' to-slate-900 p-4'}>
                     <span className={'inline-flex h-14 w-14 items-center justify-center rounded-2xl border text-2xl font-black ' + tones}>{lvl}</span>
                     <span className="rounded-full border border-slate-700 bg-slate-950/70 px-2.5 py-1 text-[11px] font-bold text-slate-300">{levelInfo.name}</span>
                   </div>
