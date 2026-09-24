@@ -548,7 +548,7 @@ export default function PracticeTests() {
                 <span className="inline-flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-400" /> Practice at your own pace</span><span className="inline-flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-400" /> Exam Ready</span><span className="inline-flex items-center gap-2"><BookOpen className="h-4 w-4 text-pink-400" /> Learn Step by Step</span>
               </div>
             </div>
-          </section>
+          {userType === 'free' && <Link href="/dashboard" className="relative z-10 mt-6 inline-flex items-center gap-2 rounded-xl bg-amber-400 px-5 py-3 text-sm font-extrabold text-slate-950 shadow-lg shadow-amber-950/30 transition hover:bg-amber-300">View My Progress <ArrowRight className="h-4 w-4" /></Link>}</section>
 
           <div className="mb-5 mt-10 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
             <div>
