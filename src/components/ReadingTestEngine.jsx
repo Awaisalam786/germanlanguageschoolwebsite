@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Loader2, RotateCcw, CheckCircle, XCircle, ChevronLeft } from 'lucide-react';
+import { Loader2, RotateCcw, CheckCircle, XCircle, ChevronLeft, AlertCircle } from 'lucide-react';
+import { supabase } from '../lib/supabaseClient';
 
 export default function ReadingTestEngine({
   passage,
@@ -13,6 +14,8 @@ export default function ReadingTestEngine({
   const [answers, setAnswers] = useState({}); // mapping of questionIndex -> selected option
   const [finished, setFinished] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
+  const [savedSuccess, setSavedSuccess] = useState(false);
   
   // Results
   const [score, setScore] = useState(0);
@@ -51,13 +54,20 @@ export default function ReadingTestEngine({
     setScore(currentScore);
     setPercentage(currentPercentage);
 
+    await executeSave(currentScore, totalMarks, currentPercentage);
+  };
+
+  const executeSave = async (currentScore, currentTotalMarks, currentPercentage) => {
+    setSaving(true);
+    setSaveError(null);
+
     // Save to Database
     const payload = {
       passage_id: passage.passage_id,
       level: passage.level,
       user_type: userType,
       score: currentScore,
-      total_marks: totalMarks,
+      total_marks: currentTotalMarks,
       percentage: currentPercentage,
     };
 
@@ -68,19 +78,38 @@ export default function ReadingTestEngine({
       payload.name = storedFreeUser?.name;
       payload.phone = storedFreeUser?.phone;
       payload.email = storedFreeUser?.email;
+      payload.user_id = storedFreeUser?.id || null;
     }
 
     try {
-      await fetch('/api/save-reading-attempt', {
+      const headers = { 'Content-Type': 'application/json' };
+      if (userType !== 'student') {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.access_token) {
+          headers['Authorization'] = `Bearer ${session.access_token}`;
+        }
+      }
+
+      const res = await fetch('/api/save-reading-attempt', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(payload)
       });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `Save failed with status ${res.status}`);
+      }
+
+      setSavedSuccess(true);
+      setSaveError(null);
     } catch (err) {
       console.error('Error saving reading attempt:', err);
+      setSaveError(err.message || 'Could not connect to server to save results.');
+      setSavedSuccess(false);
+    } finally {
+      setSaving(false);
     }
-
-    setSaving(false);
   };
 
   const resetEngine = () => {
@@ -88,6 +117,8 @@ export default function ReadingTestEngine({
     setFinished(false);
     setScore(0);
     setPercentage(0);
+    setSaveError(null);
+    setSavedSuccess(false);
   };
 
   // --- RESULT VIEW ---
@@ -97,6 +128,44 @@ export default function ReadingTestEngine({
         <div className="py-24 text-center">
           <Loader2 className="w-10 h-10 text-blue-500 animate-spin mx-auto mb-4" />
           <p className="text-slate-400">Saving your results...</p>
+        </div>
+      );
+    }
+
+    if (saveError) {
+      return (
+        <div className="animate-fade-in max-w-2xl mx-auto space-y-6 text-center py-12">
+          <div className="w-20 h-20 mx-auto bg-rose-500/10 border-4 border-rose-500/20 rounded-full flex items-center justify-center">
+            <AlertCircle className="w-10 h-10 text-rose-400" />
+          </div>
+          <h2 className="text-3xl font-extrabold text-white">Save Failed</h2>
+          <div className="bg-slate-900 border border-rose-500/30 rounded-3xl p-6 shadow-xl text-left space-y-3">
+            <p className="text-sm font-semibold text-rose-300">
+              {userType === 'student'
+                ? 'Your student test score could not be saved to the database. Your teacher will not be able to review this attempt until it is saved.'
+                : 'Your reading test score could not be saved to your account.'}
+            </p>
+            <p className="text-xs text-slate-400 bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono break-words">
+              {saveError}
+            </p>
+            <p className="text-xs text-slate-400">
+              Completed score: <strong className="text-white">{score} / {totalMarks}</strong> ({percentage}%)
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row justify-center gap-3">
+            <button
+              onClick={() => executeSave(score, totalMarks, percentage)}
+              className="px-6 py-3 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-xl flex items-center justify-center gap-2 transition shadow-lg"
+            >
+              <RotateCcw className="w-4 h-4" /> Retry Save
+            </button>
+            <button
+              onClick={onBack}
+              className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition"
+            >
+              Exit to Menu
+            </button>
+          </div>
         </div>
       );
     }
@@ -150,6 +219,15 @@ export default function ReadingTestEngine({
             </div>
           </div>
           <p className="text-slate-400 text-sm font-bold">{percentage}% Accuracy</p>
+          {userType === 'free' ? (
+            <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
+              <CheckCircle className="w-3.5 h-3.5" /> Saved to your learner account
+            </div>
+          ) : userType === 'anonymous' ? (
+            <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 bg-slate-800/80 px-3 py-1 rounded-full">
+              Completed as guest (not saved to an account)
+            </div>
+          ) : null}
         </div>
 
         {/* Detailed Review */}

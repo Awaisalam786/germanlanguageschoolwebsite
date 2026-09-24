@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { BookOpen, Clock, Loader2, CheckCircle, XCircle, ChevronRight, Play, RefreshCw, X, ArrowLeft } from 'lucide-react';
+import { BookOpen, Clock, Loader2, CheckCircle, XCircle, ChevronRight, Play, RefreshCw, X, ArrowLeft, AlertCircle } from 'lucide-react';
 import { translations } from '../i18n/translations';
 import { useGlobalState } from '../context/GlobalStateContext';
 
@@ -29,6 +29,9 @@ export default function GrammarEngine({ level, onBack, userType, storedFreeUser,
 
   const [feedback, setFeedback] = useState(null); // { isCorrect: bool, show: bool }
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
+  const [savedSuccess, setSavedSuccess] = useState(false);
+  const [savedPayload, setSavedPayload] = useState(null);
 
   // Focus ref for inputs
   const inputRef = useRef(null);
@@ -230,6 +233,7 @@ export default function GrammarEngine({ level, onBack, userType, storedFreeUser,
       name: userType === 'student' ? studentName : storedFreeUser?.name,
       email: userType === 'student' ? null : storedFreeUser?.email,
       phone: userType === 'student' ? null : storedFreeUser?.phone,
+      user_id: userType === 'student' ? null : (storedFreeUser?.id || null),
       access_code_used: userType === 'student' ? verifiedCode : null,
       level: level,
       chapters_selected: Array.from(selectedChapters).map(id => chapters.find(c => c.id === id)?.chapter_number).join(', '),
@@ -239,17 +243,44 @@ export default function GrammarEngine({ level, onBack, userType, storedFreeUser,
       percentage: percentage,
       question_results: log
     };
+    setSavedPayload(payload);
+
+    await executeSave(payload);
+  };
+
+  const executeSave = async (payloadToSave) => {
+    setSaving(true);
+    setSaveError(null);
 
     try {
-      await fetch('/api/save-grammar-attempt', {
+      const headers = { 'Content-Type': 'application/json' };
+      if (userType !== 'student') {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.access_token) {
+          headers['Authorization'] = `Bearer ${session.access_token}`;
+        }
+      }
+
+      const res = await fetch('/api/save-grammar-attempt', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        headers,
+        body: JSON.stringify(payloadToSave)
       });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `Save failed with status ${res.status}`);
+      }
+
+      setSavedSuccess(true);
+      setSaveError(null);
     } catch (err) {
-      console.error(err);
+      console.error('[GrammarEngine] Save error:', err);
+      setSaveError(err.message || 'Could not connect to server to save results.');
+      setSavedSuccess(false);
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
   };
 
   const formatTime = (seconds) => {
@@ -550,6 +581,53 @@ export default function GrammarEngine({ level, onBack, userType, storedFreeUser,
 
   // --- RESULTS PAGE ---
   if (appState === 'RESULTS') {
+    if (saving) {
+      return (
+        <div className="py-24 text-center">
+          <Loader2 className="w-10 h-10 text-emerald-500 animate-spin mx-auto mb-4" />
+          <p className="text-slate-400">Saving your grammar drill results...</p>
+        </div>
+      );
+    }
+
+    if (saveError) {
+      return (
+        <div className="max-w-2xl mx-auto text-center space-y-6 py-12 animate-fade-in">
+          <div className="w-20 h-20 mx-auto bg-rose-500/10 border-4 border-rose-500/20 rounded-full flex items-center justify-center">
+            <AlertCircle className="w-10 h-10 text-rose-400" />
+          </div>
+          <h2 className="text-3xl font-extrabold text-white">Save Failed</h2>
+          <div className="bg-slate-900 border border-rose-500/30 rounded-3xl p-6 shadow-xl text-left space-y-3">
+            <p className="text-sm font-semibold text-rose-300">
+              {userType === 'student'
+                ? 'Your student test score could not be saved to the database. Your teacher will not be able to review this attempt until it is saved.'
+                : 'Your grammar drill score could not be saved to your account.'}
+            </p>
+            <p className="text-xs text-slate-400 bg-slate-950 p-3 rounded-xl border border-slate-800 font-mono break-words">
+              {saveError}
+            </p>
+            <p className="text-xs text-slate-400">
+              Completed score: <strong className="text-white">{savedPayload?.correct_count ?? score} / {savedPayload?.total_questions ?? questionsPool.length}</strong> ({savedPayload?.percentage ?? 0}%)
+            </p>
+          </div>
+          <div className="flex flex-col sm:flex-row justify-center gap-3">
+            <button
+              onClick={() => executeSave(savedPayload)}
+              className="px-6 py-3 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-xl flex items-center justify-center gap-2 transition shadow-lg"
+            >
+              <RefreshCw className="w-4 h-4" /> Retry Save
+            </button>
+            <button
+              onClick={onBack}
+              className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition"
+            >
+              Exit to Menu
+            </button>
+          </div>
+        </div>
+      );
+    }
+
     const percentage = questionsPool.length > 0 ? Math.round((score / questionsPool.length) * 100) : 0;
     const passed = percentage >= 70;
 
@@ -568,16 +646,31 @@ export default function GrammarEngine({ level, onBack, userType, storedFreeUser,
             You scored {score} out of {questionsPool.length} correctly.
           </p>
           
-          {userType !== 'student' && (
+          {userType === 'student' ? (
+            <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 inline-block mt-4 text-sm text-emerald-300">
+              <CheckCircle className="w-4 h-4 inline mr-1.5" />
+              Your score has been securely saved for your teacher review.
+            </div>
+          ) : userType === 'free' ? (
+            <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 inline-block mt-4 text-sm text-emerald-300">
+              <CheckCircle className="w-4 h-4 inline mr-1.5" />
+              Your score has been securely saved to your learner account.
+            </div>
+          ) : (
             <div className="bg-blue-900/20 border border-blue-500/30 rounded-xl p-4 inline-block mt-4 text-sm text-blue-200">
-              <span className="font-bold">Note for Free Users:</span> Your score has been logged anonymously. To track your progress permanently, enroll in a premium course!
+              <span className="font-bold">Guest practice:</span> Completed anonymously. Sign up for a free learner account to track your progress!
             </div>
           )}
         </div>
 
         <div className="grid sm:grid-cols-2 gap-4 max-w-md mx-auto">
           <button
-            onClick={() => setAppState('SETUP')}
+            onClick={() => {
+              setSaveError(null);
+              setSavedSuccess(false);
+              setSavedPayload(null);
+              setAppState('SETUP');
+            }}
             className="py-4 bg-slate-900 border border-slate-700 hover:bg-slate-800 text-white font-bold rounded-xl transition flex items-center justify-center gap-2"
           >
             <RefreshCw className="w-5 h-5" /> Play Again

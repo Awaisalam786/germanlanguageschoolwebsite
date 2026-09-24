@@ -63,7 +63,7 @@ export default function FAQ({ currentLang, setActiveTab }) {
                   <span className="inline-block px-2 py-0.5 rounded bg-slate-950 text-amber-400 text-[10px] font-bold border border-slate-800">
                     Category: {faq.category}
                   </span>
-                  <p>{faq.a}</p>
+                  <p className="prose-a:text-amber-400 hover:prose-a:underline" dangerouslySetInnerHTML={{ __html: faq.a }} />
                 </div>
               )}
             </div>

@@ -29,8 +29,10 @@ export default function PracticeTests() {
   const [errorMsg, setErrorMsg] = useState('');
   
   // Auth & Profile
-  const [userType, setUserType] = useState(''); // 'free' | 'student'
-  const [freeUserForm, setFreeUserForm] = useState({ name: '', phone: '', email: '' });
+  const [userType, setUserType] = useState(''); // 'free' | 'student' | 'anonymous'
+  const [authUser, setAuthUser] = useState(null);
+  const [authMode, setAuthMode] = useState('signup'); // 'signup' | 'signin'
+  const [learnerForm, setLearnerForm] = useState({ name: '', email: '', password: '', phone: '' });
   const [storedFreeUser, setStoredFreeUser] = useState(null);
   const [accessCode, setAccessCode] = useState('');
   const [verifiedCode, setVerifiedCode] = useState(null);
@@ -39,7 +41,34 @@ export default function PracticeTests() {
 
   // Practice Test Navigation
   const [materials, setMaterials] = useState([]);
-  const [readingPassages, setReadingPassages] = useState([]); const [progressAttempts, setProgressAttempts] = useState([]); useEffect(() => { if (step !== 3 || userType !== 'free' || !storedFreeUser?.email) { setProgressAttempts([]); return; } let active = true; fetch(`/api/my-progress?email=${encodeURIComponent(storedFreeUser.email)}`).then(res => res.json()).then(data => { if (active) setProgressAttempts(data.attempts || []); }).catch(() => {}); return () => { active = false; }; }, [step, userType, storedFreeUser?.email]);
+  const [readingPassages, setReadingPassages] = useState([]);
+  const [progressAttempts, setProgressAttempts] = useState([]);
+
+  // Fetch attempts securely with Bearer token for authenticated learners
+  useEffect(() => {
+    if (step !== 3 || userType !== 'free') {
+      setProgressAttempts([]);
+      return;
+    }
+    let active = true;
+    const fetchUserProgress = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.access_token) return;
+        const res = await fetch('/api/my-progress', {
+          headers: { Authorization: `Bearer ${session.access_token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (active) setProgressAttempts(data.attempts || []);
+        }
+      } catch (e) {
+        console.error('Error fetching progress:', e);
+      }
+    };
+    fetchUserProgress();
+    return () => { active = false; };
+  }, [step, userType]);
   const [selectedLevel, setSelectedLevel] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null); // 'Vocab Test', 'Grammar Test', 'Reading Test', 'Speaking Test'
   const [selectedMaterial, setSelectedMaterial] = useState(null);
@@ -52,17 +81,56 @@ export default function PracticeTests() {
 
   useEffect(() => {
     fetchMaterials();
-    // Check local storage for free user
-    const savedUser = localStorage.getItem('gls_free_user');
-    if (savedUser) {
-      try {
-        setStoredFreeUser(JSON.parse(savedUser));
+
+    // Check for existing Supabase Auth session first
+    const initAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const user = session.user;
+        const profile = {
+          id: user.id,
+          name: user.user_metadata?.name || user.email?.split('@')[0],
+          email: user.email,
+          phone: user.user_metadata?.phone || '',
+        };
+        setAuthUser(user);
+        setStoredFreeUser(profile);
         setUserType('free');
-        setStep(2); // Skip straight to level selection if logged in
-      } catch (e) {
-        console.error(e);
+        setStep(2); // Skip directly to level selection
+      } else {
+        // Fallback: check localStorage for saved session
+        const savedUser = localStorage.getItem('gls_free_user');
+        if (savedUser) {
+          try {
+            setStoredFreeUser(JSON.parse(savedUser));
+            setUserType('free');
+            setStep(2);
+          } catch (e) {
+            console.error(e);
+          }
+        }
       }
-    }
+    };
+
+    initAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        const user = session.user;
+        const profile = {
+          id: user.id,
+          name: user.user_metadata?.name || user.email?.split('@')[0],
+          email: user.email,
+          phone: user.user_metadata?.phone || '',
+        };
+        setAuthUser(user);
+        setStoredFreeUser(profile);
+      } else {
+        setAuthUser(null);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const fetchMaterials = async () => {
@@ -111,25 +179,89 @@ export default function PracticeTests() {
   };
 
   // --- Auth Handlers ---
-  const handleFreeUserSubmit = (e) => {
+  const handleLearnerSignup = async (e) => {
     e.preventDefault();
+    setLoading(true);
     setErrorMsg('');
-    
-    if (!freeUserForm.name || !freeUserForm.phone || !freeUserForm.email) {
-      setErrorMsg('All fields are required.');
-      return;
+
+    try {
+      const res = await fetch('/api/auth/learner-signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: learnerForm.name,
+          email: learnerForm.email,
+          password: learnerForm.password,
+          phone: learnerForm.phone
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to create account');
+
+      const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
+        email: learnerForm.email.trim(),
+        password: learnerForm.password
+      });
+
+      if (signInErr) throw signInErr;
+
+      const user = signInData.user;
+      const profile = {
+        id: user.id,
+        name: learnerForm.name || user.email.split('@')[0],
+        email: user.email,
+        phone: learnerForm.phone || ''
+      };
+      localStorage.setItem('gls_free_user', JSON.stringify(profile));
+      setStoredFreeUser(profile);
+      setAuthUser(user);
+      setUserType('free');
+      setStep(2);
+    } catch (err) {
+      setErrorMsg(err.message || 'Error creating account. Please try again.');
+    } finally {
+      setLoading(false);
     }
+  };
 
-    const userData = {
-      name: freeUserForm.name,
-      phone: freeUserForm.phone,
-      email: freeUserForm.email
-    };
+  const handleLearnerSignin = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setErrorMsg('');
 
-    localStorage.setItem('gls_free_user', JSON.stringify(userData));
-    setStoredFreeUser(userData);
-    setUserType('free');
-    setStep(2); // Go to level selection
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: learnerForm.email.trim(),
+        password: learnerForm.password
+      });
+
+      if (error) throw error;
+
+      const user = data.user;
+      const profile = {
+        id: user.id,
+        name: user.user_metadata?.name || user.email.split('@')[0],
+        email: user.email,
+        phone: user.user_metadata?.phone || ''
+      };
+      localStorage.setItem('gls_free_user', JSON.stringify(profile));
+      setStoredFreeUser(profile);
+      setAuthUser(user);
+      setUserType('free');
+      setStep(2);
+    } catch (err) {
+      setErrorMsg(err.message || 'Invalid email or password.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const startGuestPractice = () => {
+    setErrorMsg('');
+    setStoredFreeUser(null);
+    setUserType('anonymous');
+    setStep(2);
   };
 
   const verifyAccessCode = async (e) => {
@@ -158,10 +290,16 @@ export default function PracticeTests() {
     setStep(2); // Go to level selection
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     if (userType === 'free') {
+      try {
+        await supabase.auth.signOut();
+      } catch (e) {
+        console.error(e);
+      }
       localStorage.removeItem('gls_free_user');
       setStoredFreeUser(null);
+      setAuthUser(null);
     }
     setStep(1);
     setUserType('');
@@ -262,15 +400,24 @@ export default function PracticeTests() {
       payload.student_name = studentName;
       payload.first_name = studentName;
     } else {
-      payload.first_name = storedFreeUser?.name;
-      payload.phone = storedFreeUser?.phone;
-      payload.email = storedFreeUser?.email;
+      payload.first_name = storedFreeUser?.name || 'Learner';
+      payload.phone = storedFreeUser?.phone || 'N/A';
+      payload.email = storedFreeUser?.email || null;
+      payload.user_id = authUser?.id || storedFreeUser?.id || null;
     }
 
     try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (userType !== 'student') {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.access_token) {
+          headers['Authorization'] = `Bearer ${session.access_token}`;
+        }
+      }
+
       const res = await fetch('/api/save-attempt', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(payload)
       });
 
@@ -434,7 +581,7 @@ export default function PracticeTests() {
 
       {/* Top Right Navigation for logged-in users & students */}
       {step >= 2 && step !== 5 && (
-        <div className="absolute top-4 right-4 sm:top-8 sm:right-8 flex items-center gap-4 z-40">
+        <div className="absolute top-4 right-4 sm:top-8 sm:right-8 flex items-center gap-3 z-40">
           {userType === 'free' && (
             <Link href="/dashboard" className="flex items-center gap-2 text-sm text-slate-300 hover:text-white transition-colors bg-slate-900 border border-slate-800 px-4 py-2 rounded-lg shadow-lg">
               <LayoutDashboard className="w-4 h-4 text-amber-500" />
@@ -446,7 +593,7 @@ export default function PracticeTests() {
             className="flex items-center gap-2 text-sm text-slate-400 hover:text-red-400 transition-colors bg-slate-900 border border-slate-800 px-4 py-2 rounded-lg"
           >
             <LogOut className="w-4 h-4" />
-            Logout {userType === 'student' ? '(Student)' : '(Free User)'}
+            Logout {userType === 'student' ? (studentName ? `(${studentName})` : '(Student)') : userType === 'anonymous' ? '(Guest)' : storedFreeUser?.name ? `(${storedFreeUser.name})` : '(Learner)'}
           </button>
         </div>
       )}
@@ -463,64 +610,180 @@ export default function PracticeTests() {
           </div>
 
           <div className="grid sm:grid-cols-2 gap-6">
-            <button
-              onClick={() => { setUserType('free'); setErrorMsg(''); setStep(1.1); }}
-              className="p-8 bg-slate-900 border border-slate-800 rounded-2xl text-center hover:border-amber-500 hover:bg-amber-500/5 transition-all group shadow-lg hover:shadow-amber-500/10"
-            >
-              <div className="w-16 h-16 mx-auto bg-amber-500/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform border border-amber-500/20">
-                <User className="w-8 h-8 text-amber-400" />
+            <div className="p-8 bg-slate-900 border border-slate-800 rounded-2xl text-center hover:border-amber-500/70 transition-all group shadow-lg hover:shadow-amber-500/10 flex flex-col justify-between">
+              <div>
+                <div className="w-16 h-16 mx-auto bg-amber-500/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform border border-amber-500/20">
+                  <User className="w-8 h-8 text-amber-400" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Public Learner Account</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Sign up or log in to automatically save your scores to your personal account, track level-wise progress, and build your practice streak.
+                </p>
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">Free Practice</h3>
-              <p className="text-xs text-slate-400">Enter your details to track your scores.</p>
-            </button>
+              <div className="mt-6 space-y-2.5">
+                <button
+                  onClick={() => { setAuthMode('signup'); setUserType('free'); setErrorMsg(''); setStep(1.1); }}
+                  className="w-full rounded-xl bg-amber-400 px-4 py-3 text-sm font-extrabold text-slate-950 transition hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200"
+                >
+                  Create Learner Account <ArrowRight className="ml-1 inline h-4 w-4" />
+                </button>
+                <button
+                  onClick={() => { setAuthMode('signin'); setUserType('free'); setErrorMsg(''); setStep(1.1); }}
+                  className="w-full rounded-xl border border-slate-700 bg-slate-800/80 px-4 py-2.5 text-xs font-bold text-slate-200 transition hover:bg-slate-700 hover:text-white"
+                >
+                  Already have an account? Sign In
+                </button>
+                <button
+                  onClick={startGuestPractice}
+                  className="pt-2 text-xs font-semibold text-slate-400 underline decoration-slate-600 underline-offset-4 transition hover:text-white"
+                >
+                  Practice as guest without saving
+                </button>
+              </div>
+            </div>
 
             <button
               onClick={() => { setUserType('student'); setErrorMsg(''); setStep(1.2); }}
-              className="p-8 bg-slate-900 border border-slate-800 rounded-2xl text-center hover:border-emerald-500 hover:bg-emerald-500/5 transition-all group shadow-lg hover:shadow-emerald-500/10"
+              className="p-8 bg-slate-900 border border-slate-800 rounded-2xl text-center hover:border-emerald-500 hover:bg-emerald-500/5 transition-all group shadow-lg hover:shadow-emerald-500/10 flex flex-col justify-between"
             >
-              <div className="w-16 h-16 mx-auto bg-emerald-500/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform border border-emerald-500/20">
-                <Key className="w-8 h-8 text-emerald-400" />
+              <div>
+                <div className="w-16 h-16 mx-auto bg-emerald-500/10 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform border border-emerald-500/20">
+                  <Key className="w-8 h-8 text-emerald-400" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">I'm an Enrolled Student</h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Use your student batch access code to practice tests assigned by your teacher. Your results will be saved directly for teacher review.
+                </p>
               </div>
-              <h3 className="text-lg font-bold text-white mb-2">I'm an Enrolled Student</h3>
-              <p className="text-xs text-slate-400">Use your student access code to begin.</p>
+              <div className="mt-6 w-full">
+                <span className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-3 text-sm font-bold text-slate-950 transition group-hover:bg-emerald-400">
+                  Enter Student Code <ArrowRight className="h-4 w-4" />
+                </span>
+              </div>
             </button>
           </div>
         </div>
       )}
 
-      {/* STEP 1.1: Free User Details Form */}
+      {/* STEP 1.1: Public Learner Auth (Sign Up / Sign In) */}
       {step === 1.1 && (
         <div className="max-w-md mx-auto bg-slate-900 border border-slate-800 rounded-2xl p-8 shadow-xl relative animate-fade-in mt-12">
-          <button onClick={() => { setUserType(''); setErrorMsg(''); setStep(1); }} className="absolute top-4 right-4 text-xs text-slate-500 hover:text-white">← Change</button>
-          <form onSubmit={handleFreeUserSubmit} className="space-y-4">
-            <div className="text-center mb-6">
-              <h3 className="text-2xl font-extrabold text-white">Your Details</h3>
-              <p className="text-sm text-slate-400">We'll save your scores to this email.</p>
+          <button onClick={() => { setUserType(''); setErrorMsg(''); setStep(1); }} className="absolute top-4 right-4 text-xs text-slate-500 hover:text-white transition-colors">
+            ← Change
+          </button>
+
+          <div className="text-center mb-6">
+            <div className="w-12 h-12 mx-auto bg-amber-500/10 rounded-xl flex items-center justify-center mb-3 border border-amber-500/20">
+              <User className="w-6 h-6 text-amber-400" />
             </div>
-            
-            {errorMsg && (
-              <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start gap-2 text-red-400 text-xs">
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
-                <p>{errorMsg}</p>
+            <h3 className="text-2xl font-extrabold text-white">
+              {authMode === 'signup' ? 'Create Learner Account' : 'Learner Sign In'}
+            </h3>
+            <p className="text-xs text-slate-400 mt-1">
+              {authMode === 'signup' 
+                ? 'Save your practice scores, track CEFR progress, and continue anytime.' 
+                : 'Sign in to access your saved attempts and learning history.'}
+            </p>
+          </div>
+
+          {/* Toggle Tabs */}
+          <div className="grid grid-cols-2 p-1 bg-slate-950 rounded-xl mb-6 border border-slate-800">
+            <button
+              type="button"
+              onClick={() => { setAuthMode('signup'); setErrorMsg(''); }}
+              className={`py-2 text-xs font-bold rounded-lg transition-colors ${authMode === 'signup' ? 'bg-amber-400 text-slate-950 shadow' : 'text-slate-400 hover:text-white'}`}
+            >
+              New Account
+            </button>
+            <button
+              type="button"
+              onClick={() => { setAuthMode('signin'); setErrorMsg(''); }}
+              className={`py-2 text-xs font-bold rounded-lg transition-colors ${authMode === 'signin' ? 'bg-amber-400 text-slate-950 shadow' : 'text-slate-400 hover:text-white'}`}
+            >
+              Sign In
+            </button>
+          </div>
+
+          {errorMsg && (
+            <div className="mb-4 p-3 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start gap-2 text-red-400 text-xs">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+              <p>{errorMsg}</p>
+            </div>
+          )}
+
+          <form onSubmit={authMode === 'signup' ? handleLearnerSignup : handleLearnerSignin} className="space-y-4">
+            {authMode === 'signup' && (
+              <div>
+                <label className="block text-xs font-medium text-slate-400 mb-1">Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Ali Ahmed"
+                  value={learnerForm.name}
+                  onChange={e => setLearnerForm({ ...learnerForm, name: e.target.value })}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none"
+                />
               </div>
             )}
-            
-            <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1">Full Name *</label>
-              <input type="text" required placeholder="John Doe" value={freeUserForm.name} onChange={e => setFreeUserForm({...freeUserForm, name: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none" />
-            </div>
             <div>
               <label className="block text-xs font-medium text-slate-400 mb-1">Email Address *</label>
-              <input type="email" required placeholder="you@example.com" value={freeUserForm.email} onChange={e => setFreeUserForm({...freeUserForm, email: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none" />
+              <input
+                type="email"
+                required
+                placeholder="you@example.com"
+                value={learnerForm.email}
+                onChange={e => setLearnerForm({ ...learnerForm, email: e.target.value })}
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none"
+              />
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-400 mb-1">Phone Number *</label>
-              <input type="text" required placeholder="+923001234567" value={freeUserForm.phone} onChange={e => setFreeUserForm({...freeUserForm, phone: e.target.value})} className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none" />
+              <label className="block text-xs font-medium text-slate-400 mb-1">Password * (min 6 characters)</label>
+              <input
+                type="password"
+                required
+                minLength={6}
+                placeholder="••••••••"
+                value={learnerForm.password}
+                onChange={e => setLearnerForm({ ...learnerForm, password: e.target.value })}
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none"
+              />
             </div>
-            <button type="submit" className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-lg flex items-center justify-center gap-2 mt-4 transition-colors">
-              Continue to Level Selection <ArrowRight className="w-4 h-4" />
+            {authMode === 'signup' && (
+              <div>
+                <label className="block text-xs font-medium text-slate-400 mb-1">Phone Number (optional)</label>
+                <input
+                  type="text"
+                  placeholder="+92 300 1234567"
+                  value={learnerForm.phone}
+                  onChange={e => setLearnerForm({ ...learnerForm, phone: e.target.value })}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2.5 text-sm text-white focus:border-amber-500 focus:outline-none"
+                />
+              </div>
+            )}
+            <button
+              disabled={loading}
+              type="submit"
+              className="w-full py-3 bg-amber-400 hover:bg-amber-300 text-slate-950 font-bold rounded-lg flex items-center justify-center gap-2 mt-4 transition-colors disabled:opacity-50"
+            >
+              {loading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <>
+                  {authMode === 'signup' ? 'Create Account & Continue' : 'Sign In & Continue'}
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </button>
           </form>
+
+          <div className="mt-4 pt-4 border-t border-slate-800 text-center">
+            <button
+              onClick={startGuestPractice}
+              className="text-xs text-slate-500 hover:text-slate-300 transition-colors"
+            >
+              Skip login and try a test as guest →
+            </button>
+          </div>
         </div>
       )}
 
@@ -941,8 +1204,10 @@ export default function PracticeTests() {
               </button>
               <div className="text-xs text-slate-400 hidden sm:block">
                 {userType === 'free'
-                  ? <>Logged in as: <strong className="text-white">{storedFreeUser?.name || storedFreeUser?.email}</strong></>
-                  : <>Code: <strong className="text-emerald-400">{verifiedCode}</strong></>
+                  ? <>Progress saved for: <strong className="text-white">{storedFreeUser?.name || storedFreeUser?.email}</strong></>
+                  : userType === 'student'
+                    ? <>Student code: <strong className="text-emerald-400">{verifiedCode}</strong></>
+                    : <>Free guest practice</>
                 }
               </div>
             </div>
@@ -981,7 +1246,7 @@ export default function PracticeTests() {
                   <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border ${testResult.userType === 'student' ? 'border-emerald-400/25 bg-emerald-400/10' : 'border-amber-400/25 bg-amber-400/10'}`}><Trophy className={`h-6 w-6 ${testResult.userType === 'student' ? 'text-emerald-300' : 'text-amber-300'}`} /></div>
                   <div className="min-w-0">
                     <div className="mb-1 inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-emerald-300"><CheckCircle className="h-3.5 w-3.5" /> Test completed</div>
-                    <h1 id="practice-result-title" className="truncate text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Great work{testResult.userType === 'free' ? `, ${storedFreeUser?.name || 'Student'}` : ''}!</h1>
+                    <h1 id="practice-result-title" className="truncate text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Great work{testResult.userType === 'free' ? `, ${storedFreeUser?.name || 'Student'}` : testResult.userType === 'student' && studentName ? `, ${studentName}` : ''}!</h1>
                   </div>
                 </div>
                 <div className="flex flex-wrap gap-2 sm:justify-end">
@@ -1018,11 +1283,62 @@ export default function PracticeTests() {
                 <dl className="divide-y divide-slate-800/90">
                   <div className="flex items-center justify-between gap-3 py-3"><dt className="text-sm text-slate-400">Level</dt><dd className="text-sm font-bold text-white">{selectedLevel || '—'}</dd></div>
                   <div className="flex items-start justify-between gap-3 py-3"><dt className="shrink-0 text-sm text-slate-400">Practice</dt><dd className="text-right text-sm font-semibold text-white">{selectedMaterial?.title || selectedCategory || 'German practice'}</dd></div>
-                  <div className="flex items-center justify-between gap-3 py-3"><dt className="text-sm text-slate-400">Learner</dt><dd className="max-w-[60%] truncate text-right text-sm font-semibold text-white">{testResult.userType === 'free' ? (storedFreeUser?.name || 'Free learner') : (studentName || 'Student')}</dd></div>
+                  <div className="flex items-center justify-between gap-3 py-3"><dt className="text-sm text-slate-400">Learner</dt><dd className="max-w-[60%] truncate text-right text-sm font-semibold text-white">{testResult.userType === 'free' ? (storedFreeUser?.name || 'Free learner') : testResult.userType === 'student' ? (studentName || 'Student') : 'Guest'}</dd></div>
                 </dl>
                 {testResult.userType === 'student' && <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-emerald-400/20 bg-emerald-400/[0.07] px-3.5 py-3 text-xs leading-relaxed text-emerald-200"><CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" /> Your result has been saved for your teacher.</div>}
               </aside>
             </div>
+
+            {/* Pedagogical Feedback and Recommended Next Activity */}
+            <div className="px-5 pb-6 sm:px-8 space-y-4">
+              <div className={`p-4 rounded-2xl border flex items-start gap-3.5 ${
+                (testResult.percentage ?? 0) >= 80 
+                  ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300' 
+                  : (testResult.percentage ?? 0) >= 50 
+                  ? 'bg-amber-500/10 border-amber-500/30 text-amber-300' 
+                  : 'bg-rose-500/10 border-rose-500/30 text-rose-300'
+              }`}>
+                <Trophy className="w-5 h-5 shrink-0 mt-0.5" />
+                <div>
+                  <h4 className="font-bold text-sm">
+                    {(testResult.percentage ?? 0) >= 80 
+                      ? 'Ausgezeichnet! (Excellent Mastery)' 
+                      : (testResult.percentage ?? 0) >= 50 
+                      ? 'Gut gemacht! (Solid Progress)' 
+                      : 'Weiter so! (Keep Practicing)'}
+                  </h4>
+                  <p className="text-xs mt-1 leading-relaxed opacity-90">
+                    {(testResult.percentage ?? 0) >= 80 
+                      ? 'Outstanding performance! You have demonstrated confident command of this topic. Move to the next skill or challenge yourself at the next CEFR level.' 
+                      : (testResult.percentage ?? 0) >= 50 
+                      ? 'Good effort! You understand the foundational principles. Try another exercise or retake to push your accuracy above 80%.' 
+                      : 'German learning requires repetition and consistency. Review the rules, reinforce key vocabulary, and take another practice test!'}
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-2xl border border-slate-800 bg-slate-900/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400">Recommended Next Activity</span>
+                  <h5 className="text-sm font-bold text-white mt-0.5">
+                    {selectedCategory === 'Grammar Test' ? `German ${selectedLevel || 'A1'} Reading Comprehension` : selectedCategory === 'Reading Test' ? `German ${selectedLevel || 'A1'} Vocabulary Practice` : `German ${selectedLevel || 'A1'} Grammar Drills`}
+                  </h5>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Strengthen your German comprehension with targeted interactive exercises.
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    resetTestSession();
+                    setStep(3); // Go to category selection for this level
+                  }}
+                  className="shrink-0 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-amber-400 hover:text-amber-300 font-bold text-xs rounded-xl border border-slate-700 transition-colors flex items-center gap-1.5"
+                >
+                  Explore {selectedLevel || 'CEFR'} Skills <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
             <div className="flex flex-col-reverse gap-3 border-t border-slate-800/90 bg-slate-950/25 px-4 py-4 sm:flex-row sm:justify-end sm:px-6 sm:py-5 lg:px-7">
               <button onClick={() => { resetTestSession(); setStep(4); }} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800 px-5 py-3 text-sm font-bold text-white transition hover:border-slate-600 hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400">Take Another Test <ArrowRight className="h-4 w-4" /></button>
               {testResult.userType === 'free' && <Link href="/dashboard" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 py-3 text-sm font-extrabold text-slate-950 shadow-lg shadow-amber-950/20 transition hover:-translate-y-0.5 hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200">View My Progress <ArrowRight className="h-4 w-4" /></Link>}

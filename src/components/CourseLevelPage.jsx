@@ -144,7 +144,7 @@ export default async function CourseLevelPage({ level }) {
               {level === 'A1' && (
                 <div className="p-4 bg-slate-900 border border-slate-800 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <p className="text-xs sm:text-sm text-slate-300">
-                    Review the full CEFR beginner curriculum including all 17 grammar topics, vocabulary lists, and exam requirements in our comprehensive guide.
+                    Explore the complete A1 curriculum, featuring all 17 grammar topics, daily vocabulary areas, the official Goethe A1 exam pattern, and module timing information in our structured guide.
                   </p>
                   <Link href="/german-a1-syllabus" className="shrink-0 text-xs sm:text-sm font-bold text-amber-400 hover:text-amber-300 flex items-center gap-1.5 underline underline-offset-4">
                     <span>German A1 syllabus</span>

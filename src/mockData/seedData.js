@@ -542,11 +542,31 @@ export const initialFaqs = [
   {
     category: 'Goethe & Visa Exams',
     q: 'Are your courses aligned with Goethe, telc, and ÖSD exams?',
-    a: 'Yes, our curriculum is 100% aligned with official Goethe-Zertifikat, telc, and ÖSD standards required for German Embassy visa applications in Islamabad and Karachi.'
+    a: 'Yes. Our curriculum is aligned with the official CEFR frameworks of the Goethe-Zertifikat, telc, and ÖSD examination standards required for German Embassy visa applications in Islamabad and Karachi. We provide targeted preparation so students can clear the official exam bodies on their first attempt.'
   },
   {
     category: 'Enrollment & Fees',
     q: 'How do I complete my enrollment and receive payment details?',
     a: 'Simply click "Enroll Now" (03421189593) on any course card or form, and our admissions team will instantly assist you on WhatsApp.'
+  },
+  {
+    category: 'Enrollment & Fees',
+    q: 'What are the tuition fees for German language courses in Pakistan?',
+    a: 'Tuition fees depend on the specific level (A1, A2, B1, or B2) and batch schedule. We offer transparent pricing in PKR with no hidden charges, including live interactive Zoom classes, recorded lectures, study materials, and exam preparation. To view current batch timings and fee schedules, check our <a href="/courses" class="text-amber-400 hover:underline font-semibold">course details and fees</a>.'
+  },
+  {
+    category: 'Course Duration & Schedule',
+    q: 'How long does it take to complete German A1, A2, or B1?',
+    a: 'Foundational courses like <a href="/courses/german-a1" class="text-amber-400 hover:underline font-semibold">German A1</a> and <a href="/courses/german-a2" class="text-amber-400 hover:underline font-semibold">German A2</a> typically take 6 to 8 weeks depending on whether you join regular or weekend batches. Intermediate levels like <a href="/courses/german-b1" class="text-amber-400 hover:underline font-semibold">German B1</a> typically span 8 to 10 weeks of structured instruction.'
+  },
+  {
+    category: 'Goethe & Visa Exams',
+    q: 'How do your courses prepare students for official Goethe-Zertifikat and telc exams?',
+    a: 'Our courses provide module-by-module preparation for Reading (Lesen), Listening (Hören), Writing (Schreiben), and Speaking (Sprechen). Students practice with authentic timed mock exams, letter-writing evaluation, and oral exam drills under our dedicated <a href="/goethe-exam-preparation" class="text-amber-400 hover:underline font-semibold">Goethe exam preparation</a> module to ensure high first-attempt pass rates.'
+  },
+  {
+    category: '100% Online Classes',
+    q: 'Can I join online German classes from Karachi, Lahore, Islamabad, or other Pakistani cities?',
+    a: 'Yes. All classes are conducted 100% live online via Zoom, allowing students located in Karachi, Lahore, Islamabad, Rawalpindi, Peshawar, Multan, Faisalabad, and across Pakistan to participate without travel. This provides thorough preparation from home for official exams conducted at Goethe-Institut Karachi, Goethe-Zentrum Islamabad, or other certified examination centers across Pakistan.'
   }
 ];

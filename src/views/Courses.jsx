@@ -93,6 +93,77 @@ export default function Courses({ currentLang, setActiveTab, onOpenTrialModal, i
         ))}
       </div>
 
+      {/* CEFR COURSE ROADMAP & PROGRESSION TABLE */}
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
+        <div className="text-center max-w-3xl mx-auto space-y-2">
+          <h2 className="text-2xl font-bold text-white">
+            German Language Course Levels &amp; Progression Roadmap
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+            Our live online German courses follow the structured Common European Framework of Reference for Languages (CEFR). Each level builds foundational to advanced language competencies through live interactive Zoom sessions, recorded lecture archives, and targeted preparation for official Goethe-Zertifikat and telc exams.
+          </p>
+        </div>
+
+        <div className="overflow-x-auto rounded-2xl border border-slate-800 bg-slate-950 p-1">
+          <table className="w-full text-left border-collapse text-xs sm:text-sm">
+            <thead>
+              <tr className="border-b border-slate-800 text-amber-400">
+                <th className="p-3 font-bold">Level</th>
+                <th className="p-3 font-bold">Duration</th>
+                <th className="p-3 font-bold">Guided Hours</th>
+                <th className="p-3 font-bold">Learning Goal</th>
+                <th className="p-3 font-bold">Exam Alignment</th>
+                <th className="p-3 font-bold">Course Details</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-800/60 text-slate-300">
+              <tr>
+                <td className="p-3 font-semibold text-white">German A1</td>
+                <td className="p-3">6–8 Weeks</td>
+                <td className="p-3">~80 Hours</td>
+                <td className="p-3">Everyday greetings, basic self-introductions, asking simple questions, and essential daily vocabulary</td>
+                <td className="p-3">Goethe-Zertifikat A1, telc Deutsch A1</td>
+                <td className="p-3 whitespace-nowrap">
+                  <Link href="/courses/german-a1" className="text-amber-400 hover:underline font-semibold">A1 Course</Link>
+                  {' · '}
+                  <Link href="/german-a1-syllabus" className="text-amber-400 hover:underline font-semibold">A1 Syllabus</Link>
+                </td>
+              </tr>
+              <tr>
+                <td className="p-3 font-semibold text-white">German A2</td>
+                <td className="p-3">6–8 Weeks</td>
+                <td className="p-3">~80 Hours</td>
+                <td className="p-3">Routine conversational exchanges, describing personal background, shopping, employment, and immediate surroundings</td>
+                <td className="p-3">Goethe-Zertifikat A2, telc Deutsch A2</td>
+                <td className="p-3 whitespace-nowrap">
+                  <Link href="/courses/german-a2" className="text-amber-400 hover:underline font-semibold">A2 Course</Link>
+                </td>
+              </tr>
+              <tr>
+                <td className="p-3 font-semibold text-white">German B1</td>
+                <td className="p-3">8–10 Weeks</td>
+                <td className="p-3">~100 Hours</td>
+                <td className="p-3">Independent communication on familiar topics, expressing opinions, describing experiences, and handling travel situations</td>
+                <td className="p-3">Goethe-Zertifikat B1, telc Deutsch B1</td>
+                <td className="p-3 whitespace-nowrap">
+                  <Link href="/courses/german-b1" className="text-amber-400 hover:underline font-semibold">B1 Course</Link>
+                </td>
+              </tr>
+              <tr>
+                <td className="p-3 font-semibold text-white">German B2</td>
+                <td className="p-3">10–12 Weeks</td>
+                <td className="p-3">~120 Hours</td>
+                <td className="p-3">Spontaneous discussion on complex topics, detailed professional communication, and clear technical argumentation</td>
+                <td className="p-3">Goethe-Zertifikat B2, telc Deutsch B2</td>
+                <td className="p-3 whitespace-nowrap">
+                  <Link href="/courses/german-b2" className="text-amber-400 hover:underline font-semibold">B2 Course</Link>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       {/* DEDICATED COURSE BUNDLES & PACKAGE SAVINGS SECTION */}
       <CourseBundles initialBundles={initialBundles} />
 
