@@ -530,37 +530,80 @@ export default function PracticeTests() {
         </div>
       )}
 
-      {/* ───── STEP 2: Level Selection ───── */}
+            {/* ───── STEP 2: Level Selection ───── */}
       {step === 2 && (
-        <div className="max-w-5xl mx-auto space-y-8 animate-fade-in w-full mt-4 flex-1">
-          <div className="text-center space-y-3 mb-10">
-            <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/30">
-              Welcome, {userType === 'student' ? studentName : storedFreeUser?.name}!
-            </span>
-            <h1 className="text-4xl font-extrabold text-white">Select Your Level</h1>
-            <p className="text-sm text-slate-300">Choose the German level you want to practice.</p>
+        <div className="max-w-6xl mx-auto w-full mt-4 flex-1 animate-fade-in">
+          <section className="relative isolate overflow-hidden rounded-[2rem] border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 px-6 py-10 sm:px-10 sm:py-12 shadow-2xl shadow-black/20">
+            <div aria-hidden="true" className="absolute -right-12 -top-24 -z-10 h-72 w-72 rounded-full bg-amber-500/10 blur-3xl" />
+            <div aria-hidden="true" className="absolute right-12 top-10 -z-10 hidden h-24 w-24 rotate-12 rounded-3xl border border-white/5 bg-white/[0.02] sm:block" />
+            <div className="max-w-3xl">
+              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 text-xs font-bold text-emerald-300">
+                <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
+                Welcome{(userType === 'student' ? studentName : storedFreeUser?.name) ? ', ' + (userType === 'student' ? studentName : storedFreeUser?.name) : ''}
+              </span>
+              <h1 className="mt-5 text-4xl font-extrabold tracking-tight text-white sm:text-5xl">Choose your practice level</h1>
+              <p className="mt-3 max-w-2xl text-base leading-relaxed text-slate-300 sm:text-lg">Build confidence in German one step at a time. Pick your CEFR level to explore practice activities.</p>
+              <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-400">
+                <span className="inline-flex items-center gap-2"><BookOpen className="h-4 w-4 text-amber-400" /> Reading, vocabulary &amp; grammar</span>
+                <span className="inline-flex items-center gap-2"><CheckCircle className="h-4 w-4 text-emerald-400" /> Practice at your own pace</span>
+              </div>
+            </div>
+          </section>
+
+          <div className="mb-5 mt-10 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-2xl font-extrabold text-white">Select your level</h2>
+              <p className="mt-1 text-sm text-slate-400">Choose the level that matches your German learning journey.</p>
+            </div>
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">CEFR learning levels</span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {getLevels().map(lvl => (
-              <button
-                key={lvl}
-                onClick={() => navigateToCategorySelection(lvl)}
-                className="group relative p-8 bg-slate-900 border border-slate-800 rounded-2xl text-center hover:border-amber-500 transition-all shadow-lg hover:-translate-y-1 hover:shadow-amber-500/20 overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-amber-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <h2 className="text-5xl font-extrabold text-white mb-3 group-hover:text-amber-400 transition-colors">{lvl}</h2>
-                <p className="text-sm text-slate-400 group-hover:text-slate-300">View tests for Level {lvl}</p>
-                <div className="mt-6 flex justify-center text-amber-500 opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-2">
-                  <ArrowRight className="w-6 h-6" />
-                </div>
-              </button>
-            ))}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {getLevels().map((lvl, index) => {
+              const levelMaterials = materials.filter(material => material.level === lvl);
+              const levelReadings = readingPassages.filter(passage => passage.level === lvl);
+              const testCount = levelMaterials.length + levelReadings.length;
+              const levelInfo = {
+                A1: { name: 'Beginner', detail: 'Start with the essentials', color: 'emerald' },
+                A2: { name: 'Elementary', detail: 'Grow everyday fluency', color: 'blue' },
+                B1: { name: 'Intermediate', detail: 'Use German independently', color: 'amber' },
+                B2: { name: 'Upper intermediate', detail: 'Communicate with confidence', color: 'rose' },
+              }[lvl] || { name: 'German practice', detail: 'Explore available exercises', color: 'amber' };
+              const tones = {
+                emerald: 'border-emerald-400/25 bg-emerald-400/10 text-emerald-300 group-hover:border-emerald-300/60 group-hover:shadow-emerald-950/50',
+                blue: 'border-blue-400/25 bg-blue-400/10 text-blue-300 group-hover:border-blue-300/60 group-hover:shadow-blue-950/50',
+                amber: 'border-amber-400/25 bg-amber-400/10 text-amber-300 group-hover:border-amber-300/60 group-hover:shadow-amber-950/50',
+                rose: 'border-rose-400/25 bg-rose-400/10 text-rose-300 group-hover:border-rose-300/60 group-hover:shadow-rose-950/50',
+              }[levelInfo.color];
+              return (
+                <button
+                  key={lvl}
+                  onClick={() => navigateToCategorySelection(lvl)}
+                  className={'group relative flex min-h-64 flex-col overflow-hidden rounded-2xl border border-slate-800 bg-slate-900/90 p-5 text-left shadow-lg transition duration-200 hover:-translate-y-1 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 ' + tones}
+                  aria-label={'Choose ' + lvl + ' ' + levelInfo.name + ' German practice'}
+                >
+                  <div className="flex items-start justify-between">
+                    <span className={'inline-flex h-14 w-14 items-center justify-center rounded-2xl border text-2xl font-black ' + tones}>{lvl}</span>
+                    <span className="rounded-full border border-slate-700 bg-slate-950/70 px-2.5 py-1 text-[11px] font-bold text-slate-300">{levelInfo.name}</span>
+                  </div>
+                  <div className="mt-5">
+                    <h3 className="text-lg font-bold text-white">German {lvl}</h3>
+                    <p className="mt-1 text-sm text-slate-400">{levelInfo.detail}</p>
+                  </div>
+                  <div className="mt-auto flex items-center justify-between border-t border-slate-800 pt-4">
+                    <span className="text-xs text-slate-400">{loading ? 'Loading practice…' : testCount + (testCount === 1 ? ' activity' : ' activities') + ' available'}</span>
+                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-slate-800 text-white transition group-hover:bg-amber-400 group-hover:text-slate-950"><ArrowRight className="h-4 w-4" /></span>
+                  </div>
+                  <span className="sr-only">Level {index + 1} of {getLevels().length}</span>
+                </button>
+              );
+            })}
           </div>
+          <p className="mt-5 text-center text-xs text-slate-500">Not sure where to begin? A1 is a good place to start for new learners.</p>
         </div>
       )}
 
-      {/* ───── STEP 3: Category Selection ───── */}
+{/* ───── STEP 3: Category Selection ───── */}
       {step === 3 && (
         <div className="max-w-5xl mx-auto space-y-8 animate-fade-in w-full mt-4 flex-1">
           <div className="mb-4">
