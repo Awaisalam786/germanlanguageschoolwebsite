@@ -931,72 +931,89 @@ export default function PracticeTests() {
 
       {/* ───── STEP 6: Result Screen ───── */}
       {step === 6 && testResult && (
-        <div className="max-w-2xl mx-auto text-center space-y-8 animate-fade-in py-12 flex-1 mt-12">
+        <div className="max-w-5xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-12 flex-1 animate-fade-in">
+          <section className="relative overflow-hidden rounded-3xl border border-slate-700/80 bg-gradient-to-br from-slate-900 via-slate-900 to-[#111d36] p-5 sm:p-8 lg:p-10 shadow-2xl shadow-black/30">
+            <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-emerald-400/10 blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-24 left-1/3 h-48 w-48 rounded-full bg-amber-400/10 blur-3xl" />
 
-          {/* Score card — shown to ALL users */}
-          <div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center border-4 ${
-            testResult.userType === 'student'
-              ? 'bg-emerald-500/10 border-emerald-500/20'
-              : 'bg-amber-500/10 border-amber-500/20'
-          }`}>
-            <Trophy className={`w-12 h-12 ${testResult.userType === 'student' ? 'text-emerald-400' : 'text-amber-400'}`} />
-          </div>
-
-          <div className="space-y-2">
-            <h2 className="text-4xl font-extrabold text-white">Your Result</h2>
-            <p className="text-slate-400 text-sm">
-              {testResult.userType === 'free'
-                ? `Great job, ${storedFreeUser?.name || 'Student'}!`
-                : `Test completed! Great work.`}
-            </p>
-          </div>
-
-          <div className="p-8 bg-slate-900 border border-slate-800 rounded-2xl shadow-xl space-y-4">
-            {testResult.isFallback || testResult.score === null ? (
-              <p className="text-slate-300">Your test has been submitted. Your score will be reviewed shortly.</p>
-            ) : (
-              <>
-                <p className="text-xs text-slate-500 uppercase tracking-widest font-bold">Your Score</p>
-                <div className={`text-7xl font-extrabold font-mono ${testResult.userType === 'student' ? 'text-emerald-400' : 'text-amber-400'}`}>
-                  {testResult.score} <span className="text-3xl text-slate-500">/ {testResult.totalMarks}</span>
+            <div className="relative">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5 mb-8">
+                <div className={`w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center border ${testResult.userType === 'student' ? 'bg-emerald-400/10 border-emerald-400/30' : 'bg-amber-400/10 border-amber-400/30'}`}>
+                  <Trophy className={`w-7 h-7 ${testResult.userType === 'student' ? 'text-emerald-400' : 'text-amber-400'}`} />
                 </div>
-                {testResult.percentage !== null && (
-                  <div className="space-y-2 mt-4">
-                    <div className={`text-2xl font-bold ${testResult.percentage >= 70 ? 'text-emerald-400' : testResult.percentage >= 50 ? 'text-amber-400' : 'text-red-400'}`}>
-                      {testResult.percentage}% Accuracy
-                    </div>
-                    <div className="w-full bg-slate-800 rounded-full h-3">
-                      <div
-                        className={`h-3 rounded-full transition-all duration-1000 ${testResult.percentage >= 70 ? 'bg-emerald-500' : testResult.percentage >= 50 ? 'bg-amber-500' : 'bg-red-500'}`}
-                        style={{ width: `${testResult.percentage}%` }}
-                      />
-                    </div>
-                    <p className="text-xs text-slate-400 pt-2">
-                      {testResult.percentage >= 70 ? '🎉 Excellent! You\'re ready for the next level.' : testResult.percentage >= 50 ? '👍 Good effort! Keep practicing.' : '📚 Keep studying — you\'ll get there!'}
-                    </p>
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* Internal student: show teacher note below score */}
-            {testResult.userType === 'student' && (
-              <div className="mt-2 inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 border border-emerald-500/30 rounded-full text-emerald-400 text-xs font-bold">
-                <CheckCircle className="w-3.5 h-3.5" /> Results saved — your teacher can view your score
+                <div className="min-w-0">
+                  <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-emerald-300 mb-1">
+                    <CheckCircle className="w-4 h-4" /> Test completed
+                  </span>
+                  <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">Great work{testResult.userType === 'free' ? `, ${storedFreeUser?.name || 'Student'}` : ''}!</h2>
+                  <p className="mt-1 text-sm text-slate-400">{selectedMaterial?.title || selectedCategory || 'German practice'} <span className="text-slate-600">·</span> Level {selectedLevel}</p>
+                </div>
               </div>
-            )}
-          </div>
 
-          <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
-            {testResult.userType === 'free' && (
-              <Link href="/dashboard" className="px-6 py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl transition-colors">
-                View My Progress
-              </Link>
-            )}
-            <button onClick={() => { resetTestSession(); setStep(4); }} className="px-6 py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl transition-colors">
-              Take Another Test
-            </button>
-          </div>
+              <div className="grid lg:grid-cols-5 gap-4 sm:gap-5">
+                <div className="lg:col-span-3 rounded-2xl border border-slate-700/80 bg-slate-950/45 p-5 sm:p-7">
+                  {testResult.isFallback || testResult.score === null ? (
+                    <div className="min-h-48 flex flex-col justify-center text-center">
+                      <p className="text-xl font-bold text-white">Your test has been submitted</p>
+                      <p className="text-slate-400 mt-2">Your score will be reviewed shortly.</p>
+                    </div>
+                  ) : (
+                    <div className="grid sm:grid-cols-[auto_1fr] items-center gap-6 sm:gap-8">
+                      <div className="mx-auto sm:mx-0 w-36 h-36 rounded-full p-[7px] shadow-lg shadow-emerald-950/30" style={{ background: `conic-gradient(${testResult.percentage >= 70 ? '#10b981' : testResult.percentage >= 50 ? '#f59e0b' : '#f87171'} ${testResult.percentage ?? 0}%, #1e293b 0)` }} role="progressbar" aria-label="Test accuracy" aria-valuemin={0} aria-valuemax={100} aria-valuenow={testResult.percentage ?? 0}>
+                        <div className="w-full h-full rounded-full bg-slate-950 flex flex-col items-center justify-center">
+                          <span className={`text-4xl font-extrabold tracking-tight ${testResult.percentage >= 70 ? 'text-emerald-400' : testResult.percentage >= 50 ? 'text-amber-400' : 'text-red-400'}`}>{testResult.percentage ?? 0}%</span>
+                          <span className="text-[11px] uppercase tracking-[0.16em] text-slate-500 font-bold">Accuracy</span>
+                        </div>
+                      </div>
+                      <div className="text-center sm:text-left">
+                        <p className="text-xs uppercase tracking-[0.2em] font-bold text-slate-400">Your score</p>
+                        <p className={`mt-1 text-5xl sm:text-6xl font-extrabold font-mono tracking-tight ${testResult.userType === 'student' ? 'text-emerald-400' : 'text-amber-400'}`}>
+                          {testResult.score}<span className="text-3xl text-slate-500"> / {testResult.totalMarks}</span>
+                        </p>
+                        <p className="mt-3 text-sm font-medium text-slate-300">
+                          {testResult.percentage >= 70 ? 'Excellent! You’re ready for the next level.' : testResult.percentage >= 50 ? 'Good effort! Keep practicing and you’ll improve.' : 'Keep studying — you’ll get there!'}
+                        </p>
+                        <div className="mt-4 h-2.5 w-full overflow-hidden rounded-full bg-slate-800 ring-1 ring-slate-700" aria-hidden="true">
+                          <div className={`h-full rounded-full transition-all duration-1000 ${testResult.percentage >= 70 ? 'bg-emerald-400' : testResult.percentage >= 50 ? 'bg-amber-400' : 'bg-red-400'}`} style={{ width: `${testResult.percentage ?? 0}%` }} />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="lg:col-span-2 rounded-2xl border border-slate-700/80 bg-slate-950/45 p-5 sm:p-6 flex flex-col justify-center">
+                  <p className="text-xs uppercase tracking-[0.18em] font-bold text-slate-500 mb-4">Test summary</p>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between gap-3 border-b border-slate-800 pb-3">
+                      <span className="text-sm text-slate-400">Level</span><span className="text-sm font-bold text-white">{selectedLevel || '—'}</span>
+                    </div>
+                    <div className="flex items-center justify-between gap-3 border-b border-slate-800 pb-3">
+                      <span className="text-sm text-slate-400">Practice</span><span className="text-sm font-bold text-white text-right">{selectedCategory || selectedMaterial?.title || 'German'}</span>
+                    </div>
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="text-sm text-slate-400">Status</span><span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-300"><CheckCircle className="w-3.5 h-3.5" /> Completed</span>
+                    </div>
+                  </div>
+                  {testResult.userType === 'student' && (
+                    <div className="mt-5 inline-flex items-center gap-2 rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-3 py-2.5 text-xs font-semibold text-emerald-300">
+                      <CheckCircle className="w-4 h-4 shrink-0" /> Results saved — your teacher can view your score
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="mt-6 flex flex-col sm:flex-row justify-center gap-3 max-w-xl mx-auto">
+                {testResult.userType === 'free' && (
+                  <Link href="/dashboard" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold rounded-xl shadow-lg shadow-amber-950/20 transition-all hover:-translate-y-0.5">
+                    View My Progress <ArrowRight className="w-4 h-4" />
+                  </Link>
+                )}
+                <button onClick={() => { resetTestSession(); setStep(4); }} className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold rounded-xl transition-all hover:-translate-y-0.5">
+                  Take Another Test <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </section>
         </div>
       )}
 
