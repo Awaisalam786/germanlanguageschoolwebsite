@@ -533,15 +533,15 @@ export default function PracticeTests() {
             {/* ───── STEP 2: Level Selection ───── */}
       {step === 2 && (
         <div className="max-w-6xl mx-auto w-full mt-4 flex-1 animate-fade-in">
-          <section className="relative isolate overflow-hidden rounded-[2rem] border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-slate-950 px-6 py-10 sm:px-10 sm:py-12 shadow-2xl shadow-black/20">
-            <div aria-hidden="true" className="absolute -right-12 -top-24 -z-10 h-72 w-72 rounded-full bg-amber-500/10 blur-3xl" />
-            <div aria-hidden="true" className="absolute right-0 top-0 -z-10 hidden h-full w-[48%] items-end justify-end overflow-hidden sm:flex"><img src="/berlin-gate.png" alt="" className="h-[115%] w-full object-contain object-right-bottom opacity-90" /><div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/35 to-transparent" /></div>
-            <div className="max-w-3xl">
+          <section className="relative isolate min-h-[290px] overflow-hidden rounded-[2rem] border border-slate-800 bg-gradient-to-br from-[#101c35] via-slate-900 to-slate-950 px-6 py-10 sm:px-10 sm:py-12 lg:min-h-[330px] shadow-2xl shadow-black/30">
+            <div aria-hidden="true" className="pointer-events-none absolute -right-12 -top-24 z-0 h-72 w-72 rounded-full bg-amber-500/15 blur-3xl" />
+            <div aria-hidden="true" className="absolute inset-y-0 right-0 z-0 hidden w-[58%] items-end justify-end overflow-hidden sm:flex"><img src="/berlin-gate.png" alt="" className="h-full w-full object-contain object-right-bottom opacity-95" /><div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/40 to-transparent" /></div>
+            <div className="relative z-10 max-w-3xl">
               <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 text-xs font-bold text-emerald-300">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />
                 Welcome{(userType === 'student' ? studentName : storedFreeUser?.name) ? ', ' + (userType === 'student' ? studentName : storedFreeUser?.name) : ''}
               </span>
-              <h1 className="mt-5 text-4xl font-extrabold tracking-tight text-white sm:text-5xl">🇩🇪 Practice Center</h1>
+              <h1 className="mt-5 text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl"><span className="text-amber-400">DE</span> Practice Center</h1>
               <p className="mt-3 max-w-2xl text-base leading-relaxed text-slate-300 sm:text-lg">Master German with interactive tests and exercises. Choose your level and take the next step.</p>
               <div className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-400">
                 <span className="inline-flex items-center gap-2"><BookOpen className="h-4 w-4 text-amber-400" /> Improve Skills</span>
