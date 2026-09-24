@@ -618,11 +618,11 @@ export default function PracticeTests() {
             <p className="text-sm text-slate-300">What would you like to practice today?</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
             {htmlTestsEnabled && (
               <button
                 onClick={() => navigateToContent('Grammar Test')}
-                className="p-6 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-6 hover:border-emerald-500 transition-all group shadow-lg hover:shadow-emerald-500/10 text-left"
+                className="group relative flex min-h-[148px] items-center gap-5 overflow-hidden rounded-2xl border border-emerald-400/15 bg-gradient-to-br from-emerald-500/[0.08] via-slate-900 to-slate-900 p-5 text-left shadow-lg shadow-black/10 transition duration-300 hover:-translate-y-1 hover:border-emerald-400/50 hover:shadow-xl hover:shadow-emerald-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 sm:p-6"
               >
                 <div className="w-16 h-16 shrink-0 bg-emerald-500/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform border border-emerald-500/20">
                   <BookOpen className="w-8 h-8 text-emerald-400" />
@@ -636,7 +636,7 @@ export default function PracticeTests() {
 
             <button
               onClick={() => navigateToContent('Reading Test')}
-              className="p-6 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-6 hover:border-blue-500 transition-all group shadow-lg hover:shadow-blue-500/10 text-left"
+              className="group relative flex min-h-[148px] items-center gap-5 overflow-hidden rounded-2xl border border-blue-400/15 bg-gradient-to-br from-blue-500/[0.08] via-slate-900 to-slate-900 p-5 text-left shadow-lg shadow-black/10 transition duration-300 hover:-translate-y-1 hover:border-blue-400/50 hover:shadow-xl hover:shadow-blue-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 sm:p-6"
             >
               <div className="w-16 h-16 shrink-0 bg-blue-500/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform border border-blue-500/20">
                 <BookOpen className="w-8 h-8 text-blue-400" />
@@ -649,7 +649,7 @@ export default function PracticeTests() {
 
             <button
               onClick={() => navigateToContent('Speaking Test')}
-              className="p-6 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-6 hover:border-pink-500 transition-all group shadow-lg hover:shadow-pink-500/10 text-left"
+              className="group relative flex min-h-[148px] items-center gap-5 overflow-hidden rounded-2xl border border-pink-400/15 bg-gradient-to-br from-pink-500/[0.08] via-slate-900 to-slate-900 p-5 text-left shadow-lg shadow-black/10 transition duration-300 hover:-translate-y-1 hover:border-pink-400/50 hover:shadow-xl hover:shadow-pink-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-pink-400 sm:p-6"
             >
               <div className="w-16 h-16 shrink-0 bg-pink-500/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform border border-pink-500/20">
                 <MessageCircle className="w-8 h-8 text-pink-400" />
@@ -662,7 +662,7 @@ export default function PracticeTests() {
 
             <button
               onClick={() => setStep('vocab_engine')}
-              className="p-6 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-6 hover:border-amber-500 transition-all group shadow-lg hover:shadow-amber-500/10 text-left"
+              className="group relative flex min-h-[148px] items-center gap-5 overflow-hidden rounded-2xl border border-amber-400/15 bg-gradient-to-br from-amber-500/[0.08] via-slate-900 to-slate-900 p-5 text-left shadow-lg shadow-black/10 transition duration-300 hover:-translate-y-1 hover:border-amber-400/50 hover:shadow-xl hover:shadow-amber-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 sm:p-6"
             >
               <div className="w-16 h-16 shrink-0 bg-gradient-to-br from-amber-500 to-amber-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-amber-500/20">
                 <Brain className="w-8 h-8 text-slate-950" />
@@ -678,7 +678,7 @@ export default function PracticeTests() {
 
             <Link
               href="/practice-tests/noun-builder"
-              className="p-6 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-6 hover:border-blue-500 transition-all group shadow-lg hover:shadow-blue-500/10 text-left"
+              className="group relative flex min-h-[148px] items-center gap-5 overflow-hidden rounded-2xl border border-blue-400/15 bg-gradient-to-br from-blue-500/[0.08] via-slate-900 to-slate-900 p-5 text-left shadow-lg shadow-black/10 transition duration-300 hover:-translate-y-1 hover:border-blue-400/50 hover:shadow-xl hover:shadow-blue-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 sm:p-6"
             >
               <div className="w-16 h-16 shrink-0 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-blue-500/20">
                 <Languages className="w-8 h-8 text-white" />
@@ -694,7 +694,7 @@ export default function PracticeTests() {
 
             <button
               onClick={() => setStep('grammar_engine')}
-              className="p-6 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-6 hover:border-emerald-500 transition-all group shadow-lg hover:shadow-emerald-500/10 text-left"
+              className="group relative flex min-h-[148px] items-center gap-5 overflow-hidden rounded-2xl border border-emerald-400/15 bg-gradient-to-br from-emerald-500/[0.08] via-slate-900 to-slate-900 p-5 text-left shadow-lg shadow-black/10 transition duration-300 hover:-translate-y-1 hover:border-emerald-400/50 hover:shadow-xl hover:shadow-emerald-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 sm:p-6"
             >
               <div className="w-16 h-16 shrink-0 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-emerald-500/20">
                 <Brain className="w-8 h-8 text-slate-950" />
@@ -711,7 +711,7 @@ export default function PracticeTests() {
             {htmlTestsEnabled && (
               <button
                 onClick={() => navigateToContent('Vocab Test')}
-                className="p-6 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-6 hover:border-amber-500 transition-all group shadow-lg hover:shadow-amber-500/10 text-left"
+                className="group relative flex min-h-[148px] items-center gap-5 overflow-hidden rounded-2xl border border-amber-400/15 bg-gradient-to-br from-amber-500/[0.08] via-slate-900 to-slate-900 p-5 text-left shadow-lg shadow-black/10 transition duration-300 hover:-translate-y-1 hover:border-amber-400/50 hover:shadow-xl hover:shadow-amber-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 sm:p-6"
               >
                 <div className="w-16 h-16 shrink-0 bg-amber-500/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform border border-amber-500/20">
                   <Languages className="w-8 h-8 text-amber-400" />
@@ -725,7 +725,7 @@ export default function PracticeTests() {
 
             <button
               onClick={() => setStep('alphabet_engine')}
-              className="p-6 bg-slate-900 border border-slate-800 rounded-2xl flex items-center gap-6 hover:border-amber-500 transition-all group shadow-lg hover:shadow-amber-500/10 text-left"
+              className="group relative flex min-h-[148px] items-center gap-5 overflow-hidden rounded-2xl border border-amber-400/15 bg-gradient-to-br from-amber-500/[0.08] via-slate-900 to-slate-900 p-5 text-left shadow-lg shadow-black/10 transition duration-300 hover:-translate-y-1 hover:border-amber-400/50 hover:shadow-xl hover:shadow-amber-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 sm:p-6"
             >
               <div className="w-16 h-16 shrink-0 bg-amber-500/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform border border-amber-500/20">
                 <Volume2 className="w-8 h-8 text-amber-400" />
