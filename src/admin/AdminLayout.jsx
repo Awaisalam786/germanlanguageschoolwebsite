@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   LayoutDashboard, 
   FileText, 
@@ -29,7 +29,9 @@ import {
   Ticket,
   Megaphone,
   FileCode2,
-  Trophy
+  Trophy,
+  ChevronDown,
+  Search
 } from 'lucide-react';
 import { translations } from '../i18n/translations';
 
@@ -43,6 +45,8 @@ export default function AdminLayout({
   children 
 }) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [openGroups, setOpenGroups] = useState({ overview: true });
+  const [menuSearch, setMenuSearch] = useState('');
   const t = translations[currentLang];
 
   const menuItems = [
@@ -78,6 +82,34 @@ export default function AdminLayout({
     { id: 'settings', label: t.admin.settings, icon: SettingsIcon },
   ];
 
+  // Keep every existing menu id and action while organizing the long menu into sections.
+  const menuItemById = Object.fromEntries(menuItems.map((item) => [item.id, item]));
+  const menuGroups = [
+    { id: 'overview', label: 'Overview', itemIds: ['dashboard', 'analytics'] },
+    { id: 'people', label: 'People', itemIds: ['students', 'teachersManager', 'inquiries'] },
+    { id: 'learning', label: 'Learning', itemIds: ['coursesManager', 'recordings', 'certificateManager', 'practiceTests', 'nounBuilder', 'chapterVocab', 'smartVocabResults', 'grammarChapters', 'grammarResults', 'readingPassages', 'readingResults'] },
+    { id: 'content', label: 'Website Content', itemIds: ['announcements', 'documents', 'blogCMS', 'testimonialsManager', 'galleryManager', 'googleReviews'] },
+    { id: 'commerce', label: 'Orders & Payments', itemIds: ['booksManager', 'bookOrders', 'paymentStatus', 'couponManager'] },
+    { id: 'settings', label: 'Settings', itemIds: ['themeCustomizer', 'notifications', 'globalContent', 'settings'] },
+  ].map((group) => ({ ...group, items: group.itemIds.map((id) => menuItemById[id]).filter(Boolean) }));
+
+  useEffect(() => {
+    const activeGroup = menuGroups.find((group) => group.items.some((item) => item.id === currentTab));
+    if (activeGroup) {
+      setOpenGroups((previous) => ({ ...previous, [activeGroup.id]: true }));
+    }
+  }, [currentTab]);
+
+  const normalizedSearch = menuSearch.trim().toLowerCase();
+  const visibleGroups = menuGroups
+    .map((group) => ({
+      ...group,
+      items: normalizedSearch
+        ? group.items.filter((item) => item.label.toLowerCase().includes(normalizedSearch))
+        : group.items,
+    }))
+    .filter((group) => group.items.length > 0);
+
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col lg:flex-row">
       
@@ -90,89 +122,134 @@ export default function AdminLayout({
       )}
 
       {/* Sidebar - Desktop & Mobile */}
-      <aside className={`fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 lg:relative lg:translate-x-0 flex flex-col w-64 bg-slate-900 border-r border-slate-800 shrink-0 h-[100dvh] lg:h-screen lg:sticky lg:top-0 ${
+      <aside className={`fixed inset-y-0 left-0 z-50 flex h-[100dvh] w-[min(84vw,18rem)] shrink-0 transform flex-col overflow-hidden border-r border-slate-800 bg-slate-900 shadow-2xl shadow-black/30 transition-transform duration-300 lg:sticky lg:top-0 lg:h-screen lg:w-64 lg:translate-x-0 lg:shadow-none ${
         mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
         
         {/* Top Brand Header */}
-        <div className="p-5 border-b border-slate-800 flex items-center justify-between">
+        <div className="flex items-center justify-between border-b border-slate-800 px-4 py-4 sm:px-5">
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-xl bg-amber-500 text-slate-950 flex items-center justify-center font-bold text-lg shadow-gold-glow">
-              🇩🇪
+            <div className="flex h-10 w-10 items-center justify-center rounded-2xl border border-amber-300/30 bg-gradient-to-br from-amber-300 to-amber-500 text-sm font-black tracking-tight text-slate-950 shadow-lg shadow-amber-950/30">
+              DE
             </div>
             <div>
-              <h2 className="text-sm font-extrabold text-white tracking-tight">German Language</h2>
-              <span className="text-[10px] text-amber-400 font-bold block uppercase tracking-widest">
+              <h2 className="text-sm font-extrabold tracking-tight text-white">German Language</h2>
+              <span className="mt-0.5 block text-[10px] font-bold uppercase tracking-[0.16em] text-amber-400">
                 Admin Portal
               </span>
             </div>
           </div>
           <button 
             onClick={() => setMobileSidebarOpen(false)}
-            className="lg:hidden p-1.5 rounded-lg bg-slate-800 text-slate-400 hover:text-white"
+            aria-label="Close admin menu"
+            className="rounded-xl border border-slate-700 bg-slate-800 p-2 text-slate-400 transition hover:border-slate-600 hover:text-white lg:hidden"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* User Session Card */}
-        <div className="p-4 bg-slate-950/80 m-3 rounded-xl border border-slate-800 space-y-1">
-          <div className="flex items-center justify-between text-xs font-bold text-white">
-            <span className="truncate max-w-[120px]">{userSession.email}</span>
-            <span className="px-2 py-0.5 rounded bg-amber-500/20 text-amber-400 text-[10px]">
+        <div className="mx-3 mt-3 rounded-2xl border border-slate-800 bg-slate-950/75 p-3.5 shadow-inner shadow-white/[0.02]">
+          <div className="flex items-center gap-2 text-xs font-bold text-white">
+            <span className="min-w-0 flex-1 truncate">{userSession.email}</span>
+            <span className="max-w-20 shrink-0 rounded-lg border border-amber-400/15 bg-amber-400/10 px-2 py-1 text-[9px] font-bold uppercase tracking-wide text-amber-300">
               {userSession.role}
             </span>
           </div>
-          <div className="flex items-center text-[10px] text-slate-400 gap-1">
-            <Lock className="w-3 h-3 text-emerald-400" />
-            <span>2FA Verified Session</span>
+          <div className="mt-2 flex items-center gap-1.5 text-[10px] text-slate-400">
+            <Lock className="h-3 w-3 text-emerald-400" />
+            <span>2FA verified session</span>
           </div>
         </div>
 
-        {/* Navigation Items */}
-        <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto">
-          {menuItems.map((item) => {
-            const Icon = item.icon;
-            const isActive = currentTab === item.id;
-            return (
-              <button
-                key={item.id}
-                onClick={() => {
-                  setCurrentTab(item.id);
-                  setMobileSidebarOpen(false);
-                }}
-                className={`w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs font-medium transition-all ${
-                  isActive
-                    ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30 font-bold'
-                    : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                }`}
-              >
-                <div className="flex items-center gap-2.5">
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-amber-400' : 'text-slate-400'}`} />
-                  <span>{item.label}</span>
-                </div>
-                {item.badge && (
-                  <span className="px-1.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 text-[10px] font-bold">
-                    {item.badge}
-                  </span>
-                )}
-              </button>
-            );
-          })}
+        {/* Grouped Navigation */}
+        <nav aria-label="Admin navigation" className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
+          <label className="relative mb-3 block">
+            <Search aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500" />
+            <input
+              type="search"
+              value={menuSearch}
+              onChange={(event) => setMenuSearch(event.target.value)}
+              placeholder="Find a section..."
+              aria-label="Search admin sections"
+              className="h-10 w-full rounded-xl border border-slate-800 bg-slate-950/80 pl-9 pr-3 text-xs text-slate-200 outline-none transition placeholder:text-slate-500 focus:border-amber-400/50 focus:ring-2 focus:ring-amber-400/10"
+            />
+          </label>
+
+          <div className="space-y-2">
+            {visibleGroups.map((group) => {
+              const isOpen = Boolean(normalizedSearch) || Boolean(openGroups[group.id]);
+              return (
+                <section key={group.id} className="rounded-2xl border border-slate-800/80 bg-slate-950/25 p-1.5">
+                  <button
+                    type="button"
+                    aria-expanded={isOpen}
+                    aria-controls={`admin-nav-${group.id}`}
+                    onClick={() => setOpenGroups((previous) => ({ ...previous, [group.id]: !previous[group.id] }))}
+                    className="flex min-h-10 w-full items-center justify-between rounded-xl px-2.5 text-left text-[10px] font-extrabold uppercase tracking-[0.15em] text-slate-400 transition hover:bg-slate-800/70 hover:text-slate-200"
+                  >
+                    <span>{group.label}</span>
+                    <span className="flex items-center gap-2">
+                      <span className="rounded-md bg-slate-800 px-1.5 py-0.5 text-[9px] font-bold tracking-normal text-slate-500">{group.items.length}</span>
+                      <ChevronDown className={`h-3.5 w-3.5 transition-transform ${isOpen ? 'rotate-180 text-amber-400' : ''}`} />
+                    </span>
+                  </button>
+                  {isOpen && (
+                    <div id={`admin-nav-${group.id}`} className="mt-1 space-y-1 pb-1">
+                      {group.items.map((item) => {
+                        const Icon = item.icon;
+                        const isActive = currentTab === item.id;
+                        return (
+                          <button
+                            type="button"
+                            key={item.id}
+                            aria-current={isActive ? 'page' : undefined}
+                            onClick={() => {
+                              setCurrentTab(item.id);
+                              setMobileSidebarOpen(false);
+                              setMenuSearch('');
+                            }}
+                            className={`group flex min-h-10 w-full items-center justify-between gap-2 rounded-xl border px-2.5 text-left text-xs transition-all ${
+                              isActive
+                                ? 'border-amber-400/25 bg-gradient-to-r from-amber-400/15 to-amber-400/[0.04] font-bold text-amber-200 shadow-sm shadow-amber-950/20'
+                                : 'border-transparent text-slate-400 hover:border-slate-700/80 hover:bg-slate-800/80 hover:text-slate-100'
+                            }`}
+                          >
+                            <span className="flex min-w-0 items-center gap-2.5">
+                              <Icon className={`h-4 w-4 shrink-0 ${isActive ? 'text-amber-300' : 'text-slate-500 group-hover:text-slate-300'}`} />
+                              <span className="truncate">{item.label}</span>
+                            </span>
+                            {item.badge && item.badge !== '3' && (
+                              <span className={`shrink-0 rounded-md px-1.5 py-0.5 text-[9px] font-bold ${isActive ? 'bg-amber-300/15 text-amber-200' : 'bg-slate-800 text-slate-500'}`}>
+                                {item.badge}
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </section>
+              );
+            })}
+            {visibleGroups.length === 0 && (
+              <p className="rounded-xl border border-dashed border-slate-800 px-3 py-5 text-center text-xs text-slate-500">No matching admin sections.</p>
+            )}
+          </div>
         </nav>
 
         {/* Sidebar Bottom Actions */}
-        <div className="p-4 border-t border-slate-800 space-y-2">
+        <div className="space-y-2 border-t border-slate-800 bg-slate-900/95 p-3.5 sm:p-4">
           <button
             onClick={onReturnToSite}
-            className="w-full py-2 px-3 rounded-lg bg-slate-950 border border-slate-800 text-xs text-slate-300 hover:text-white flex items-center justify-center gap-2 transition"
+            className="flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border border-slate-800 bg-slate-950 px-3 py-2 text-xs text-slate-300 transition hover:border-slate-700 hover:text-white"
           >
             <Globe className="w-3.5 h-3.5 text-amber-400" />
             <span>View Public Website</span>
           </button>
           <button
             onClick={onLogout}
-            className="w-full py-2 px-3 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-xs text-red-400 font-bold flex items-center justify-center gap-2 transition"
+            className="flex min-h-10 w-full items-center justify-center gap-2 rounded-xl border border-rose-400/20 bg-rose-400/[0.07] px-3 py-2 text-xs font-bold text-rose-300 transition hover:border-rose-400/40 hover:bg-rose-400/10"
           >
             <LogOut className="w-3.5 h-3.5" />
             <span>{t.admin.logout}</span>
