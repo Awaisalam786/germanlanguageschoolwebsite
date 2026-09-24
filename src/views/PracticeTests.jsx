@@ -305,91 +305,124 @@ export default function PracticeTests() {
     .sort((a, b) => extractChapterNumber(a.title) - extractChapterNumber(b.title));
 
   const renderReadingPassages = () => {
-    // 1. Strict filtering by the selected level
-    const levelPassages = readingPassages.filter(p => p.level === selectedLevel);
-    
+    const normalizedLevel = String(selectedLevel || '').trim().toUpperCase();
+    const levelPassages = readingPassages.filter(
+      passage => String(passage.level || '').trim().toUpperCase() === normalizedLevel
+    );
+    const questionCount = passage => Array.isArray(passage.questions) ? passage.questions.length : 0;
+    const totalQuestions = levelPassages.reduce((total, passage) => total + questionCount(passage), 0);
+
     if (levelPassages.length === 0) {
       return (
-        <div className="text-center text-slate-500 py-12 bg-slate-900/50 rounded-2xl border border-slate-800 border-dashed w-full">
-          No reading passages uploaded yet for Level {selectedLevel}.
+        <div className="rounded-3xl border border-slate-800 bg-slate-900/70 p-8 text-center shadow-xl sm:p-12">
+          <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl border border-blue-400/20 bg-blue-400/10">
+            <BookOpen className="h-8 w-8 text-blue-300" />
+          </div>
+          <h2 className="text-xl font-bold text-white">Reading passages are on the way</h2>
+          <p className="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-400">
+            There are no reading passages available for {selectedLevel} right now. Please check back soon or choose another skill.
+          </p>
+          <button onClick={goBackToCategory} className="mt-6 inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800 px-4 py-2.5 text-sm font-semibold text-slate-200 transition hover:border-slate-600 hover:bg-slate-700">
+            &larr; Back to skills
+          </button>
         </div>
       );
     }
 
-    // 2. Group passages by chapter reference
-    const grouped = levelPassages.reduce((acc, passage) => {
-      const ch = passage.chapter_reference || 'Other';
-      if (!acc[ch]) acc[ch] = [];
-      acc[ch].push(passage);
-      return acc;
+    const grouped = levelPassages.reduce((groups, passage) => {
+      const chapter = String(passage.chapter_reference || '').trim() || 'Other';
+      if (!groups[chapter]) groups[chapter] = [];
+      groups[chapter].push(passage);
+      return groups;
     }, {});
 
-    // 3. Sort the chapter keys numerically (1, 2, 3...) and place 'Other' at the end
     const sortedChapters = Object.keys(grouped).sort((a, b) => {
       if (a === 'Other') return 1;
       if (b === 'Other') return -1;
-      return parseInt(a) - parseInt(b);
+      const numberA = Number((a.match(/\d+/) || [])[0]);
+      const numberB = Number((b.match(/\d+/) || [])[0]);
+      if (numberA && numberB && numberA !== numberB) return numberA - numberB;
+      return a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' });
     });
 
-    // 4. Render each chapter section with its sorted passages
     return (
-      <div className="w-full">
-        {sortedChapters.map(chapter => {
-          // Sort passages within the chapter by passage_id
-          const passages = grouped[chapter].sort((a, b) => a.passage_id - b.passage_id);
-
-          return (
-            <div key={chapter} className="mb-12">
-              
-              {/* Section Header */}
-              <div className="flex items-center gap-3 mb-6 border-b border-slate-800 pb-3">
-                <BookOpen className="w-6 h-6 text-blue-500" />
-                <h2 className="text-2xl font-playfair font-bold text-white">
-                  {chapter === 'Other' ? 'Additional Passages' : `Chapter ${chapter}`}
-                </h2>
+      <div className="space-y-8">
+        <section className="relative isolate overflow-hidden rounded-3xl border border-blue-400/20 bg-gradient-to-br from-[#101c35] via-slate-900 to-slate-950 px-5 py-6 shadow-xl sm:px-8 sm:py-8">
+          <div aria-hidden="true" className="pointer-events-none absolute -right-12 -top-20 -z-10 h-56 w-56 rounded-full bg-blue-400/10 blur-3xl" />
+          <div className="relative flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="max-w-2xl">
+              <span className="inline-flex items-center gap-2 rounded-full border border-blue-400/20 bg-blue-400/10 px-3 py-1 text-xs font-bold uppercase tracking-wider text-blue-200">
+                <BookOpen className="h-3.5 w-3.5" /> Reading practice
+              </span>
+              <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+                {selectedLevel} <span className="text-amber-400">Reading</span>
+              </h1>
+              <p className="mt-2 text-sm leading-relaxed text-slate-300 sm:text-base">
+                Choose a passage, read at your own pace, then answer a few questions to check your understanding.
+              </p>
+            </div>
+            <div className="grid grid-cols-2 gap-3 sm:min-w-56">
+              <div className="rounded-2xl border border-slate-700/80 bg-slate-950/60 px-4 py-3">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Passages</p>
+                <p className="mt-1 text-2xl font-extrabold text-white">{levelPassages.length}</p>
               </div>
-
-              {/* Section Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {passages.map(mat => (
-                  <div 
-                    key={mat.id} 
-                    className="group relative bg-slate-900 border border-slate-800 rounded-2xl p-6 flex flex-col justify-between hover:border-blue-500 transition-all shadow-lg hover:-translate-y-1 hover:shadow-blue-500/20 overflow-hidden"
-                  >
-                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    
-                    <div className="relative z-10">
-                      <div className="flex justify-between items-start mb-6">
-                        <div className="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 font-extrabold flex items-center justify-center text-xl border border-blue-500/30 shadow-inner">
-                          {mat.level}
-                        </div>
-                        <span className="px-3 py-1 bg-slate-950 border border-slate-800 rounded-full text-[10px] uppercase tracking-widest text-slate-400 font-bold flex items-center gap-1.5">
-                          <BookOpen className="w-3 h-3 text-blue-400" /> Reading
-                        </span>
-                      </div>
-                      
-                      <h3 className="text-xl font-playfair font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">
-                        {mat.passage_title}
-                      </h3>
-                      <p className="text-xs text-slate-400 flex items-center gap-1.5 mt-2">
-                        <CheckSquare className="w-3.5 h-3.5 text-slate-500" /> {mat.questions?.length || 0} Questions
-                      </p>
-                    </div>
-
-                    <button
-                      onClick={() => {
-                        setSelectedMaterial(mat); // Use selectedMaterial to store the passage
-                        setStep('reading_engine');
-                      }}
-                      className="relative z-10 mt-8 w-full py-3.5 rounded-xl bg-slate-950 border border-slate-800 hover:border-blue-500 hover:bg-blue-500 hover:text-white font-bold text-sm transition-all flex items-center justify-center gap-2 group-hover:shadow-lg text-slate-300 group-hover:text-white"
-                    >
-                      Start Test 
-                      <PlayCircle className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                    </button>
-                  </div>
-                ))}
+              <div className="rounded-2xl border border-slate-700/80 bg-slate-950/60 px-4 py-3">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Questions</p>
+                <p className="mt-1 text-2xl font-extrabold text-blue-300">{totalQuestions}</p>
               </div>
             </div>
+          </div>
+        </section>
+
+        {sortedChapters.map(chapter => {
+          const passages = [...grouped[chapter]].sort((a, b) => {
+            const idA = Number(a.passage_id ?? a.id ?? 0);
+            const idB = Number(b.passage_id ?? b.id ?? 0);
+            return idA - idB;
+          });
+          const chapterLabel = chapter === 'Other'
+            ? 'Additional passages'
+            : /^\d+$/.test(chapter) ? `Chapter ${chapter}` : chapter;
+
+          return (
+            <section key={chapter} aria-labelledby={`reading-chapter-${chapter.replace(/[^a-z0-9]/gi, '-')}`}>
+              <div className="mb-4 flex flex-wrap items-end justify-between gap-3 border-b border-slate-800 pb-3">
+                <div className="flex items-center gap-3">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-400/10"><BookOpen className="h-5 w-5 text-blue-300" /></span>
+                  <div>
+                    <h2 id={`reading-chapter-${chapter.replace(/[^a-z0-9]/gi, '-')}`} className="text-lg font-bold text-white sm:text-xl">{chapterLabel}</h2>
+                    <p className="mt-0.5 text-xs text-slate-500">Passages to build your reading confidence</p>
+                  </div>
+                </div>
+                <span className="rounded-full border border-slate-800 bg-slate-900 px-3 py-1 text-xs font-medium text-slate-400">{passages.length} {passages.length === 1 ? 'passage' : 'passages'}</span>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {passages.map((passage, index) => {
+                  const passageQuestions = questionCount(passage);
+                  const excerpt = String(passage.passage_text || '').replace(/\s+/g, ' ').trim();
+                  const preview = excerpt.length > 132 ? `${excerpt.slice(0, 132).trimEnd()}…` : excerpt;
+
+                  return (
+                    <article key={passage.id || passage.passage_id || `${chapter}-${index}`} className="group relative flex min-h-[260px] flex-col overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-b from-slate-900 to-slate-950 p-5 shadow-lg shadow-black/10 transition duration-200 hover:-translate-y-1 hover:border-blue-400/40 hover:shadow-xl hover:shadow-blue-950/30">
+                      <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-blue-500/70 via-cyan-400/60 to-transparent opacity-70 transition group-hover:opacity-100" />
+                      <div className="mb-5 flex items-center justify-between gap-3">
+                        <span className="inline-flex h-11 min-w-11 items-center justify-center rounded-xl border border-blue-400/25 bg-blue-400/10 px-2 text-sm font-extrabold text-blue-300">{passage.level || selectedLevel}</span>
+                        <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-800 bg-slate-950/80 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400"><BookOpen className="h-3 w-3 text-blue-300" /> Reading</span>
+                      </div>
+                      <h3 className="text-lg font-bold leading-snug text-white transition-colors group-hover:text-blue-200">{passage.passage_title || 'Untitled passage'}</h3>
+                      <p className="mt-2 line-clamp-3 min-h-[3.75rem] text-sm leading-relaxed text-slate-400">{preview || 'Read this short German passage and answer the questions to practice comprehension.'}</p>
+                      <div className="mt-auto flex items-center justify-between gap-3 border-t border-slate-800/90 pt-4">
+                        <span className="inline-flex items-center gap-2 text-xs font-medium text-slate-400"><CheckSquare className="h-4 w-4 text-blue-300" />{passageQuestions} {passageQuestions === 1 ? 'question' : 'questions'}</span>
+                        <button onClick={() => { setSelectedMaterial(passage); setStep('reading_engine'); }} aria-label={`Start reading test: ${passage.passage_title || 'Untitled passage'}`} className="inline-flex min-h-10 items-center justify-center gap-2 rounded-xl bg-blue-500 px-4 py-2 text-xs font-bold text-white shadow-md shadow-blue-950/30 transition hover:bg-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-300">
+                          Start reading <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+                        </button>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </section>
           );
         })}
       </div>
@@ -791,23 +824,30 @@ export default function PracticeTests() {
 
       {/* ───── STEP 4: Content (Test List, Placeholder, or WhatsApp) ───── */}
       {step === 4 && (
-        <div className="max-w-5xl mx-auto space-y-8 animate-fade-in w-full mt-4 flex-1">
+        <div className="max-w-5xl mx-auto space-y-6 animate-fade-in w-full mt-8 flex-1">
           <div className="mb-4">
              <button onClick={goBackToCategory} className="text-sm text-slate-400 hover:text-white flex items-center gap-2 transition-colors">
               &larr; Back to Categories
             </button>
           </div>
-          <div className="text-center space-y-3 mb-10">
-            <h1 className="text-4xl font-extrabold text-white">
-              {selectedLevel} <span className="text-amber-500">{selectedCategory}</span>
-            </h1>
-          </div>
+          {selectedCategory !== 'Reading Test' && (
+            <div className="text-center space-y-3 mb-10">
+              <h1 className="text-4xl font-extrabold text-white">
+                {selectedLevel} <span className="text-amber-500">{selectedCategory}</span>
+              </h1>
+            </div>
+          )}
 
           {/* Reading Test List */}
           {selectedCategory === 'Reading Test' && (
             loading ? (
-              <div className="text-center py-12">
-                <Loader2 className="w-8 h-8 text-amber-500 animate-spin mx-auto" />
+              <div className="space-y-6" aria-label="Loading reading passages">
+                <div className="animate-pulse rounded-3xl border border-slate-800 bg-slate-900 p-8">
+                  <div className="h-4 w-32 rounded bg-slate-800" />
+                  <div className="mt-4 h-8 w-64 max-w-full rounded bg-slate-800" />
+                  <div className="mt-3 h-4 w-full max-w-xl rounded bg-slate-800" />
+                </div>
+                <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">{[0, 1, 2].map(item => <div key={item} className="h-64 animate-pulse rounded-2xl border border-slate-800 bg-slate-900" />)}</div>
               </div>
             ) : (
               renderReadingPassages()
