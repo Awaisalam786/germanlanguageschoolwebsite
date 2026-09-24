@@ -931,90 +931,64 @@ export default function PracticeTests() {
 
       {/* ───── STEP 6: Result Screen ───── */}
       {step === 6 && testResult && (
-        <div className="max-w-5xl mx-auto w-full px-4 sm:px-6 py-8 sm:py-12 flex-1 animate-fade-in">
-          <section className="relative overflow-hidden rounded-3xl border border-slate-700/80 bg-gradient-to-br from-slate-900 via-slate-900 to-[#111d36] p-5 sm:p-8 lg:p-10 shadow-2xl shadow-black/30">
-            <div className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-emerald-400/10 blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-24 left-1/3 h-48 w-48 rounded-full bg-amber-400/10 blur-3xl" />
-
-            <div className="relative">
-              <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5 mb-8">
-                <div className={`w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center border ${testResult.userType === 'student' ? 'bg-emerald-400/10 border-emerald-400/30' : 'bg-amber-400/10 border-amber-400/30'}`}>
-                  <Trophy className={`w-7 h-7 ${testResult.userType === 'student' ? 'text-emerald-400' : 'text-amber-400'}`} />
-                </div>
-                <div className="min-w-0">
-                  <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-emerald-300 mb-1">
-                    <CheckCircle className="w-4 h-4" /> Test completed
-                  </span>
-                  <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white">Great work{testResult.userType === 'free' ? `, ${storedFreeUser?.name || 'Student'}` : ''}!</h2>
-                  <p className="mt-1 text-sm text-slate-400">{selectedMaterial?.title || selectedCategory || 'German practice'} <span className="text-slate-600">·</span> Level {selectedLevel}</p>
-                </div>
-              </div>
-
-              <div className="grid lg:grid-cols-5 gap-4 sm:gap-5">
-                <div className="lg:col-span-3 rounded-2xl border border-slate-700/80 bg-slate-950/45 p-5 sm:p-7">
-                  {testResult.isFallback || testResult.score === null ? (
-                    <div className="min-h-48 flex flex-col justify-center text-center">
-                      <p className="text-xl font-bold text-white">Your test has been submitted</p>
-                      <p className="text-slate-400 mt-2">Your score will be reviewed shortly.</p>
-                    </div>
-                  ) : (
-                    <div className="grid sm:grid-cols-[auto_1fr] items-center gap-6 sm:gap-8">
-                      <div className="mx-auto sm:mx-0 w-36 h-36 rounded-full p-[7px] shadow-lg shadow-emerald-950/30" style={{ background: `conic-gradient(${testResult.percentage >= 70 ? '#10b981' : testResult.percentage >= 50 ? '#f59e0b' : '#f87171'} ${testResult.percentage ?? 0}%, #1e293b 0)` }} role="progressbar" aria-label="Test accuracy" aria-valuemin={0} aria-valuemax={100} aria-valuenow={testResult.percentage ?? 0}>
-                        <div className="w-full h-full rounded-full bg-slate-950 flex flex-col items-center justify-center">
-                          <span className={`text-4xl font-extrabold tracking-tight ${testResult.percentage >= 70 ? 'text-emerald-400' : testResult.percentage >= 50 ? 'text-amber-400' : 'text-red-400'}`}>{testResult.percentage ?? 0}%</span>
-                          <span className="text-[11px] uppercase tracking-[0.16em] text-slate-500 font-bold">Accuracy</span>
-                        </div>
-                      </div>
-                      <div className="text-center sm:text-left">
-                        <p className="text-xs uppercase tracking-[0.2em] font-bold text-slate-400">Your score</p>
-                        <p className={`mt-1 text-5xl sm:text-6xl font-extrabold font-mono tracking-tight ${testResult.userType === 'student' ? 'text-emerald-400' : 'text-amber-400'}`}>
-                          {testResult.score}<span className="text-3xl text-slate-500"> / {testResult.totalMarks}</span>
-                        </p>
-                        <p className="mt-3 text-sm font-medium text-slate-300">
-                          {testResult.percentage >= 70 ? 'Excellent! You’re ready for the next level.' : testResult.percentage >= 50 ? 'Good effort! Keep practicing and you’ll improve.' : 'Keep studying — you’ll get there!'}
-                        </p>
-                        <div className="mt-4 h-2.5 w-full overflow-hidden rounded-full bg-slate-800 ring-1 ring-slate-700" aria-hidden="true">
-                          <div className={`h-full rounded-full transition-all duration-1000 ${testResult.percentage >= 70 ? 'bg-emerald-400' : testResult.percentage >= 50 ? 'bg-amber-400' : 'bg-red-400'}`} style={{ width: `${testResult.percentage ?? 0}%` }} />
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                <div className="lg:col-span-2 rounded-2xl border border-slate-700/80 bg-slate-950/45 p-5 sm:p-6 flex flex-col justify-center">
-                  <p className="text-xs uppercase tracking-[0.18em] font-bold text-slate-500 mb-4">Test summary</p>
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between gap-3 border-b border-slate-800 pb-3">
-                      <span className="text-sm text-slate-400">Level</span><span className="text-sm font-bold text-white">{selectedLevel || '—'}</span>
-                    </div>
-                    <div className="flex items-center justify-between gap-3 border-b border-slate-800 pb-3">
-                      <span className="text-sm text-slate-400">Practice</span><span className="text-sm font-bold text-white text-right">{selectedCategory || selectedMaterial?.title || 'German'}</span>
-                    </div>
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-sm text-slate-400">Status</span><span className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-300"><CheckCircle className="w-3.5 h-3.5" /> Completed</span>
-                    </div>
+        <main className="mx-auto flex w-full max-w-5xl flex-1 animate-fade-in items-center px-4 py-8 sm:px-6 sm:py-12">
+          <section aria-labelledby="practice-result-title" className="relative isolate w-full overflow-hidden rounded-3xl border border-slate-700/80 bg-[#0b1224] shadow-2xl shadow-black/40">
+            <div aria-hidden="true" className="pointer-events-none absolute -right-20 -top-28 -z-10 h-72 w-72 rounded-full bg-emerald-400/10 blur-3xl" />
+            <div aria-hidden="true" className="pointer-events-none absolute -bottom-32 left-1/3 -z-10 h-64 w-64 rounded-full bg-amber-400/[0.08] blur-3xl" />
+            <div className="border-b border-slate-800/90 bg-gradient-to-r from-slate-900/95 via-slate-900/80 to-[#111c32]/80 px-5 py-5 sm:px-8 sm:py-6">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex min-w-0 items-center gap-4">
+                  <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border ${testResult.userType === 'student' ? 'border-emerald-400/25 bg-emerald-400/10' : 'border-amber-400/25 bg-amber-400/10'}`}><Trophy className={`h-6 w-6 ${testResult.userType === 'student' ? 'text-emerald-300' : 'text-amber-300'}`} /></div>
+                  <div className="min-w-0">
+                    <div className="mb-1 inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-emerald-300"><CheckCircle className="h-3.5 w-3.5" /> Test completed</div>
+                    <h1 id="practice-result-title" className="truncate text-2xl font-extrabold tracking-tight text-white sm:text-3xl">Great work{testResult.userType === 'free' ? `, ${storedFreeUser?.name || 'Student'}` : ''}!</h1>
                   </div>
-                  {testResult.userType === 'student' && (
-                    <div className="mt-5 inline-flex items-center gap-2 rounded-xl border border-emerald-500/25 bg-emerald-500/10 px-3 py-2.5 text-xs font-semibold text-emerald-300">
-                      <CheckCircle className="w-4 h-4 shrink-0" /> Results saved — your teacher can view your score
-                    </div>
-                  )}
                 </div>
-              </div>
-
-              <div className="mt-6 flex flex-col sm:flex-row justify-center gap-3 max-w-xl mx-auto">
-                {testResult.userType === 'free' && (
-                  <Link href="/dashboard" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold rounded-xl shadow-lg shadow-amber-950/20 transition-all hover:-translate-y-0.5">
-                    View My Progress <ArrowRight className="w-4 h-4" />
-                  </Link>
-                )}
-                <button onClick={() => { resetTestSession(); setStep(4); }} className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white font-bold rounded-xl transition-all hover:-translate-y-0.5">
-                  Take Another Test <ArrowRight className="w-4 h-4" />
-                </button>
+                <div className="flex flex-wrap gap-2 sm:justify-end">
+                  <span className="rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1.5 text-xs font-semibold text-slate-300">Level {selectedLevel || '—'}</span>
+                  <span className="max-w-full truncate rounded-full border border-slate-700 bg-slate-950/70 px-3 py-1.5 text-xs font-semibold text-slate-300">{selectedMaterial?.title || selectedCategory || 'German practice'}</span>
+                </div>
               </div>
             </div>
+            <div className="grid gap-4 p-4 sm:gap-5 sm:p-6 lg:grid-cols-12 lg:p-7">
+              <section aria-label="Your score and accuracy" className="rounded-2xl border border-slate-700/80 bg-gradient-to-br from-slate-900/95 to-slate-900/50 p-5 sm:p-7 lg:col-span-7">
+                {testResult.isFallback || testResult.score === null ? (
+                  <div className="flex min-h-48 flex-col items-center justify-center text-center">
+                    <span className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-full bg-emerald-400/10 text-emerald-300"><CheckCircle className="h-6 w-6" /></span>
+                    <p className="text-xl font-bold text-white">Your test has been submitted</p>
+                    <p className="mt-2 max-w-sm text-sm leading-relaxed text-slate-400">Your answers are being reviewed. Your score will appear here when it’s ready.</p>
+                  </div>
+                ) : (
+                  <div className="grid items-center gap-6 sm:grid-cols-[auto_1fr] sm:gap-8">
+                    <div className="mx-auto h-32 w-32 rounded-full p-[6px] shadow-lg shadow-emerald-950/30 sm:mx-0 sm:h-36 sm:w-36" style={{ background: `conic-gradient(${testResult.percentage >= 70 ? '#34d399' : testResult.percentage >= 50 ? '#fbbf24' : '#f87171'} ${Math.max(0, Math.min(100, testResult.percentage ?? 0))}%, #263247 0)` }} role="progressbar" aria-label="Test accuracy" aria-valuemin={0} aria-valuemax={100} aria-valuenow={testResult.percentage ?? 0}>
+                      <div className="flex h-full w-full flex-col items-center justify-center rounded-full bg-[#0b1224]"><span className={`text-4xl font-extrabold tracking-tight ${testResult.percentage >= 70 ? 'text-emerald-300' : testResult.percentage >= 50 ? 'text-amber-300' : 'text-rose-300'}`}>{testResult.percentage ?? 0}%</span><span className="mt-0.5 text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">Accuracy</span></div>
+                    </div>
+                    <div className="min-w-0 text-center sm:text-left">
+                      <p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Your score</p>
+                      <p className={`mt-1 text-5xl font-extrabold tabular-nums tracking-tight sm:text-6xl ${testResult.userType === 'student' ? 'text-emerald-300' : 'text-amber-300'}`}>{testResult.score}<span className="ml-1 text-2xl font-semibold text-slate-500">/ {testResult.totalMarks}</span></p>
+                      <p className="mt-3 text-sm leading-relaxed text-slate-300">{testResult.percentage >= 70 ? 'Excellent result — you’re ready for the next challenge.' : testResult.percentage >= 50 ? 'Good progress — keep practicing to build confidence.' : 'Every attempt helps you improve. Keep going!'}</p>
+                      <div className="mt-5 h-2.5 w-full overflow-hidden rounded-full bg-slate-800 ring-1 ring-slate-700/80" aria-hidden="true"><div className={`h-full rounded-full transition-all duration-1000 ${testResult.percentage >= 70 ? 'bg-gradient-to-r from-emerald-500 to-emerald-300' : testResult.percentage >= 50 ? 'bg-gradient-to-r from-amber-500 to-amber-300' : 'bg-gradient-to-r from-rose-500 to-rose-300'}`} style={{ width: `${Math.max(0, Math.min(100, testResult.percentage ?? 0))}%` }} /></div>
+                      <div className="mt-2 flex justify-between text-[11px] font-medium text-slate-500"><span>Keep learning</span><span>{testResult.percentage ?? 0}% complete</span></div>
+                    </div>
+                  </div>
+                )}
+              </section>
+              <aside aria-label="Test summary" className="rounded-2xl border border-slate-700/80 bg-slate-900/65 p-5 sm:p-6 lg:col-span-5">
+                <div className="mb-4 flex items-center justify-between"><h2 className="text-xs font-bold uppercase tracking-[0.18em] text-slate-400">Test summary</h2><span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-emerald-300"><span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> Complete</span></div>
+                <dl className="divide-y divide-slate-800/90">
+                  <div className="flex items-center justify-between gap-3 py-3"><dt className="text-sm text-slate-400">Level</dt><dd className="text-sm font-bold text-white">{selectedLevel || '—'}</dd></div>
+                  <div className="flex items-start justify-between gap-3 py-3"><dt className="shrink-0 text-sm text-slate-400">Practice</dt><dd className="text-right text-sm font-semibold text-white">{selectedMaterial?.title || selectedCategory || 'German practice'}</dd></div>
+                  <div className="flex items-center justify-between gap-3 py-3"><dt className="text-sm text-slate-400">Learner</dt><dd className="max-w-[60%] truncate text-right text-sm font-semibold text-white">{testResult.userType === 'free' ? (storedFreeUser?.name || 'Free learner') : (studentName || 'Student')}</dd></div>
+                </dl>
+                {testResult.userType === 'student' && <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-emerald-400/20 bg-emerald-400/[0.07] px-3.5 py-3 text-xs leading-relaxed text-emerald-200"><CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" /> Your result has been saved for your teacher.</div>}
+              </aside>
+            </div>
+            <div className="flex flex-col-reverse gap-3 border-t border-slate-800/90 bg-slate-950/25 px-4 py-4 sm:flex-row sm:justify-end sm:px-6 sm:py-5 lg:px-7">
+              <button onClick={() => { resetTestSession(); setStep(4); }} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-800 px-5 py-3 text-sm font-bold text-white transition hover:border-slate-600 hover:bg-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400">Take Another Test <ArrowRight className="h-4 w-4" /></button>
+              {testResult.userType === 'free' && <Link href="/dashboard" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-amber-400 px-5 py-3 text-sm font-extrabold text-slate-950 shadow-lg shadow-amber-950/20 transition hover:-translate-y-0.5 hover:bg-amber-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-200">View My Progress <ArrowRight className="h-4 w-4" /></Link>}
+            </div>
           </section>
-        </div>
+        </main>
       )}
 
       {/* Level-Specific Practice Tests & Course Navigation */}
