@@ -65,7 +65,7 @@ export default function About({ currentLang, setActiveTab }) {
         <div className="text-center max-w-2xl mx-auto space-y-2">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-white">Academic Leadership &amp; Faculty</h2>
           <p className="text-sm text-slate-400">
-            Meet the experienced educators and leadership guiding students across Pakistan toward German fluency.
+            Learn about the founder and the teaching team behind our live online German classes for students in Pakistan.
           </p>
         </div>
 

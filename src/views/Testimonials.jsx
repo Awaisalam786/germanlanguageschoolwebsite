@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Star, Quote, Award, CheckCircle, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
+import { withoutSampleTestimonials } from '../lib/sampleContent';
 
 export default function Testimonials({ currentLang, setActiveTab }) {
   const [testimonials, setTestimonials] = useState([]);
@@ -10,7 +11,7 @@ export default function Testimonials({ currentLang, setActiveTab }) {
   useEffect(() => {
     const fetchTestimonials = async () => {
       const { data } = await supabase.from('testimonials').select('*').order('created_at', { ascending: false });
-      if (data) setTestimonials(data);
+      if (data) setTestimonials(withoutSampleTestimonials(data));
       setLoading(false);
     };
     fetchTestimonials();
@@ -24,7 +25,7 @@ export default function Testimonials({ currentLang, setActiveTab }) {
         </span>
         <h1 className="text-4xl font-extrabold text-white">What Our Graduates Say</h1>
         <p className="text-sm text-slate-300">
-          Discover how German Learning School helped students across Pakistan land jobs, pass university entrance exams, and settle in Germany.
+          Feedback from German Learning School students across Pakistan.
         </p>
       </div>
 
@@ -33,6 +34,10 @@ export default function Testimonials({ currentLang, setActiveTab }) {
           <div className="col-span-full text-center text-slate-400 py-12 flex flex-col items-center">
             <Loader2 className="w-8 h-8 text-amber-500 animate-spin mb-4" />
             Loading testimonials...
+          </div>
+        ) : testimonials.length === 0 ? (
+          <div className="col-span-full text-center py-12 text-slate-400">
+            Student testimonials are being collected and will be published here with students&apos; permission.
           </div>
         ) : testimonials.map((t) => (
           <div 
@@ -54,13 +59,23 @@ export default function Testimonials({ currentLang, setActiveTab }) {
             </div>
 
             <div className="pt-6 mt-6 border-t border-slate-800 flex items-center gap-3">
-              <Image
-                src={t.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&q=80'}
-                alt={t.name}
-                width={48}
-                height={48}
-                className="w-12 h-12 rounded-full object-cover border border-amber-500/40 shrink-0"
-              />
+              {t.avatar ? (
+                <Image
+                  src={t.avatar}
+                  alt={t.name}
+                  width={48}
+                  height={48}
+                  className="w-12 h-12 rounded-full object-cover border border-amber-500/40 shrink-0"
+                />
+              ) : (
+                // No stock-photo fallback for real students: show their initial.
+                <div
+                  aria-hidden="true"
+                  className="w-12 h-12 rounded-full border border-amber-500/40 bg-slate-800 text-amber-400 font-bold flex items-center justify-center shrink-0"
+                >
+                  {(t.name || '?').trim().charAt(0).toUpperCase()}
+                </div>
+              )}
               <div className="text-xs">
                 <div className="font-bold text-white">{t.name}</div>
                 <div className="text-amber-400 font-medium">{t.role || 'Alumni'}</div>

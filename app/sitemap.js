@@ -1,4 +1,5 @@
 import { supabase } from '../src/lib/supabaseClient';
+import { CONTENT_GATED_ROUTES, hasGenuineContent } from '../src/lib/publicContent';
 
 export const revalidate = 3600; // Regenerate sitemap hourly so newly published blog posts get added automatically
 
@@ -35,9 +36,23 @@ export default async function sitemap() {
     '/founder',
     '/books',
     '/resources'
-  ].map((route) => ({
-    url: `${baseUrl}${route}`
-  }));
+  ];
+
+  // /teachers, /gallery, /books and /testimonials are listed only while they
+  // have genuine content (same check as their noindex metadata). If the check
+  // fails the URL stays in, as before.
+  const emptyRoutes = new Set();
+  await Promise.all(
+    CONTENT_GATED_ROUTES.map(async (route) => {
+      if ((await hasGenuineContent(route)) === false) emptyRoutes.add(route);
+    })
+  );
+
+  const staticRouteEntries = staticRoutes
+    .filter((route) => !emptyRoutes.has(route))
+    .map((route) => ({
+      url: `${baseUrl}${route}`
+    }));
 
   let blogRoutes = [];
   try {
@@ -60,5 +75,5 @@ export default async function sitemap() {
     console.error('Error fetching blog posts for sitemap:', error);
   }
 
-  return [...staticRoutes, ...blogRoutes];
+  return [...staticRouteEntries, ...blogRoutes];
 }

@@ -47,25 +47,40 @@ export default function FAQ({ currentLang, setActiveTab }) {
               key={idx}
               className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden transition-all duration-200"
             >
-              <button
-                onClick={() => setOpenIdx(isOpen ? null : idx)}
-                className="w-full p-5 text-left flex items-center justify-between gap-4 font-bold text-sm text-white hover:text-amber-400"
-              >
-                <div className="flex items-center gap-3">
-                  <HelpCircle className="w-5 h-5 text-amber-400 shrink-0" />
-                  <span>{faq.q}</span>
-                </div>
-                {isOpen ? <ChevronUp className="w-5 h-5 text-amber-400 shrink-0" /> : <ChevronDown className="w-5 h-5 text-slate-500 shrink-0" />}
-              </button>
+              {/* Question as a heading wrapping the toggle button (accessible
+                  accordion pattern), so the page has a real H2 per question. */}
+              <h2>
+                <button
+                  type="button"
+                  id={`faq-q-${idx}`}
+                  aria-expanded={isOpen}
+                  aria-controls={`faq-a-${idx}`}
+                  onClick={() => setOpenIdx(isOpen ? null : idx)}
+                  className="w-full p-5 text-left flex items-center justify-between gap-4 font-bold text-sm text-white hover:text-amber-400"
+                >
+                  <div className="flex items-center gap-3">
+                    <HelpCircle className="w-5 h-5 text-amber-400 shrink-0" />
+                    <span>{faq.q}</span>
+                  </div>
+                  {isOpen ? <ChevronUp className="w-5 h-5 text-amber-400 shrink-0" /> : <ChevronDown className="w-5 h-5 text-slate-500 shrink-0" />}
+                </button>
+              </h2>
 
-              {isOpen && (
-                <div className="px-5 pb-5 pt-1 text-xs text-slate-300 border-t border-slate-800/80 leading-relaxed space-y-2">
+              {/* Every answer stays in the HTML (hidden until opened) so the
+                  visible page matches the FAQPage structured data and answer
+                  engines can read all of it. */}
+              <div
+                id={`faq-a-${idx}`}
+                role="region"
+                aria-labelledby={`faq-q-${idx}`}
+                hidden={!isOpen}
+                className="px-5 pb-5 pt-1 text-xs text-slate-300 border-t border-slate-800/80 leading-relaxed space-y-2"
+              >
                   <span className="inline-block px-2 py-0.5 rounded bg-slate-950 text-amber-400 text-[10px] font-bold border border-slate-800">
                     Category: {faq.category}
                   </span>
                   <p className="prose-a:text-amber-400 hover:prose-a:underline" dangerouslySetInnerHTML={{ __html: faq.a }} />
-                </div>
-              )}
+              </div>
             </div>
           );
         })}

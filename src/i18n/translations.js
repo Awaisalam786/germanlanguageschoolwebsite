@@ -132,7 +132,7 @@ export const translations = {
       ],
     },
     courses: {
-      title: 'Online Deutschkurse (A1 bis C2)',
+      title: 'Online Deutschkurse (A1 bis B2)',
       subtitle: 'Strukturierter Unterricht abgestimmt auf Goethe-Institut, TestDaF, telc und ÖSD Prüfungen.',
       viewDetails: 'Details Ansehen',
       duration: 'Dauer',
@@ -228,7 +228,7 @@ export const translations = {
       ],
     },
     courses: {
-      title: 'آن لائن جرمن زبان کے لیولز (A1 سے C2)',
+      title: 'آن لائن جرمن زبان کے لیولز (A1 سے B2)',
       subtitle: 'گوئٹے، ٹیسٹ ڈاف، ٹیلک اور ÖSD کے امتحانات کے مطابق لائیو آن لائن کلاسز۔',
       viewDetails: 'تفصیلات دیکھیں',
       duration: 'دورانیہ',

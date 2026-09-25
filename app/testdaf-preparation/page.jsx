@@ -154,6 +154,9 @@ export default function TestDaFPreparation() {
             {/* H2: TestDaF Preparation in Pakistan (Overview & Distinction) */}
             <section className="bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-4 shadow-xl">
               <h2 className="text-2xl sm:text-3xl font-extrabold text-white">TestDaF Preparation in Pakistan</h2>
+              <p className="text-slate-200 leading-relaxed text-sm sm:text-base">
+                <strong className="text-white">Short answer:</strong> TestDaF is an academic German exam for applicants to degree programmes taught in German. Results are reported for each of its four sections, and TDN 4 in all four is the usual requirement for direct admission to most German universities. Start preparing once you are around B2 level, and register through a licensed TestDaF test centre.
+              </p>
               <p className="text-slate-300 leading-relaxed text-sm sm:text-base">
                 TestDaF (Test Deutsch als Fremdsprache) is a standardized academic language proficiency examination developed by the TestDaF-Institut. It is primarily designed for international applicants who intend to pursue degree programs taught in German at German higher education institutions (Universitäten and Fachhochschulen).
               </p>

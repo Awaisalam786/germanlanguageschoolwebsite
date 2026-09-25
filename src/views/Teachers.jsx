@@ -2,18 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { ShieldCheck, Mail, BookOpen, Award, Star, Calendar, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
-
-// Sample profiles from supabase/seed_data.sql (fictional names, invented
-// credentials, Unsplash stock photos). They are still present in the live
-// `teachers` table, so they are filtered out here and never shown as real
-// staff. Delete them in Admin -> Teachers; this list can then be removed.
-const SAMPLE_TEACHER_NAMES = new Set([
-  'Prof. Dr. Michael Weber',
-  'Miss Fatima Noor',
-  'Sir Ahmed Shah',
-]);
-const withoutSampleProfiles = (list) =>
-  (list || []).filter((t) => !SAMPLE_TEACHER_NAMES.has((t?.name || '').trim()));
+import { withoutSampleTeachers as withoutSampleProfiles } from '../lib/sampleContent';
 
 export default function Teachers({ currentLang, onOpenTrialModal, initialTeachers = null }) {
   const [teachers, setTeachers] = useState(withoutSampleProfiles(initialTeachers));

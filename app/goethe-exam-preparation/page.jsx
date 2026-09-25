@@ -154,6 +154,9 @@ export default function GoetheExamPreparation() {
             {/* H2: Goethe Exam Preparation in Pakistan (Overview & Distinction) */}
             <section className="bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-4 shadow-xl">
               <h2 className="text-2xl sm:text-3xl font-extrabold text-white">Goethe Exam Preparation in Pakistan</h2>
+              <p className="text-slate-200 leading-relaxed text-sm sm:text-base">
+                <strong className="text-white">Short answer:</strong> To prepare for a Goethe-Zertifikat exam from Pakistan, first confirm the level your visa, university or employer asks for (A1–B2), then practise all four modules — Lesen, Hören, Schreiben and Sprechen — under timed conditions. Register for the official exam with the Goethe-Institut; German Learning School provides preparation only.
+              </p>
               <p className="text-slate-300 leading-relaxed text-sm sm:text-base">
                 The Goethe-Zertifikat is the gold standard for certifying German language proficiency worldwide. Recognized by the German Federal Foreign Office (Auswärtiges Amt), universities, and medical licensing boards, it serves as formal verification of your linguistic ability.
               </p>

@@ -73,7 +73,7 @@ export default function Navbar({
   const aboutMenuItems = [
     { id: 'about', label: t.nav.about, icon: Users, desc: 'Our mission & 100% online model' },
     { id: 'founder', label: t.nav.founder, icon: UserCheck, desc: 'Founder & head mentor profile' },
-    { id: 'teachers', label: t.nav.teachers, icon: ShieldCheck, desc: 'Native German & Pakistani faculty' },
+    { id: 'teachers', label: t.nav.teachers, icon: ShieldCheck, desc: 'Our teaching team' },
   ];
 
   // Dropdown 2: Resources Group

@@ -5,6 +5,7 @@ import { Clock, Calendar, CheckCircle2, ArrowRight, BookOpen, GraduationCap, Shi
 import CourseLevelClientWrapper from './CourseLevelClientWrapper';
 import { levelData } from '../lib/seoLevelData';
 import SchemaMarkup from './SchemaMarkup';
+import { ORGANIZATION_REF } from '../lib/seo';
 
 export default async function CourseLevelPage({ level }) {
   // Fetch actual course data for this level
@@ -48,11 +49,7 @@ export default async function CourseLevelPage({ level }) {
     "@type": "Course",
     "name": content.h1,
     "description": content.overview,
-    "provider": {
-      "@type": "Organization",
-      "name": "German Learning School",
-      "sameAs": "https://germanlearningschool.com"
-    },
+    "provider": ORGANIZATION_REF,
     ...(course?.price ? {
       "offers": {
         "@type": "Offer",
@@ -316,7 +313,7 @@ export default async function CourseLevelPage({ level }) {
               <ul className="space-y-4 text-sm text-slate-300">
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0" />
-                  <span>Experienced German language instructors with proven track records</span>
+                  <span>Live classes taught by German language instructors</span>
                 </li>
                 <li className="flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0" />

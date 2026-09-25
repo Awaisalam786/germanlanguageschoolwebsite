@@ -58,7 +58,7 @@ export default function TrialClassModal({ isOpen, onClose, currentLang }) {
 
             <h3 className="text-xl font-extrabold text-white mb-1">Book a Free Live Trial Class</h3>
             <p className="text-xs text-slate-400 mb-6">
-              Experience our interactive communicative methodology with native certified instructors.
+              Experience our interactive communicative methodology in a live online class.
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">

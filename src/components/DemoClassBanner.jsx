@@ -21,7 +21,7 @@ export default function DemoClassBanner({ onOpenTrialModal }) {
           </h3>
 
           <p className="text-xs sm:text-sm text-slate-300 font-normal leading-relaxed">
-            Join a 30-minute live demonstration session to see how our native German and Pakistani faculty explain German grammar using interactive smartboards.
+            Join a 30-minute live demonstration session to see how our instructors explain German grammar using interactive smartboards.
           </p>
         </div>
 

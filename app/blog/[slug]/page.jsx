@@ -3,9 +3,14 @@ import BlogPostClient from '../../../src/views/BlogPost';
 import SchemaMarkup from '../../../src/components/SchemaMarkup';
 import { notFound } from 'next/navigation';
 import { normalizeBlogContentHeadings } from '../../../src/lib/blogContent';
-import { DEFAULT_OG_IMAGE } from '../../../src/lib/seo';
+import { DEFAULT_OG_IMAGE, ORGANIZATION_REF, SITE_NAME } from '../../../src/lib/seo';
 
 export const revalidate = 60; // Revalidate cache every 60 seconds
+
+const isTeamAuthor = (author) => {
+  const name = (author || '').trim();
+  return !name || name === `${SITE_NAME} Team`;
+};
 
 export async function generateMetadata({ params }) {
   const resolvedParams = await params;
@@ -95,14 +100,13 @@ export default async function BlogPostPage({ params }) {
     "image": post.image ? [post.image] : [],
     "datePublished": post.created_at,
     "dateModified": post.created_at,
-    "author": {
-      "@type": "Person",
-      "name": post.author || "German Learning School Team"
-    },
+    // "German Learning School Team" (the default byline) is the school itself,
+    // not a person, so it points at the Organization entity.
+    "author": isTeamAuthor(post.author)
+      ? ORGANIZATION_REF
+      : { "@type": "Person", "name": post.author.trim() },
     "publisher": {
-      "@type": "Organization",
-      "name": "German Learning School",
-      "url": "https://germanlearningschool.com",
+      ...ORGANIZATION_REF,
       "logo": {
         "@type": "ImageObject",
         "url": "https://germanlearningschool.com/logo.png"

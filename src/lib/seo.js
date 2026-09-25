@@ -16,6 +16,18 @@
 
 export const SITE_NAME = 'German Learning School';
 
+// Stable JSON-LD identifier for the school. The full EducationalOrganization
+// node is output once in app/layout.jsx; Course, Article and WebSite schema
+// reference it by this @id so search engines see one connected entity.
+export const ORGANIZATION_ID = 'https://germanlearningschool.com/#organization';
+
+export const ORGANIZATION_REF = {
+  '@type': 'EducationalOrganization',
+  '@id': ORGANIZATION_ID,
+  name: SITE_NAME,
+  url: 'https://germanlearningschool.com',
+};
+
 export const DEFAULT_OG_IMAGE = {
   url: '/opengraph-image.png',
   width: 1200,

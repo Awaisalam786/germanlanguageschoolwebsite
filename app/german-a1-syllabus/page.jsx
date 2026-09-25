@@ -615,14 +615,14 @@ export default function GermanA1SyllabusPage() {
           </div>
 
           <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-            If you want structured guidance to master the complete syllabus with certified instructors, enroll in our live online <Link href="/courses/german-a1" className="text-amber-400 hover:underline font-semibold">German A1 course</Link> featuring real-time interactive Zoom classes:
+            If you want structured guidance to master the complete syllabus, enroll in our live online <Link href="/courses/german-a1" className="text-amber-400 hover:underline font-semibold">German A1 course</Link> featuring real-time interactive Zoom classes:
           </p>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 text-xs sm:text-sm">
             <div className="p-5 bg-slate-950/70 border border-slate-800 rounded-2xl space-y-2">
               <h3 className="font-bold text-white text-base">Live Interactive Zoom Classes</h3>
               <p className="text-slate-400 leading-relaxed">
-                Attend live lectures with experienced instructors, ask questions in real time, and practice speaking in a supportive classroom environment.
+                Attend live lectures with our instructors, ask questions in real time, and practice speaking in a supportive classroom environment.
               </p>
             </div>
 

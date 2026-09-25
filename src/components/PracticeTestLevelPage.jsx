@@ -318,7 +318,7 @@ export default function PracticeTestLevelPage({ level }) {
             <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-2 text-xs">
               <span className="text-amber-400 font-bold block">Need structured guidance?</span>
               <p className="text-slate-400">
-                Join our certified faculty in live online Zoom batches designed to prepare you for official CEFR examinations.
+                Join our live online Zoom batches designed to prepare you for official CEFR examinations.
               </p>
               <Link
                 href={`/courses/german-${level.toLowerCase()}`}

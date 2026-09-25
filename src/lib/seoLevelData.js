@@ -1,7 +1,7 @@
 export const levelData = {
   'A1': {
     h1: 'German A1 Course in Pakistan',
-    intro: 'Start your German language journey with our German A1 course in Pakistan, tailored for absolute beginners. Learn foundational German grammar, everyday vocabulary, and conversational speaking through live online Zoom classes led by experienced instructors. Prepare confidently for the Goethe-Zertifikat A1 exam from Karachi, Lahore, Islamabad, or anywhere across Pakistan.',
+    intro: 'Start your German language journey with our German A1 course in Pakistan, tailored for absolute beginners. Learn foundational German grammar, everyday vocabulary, and conversational speaking through live online Zoom classes taught live by our instructors. Prepare confidently for the Goethe-Zertifikat A1 exam from Karachi, Lahore, Islamabad, or anywhere across Pakistan.',
     overview: 'Our German A1 course in Pakistan provides a comprehensive, structured starting point for learning the German language from scratch according to the official CEFR (Common European Framework of Reference for Languages) standard. This course is specially designed for Pakistani students planning higher education in Germany, professionals preparing for German job markets, and spouses seeking a German Family Reunion Visa (Ehegattennachzug). Through interactive live classes, you will develop balanced competence in all four language competencies: listening (Hören), reading (Lesen), writing (Schreiben), and speaking (Sprechen).',
     learningPoints: [
       'Accurate German pronunciation, alphabet, and phonetics',
@@ -152,7 +152,7 @@ export const levelData = {
       },
       {
         q: 'How are the B2 classes delivered?',
-        a: 'Classes are conducted live online via Zoom with experienced instructors. You receive interactive speaking practice, comprehensive study materials, recorded sessions, and detailed feedback on written assignments.'
+        a: 'Classes are conducted live online via Zoom with our instructors. You receive interactive speaking practice, comprehensive study materials, recorded sessions, and detailed feedback on written assignments.'
       },
       {
         q: 'Can I test my German B2 knowledge online?',

@@ -16,7 +16,12 @@ export default function CertificateShowcase() {
       // Fetch certificates
       const { data: certData } = await supabase.from('certificates').select('*').eq('verified', true).order('issue_date', { ascending: false });
       if (certData) {
-        const mapped = certData.map(c => ({
+        // The sample rows from supabase/seed_data.sql use Unsplash stock photos
+        // instead of certificate scans and must never be shown as real student
+        // certificates. A genuine certificate is always an uploaded scan, so
+        // stock-photo rows are skipped. Delete those rows in Admin -> Certificates.
+        const genuine = certData.filter(c => !/images\.unsplash\.com/i.test(c.image_url || ''));
+        const mapped = genuine.map(c => ({
           studentName: c.student_name,
           congratsTitle: c.congrats_title,
           examBody: c.exam_body,
@@ -75,10 +80,10 @@ export default function CertificateShowcase() {
             <span>Student Certificates • Protected Original Documents</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white">
-            Real Student Certificate Showcase
+            Student Certificate Showcase
           </h2>
           <p className="text-sm text-slate-300">
-            Official Goethe-Zertifikat, telc, and ÖSD certificates achieved by our Pakistani online students.
+            German exam certificates achieved by our online students in Pakistan.
           </p>
         </div>
 

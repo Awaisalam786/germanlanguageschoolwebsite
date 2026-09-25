@@ -99,6 +99,9 @@ export default function Courses({ currentLang, setActiveTab, onOpenTrialModal, i
           <h2 className="text-2xl font-bold text-white">
             German Language Course Levels &amp; Progression Roadmap
           </h2>
+          <p className="text-sm text-slate-200 leading-relaxed">
+            <strong className="text-white">Short answer:</strong> Complete beginners start with German A1. German Learning School teaches four CEFR levels in order — A1, A2, B1 and B2 — in live online Zoom classes. A1 and A2 take about 6–8 weeks each, B1 about 8–10 weeks and B2 about 10–12 weeks, so reaching B2 from zero typically means 30–38 weeks of classes.
+          </p>
           <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
             Our live online German courses follow the structured Common European Framework of Reference for Languages (CEFR). Each level builds foundational to advanced language competencies through live interactive Zoom sessions, recorded lecture archives, and targeted preparation for official Goethe-Zertifikat and telc exams.
           </p>
@@ -187,6 +190,12 @@ export default function Courses({ currentLang, setActiveTab, onOpenTrialModal, i
           </Link>
           <Link href="/telc-exam-preparation" className="inline-block px-6 py-2 bg-slate-900 border border-slate-800 hover:border-emerald-500/50 text-emerald-400 rounded-full text-sm font-bold transition-all">
             telc Exam Preparation Hub
+          </Link>
+          <Link href="/testdaf-preparation" className="inline-block px-6 py-2 bg-slate-900 border border-slate-800 hover:border-emerald-500/50 text-emerald-400 rounded-full text-sm font-bold transition-all">
+            TestDaF Preparation
+          </Link>
+          <Link href="/practice-tests" className="inline-block px-6 py-2 bg-slate-900 border border-slate-800 hover:border-emerald-500/50 text-emerald-400 rounded-full text-sm font-bold transition-all">
+            Free German Practice Tests
           </Link>
         </div>
       </div>

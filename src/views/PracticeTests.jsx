@@ -602,10 +602,12 @@ export default function PracticeTests() {
       {step === 1 && (
         <div className="max-w-3xl mx-auto space-y-8 animate-fade-in mt-12">
           <div className="text-center space-y-3">
-            <span className="px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/30">
-              Interactive Practice Tests
-            </span>
-            <h1 className="text-4xl font-extrabold text-white">Before You Begin</h1>
+            {/* Page H1 (this is the step the server renders for /practice-tests).
+                Styled as the existing pill so the design is unchanged. */}
+            <h1 className="inline-block px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/30">
+              Free German Practice Tests (A1–B2)
+            </h1>
+            <h2 className="text-4xl font-extrabold text-white">Before You Begin</h2>
             <p className="text-sm text-slate-300">Choose how you want to track your progress.</p>
           </div>
 
@@ -1410,7 +1412,7 @@ export default function PracticeTests() {
         {/* Course CTA Banner */}
         <div className="p-6 bg-slate-900/80 border border-slate-800 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-center sm:text-left">
-            <h3 className="text-base font-bold text-white">Need structured lessons with certified teachers?</h3>
+            <h3 className="text-base font-bold text-white">Need structured lessons with a live teacher?</h3>
             <p className="text-xs text-slate-400 mt-0.5">Live online Zoom batches covering A1 to B2 with exam preparation and personalized feedback.</p>
           </div>
           <Link

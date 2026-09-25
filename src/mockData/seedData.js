@@ -547,7 +547,7 @@ export const initialFaqs = [
   {
     category: 'Goethe & Visa Exams',
     q: 'Are your courses aligned with Goethe, telc, and ÖSD exams?',
-    a: 'Yes. Our curriculum is aligned with the official CEFR frameworks of the Goethe-Zertifikat, telc, and ÖSD examination standards required for German Embassy visa applications in Islamabad and Karachi. We provide targeted preparation so students can clear the official exam bodies on their first attempt.'
+    a: 'Yes. Our curriculum is aligned with the official CEFR frameworks of the Goethe-Zertifikat, telc, and ÖSD examination standards required for German Embassy visa applications in Islamabad and Karachi. We provide targeted preparation for these official exams.'
   },
   {
     category: 'Enrollment & Fees',
@@ -567,7 +567,7 @@ export const initialFaqs = [
   {
     category: 'Goethe & Visa Exams',
     q: 'How do your courses prepare students for official Goethe-Zertifikat and telc exams?',
-    a: 'Our courses provide module-by-module preparation for Reading (Lesen), Listening (Hören), Writing (Schreiben), and Speaking (Sprechen). Students practice with authentic timed mock exams, letter-writing evaluation, and oral exam drills under our dedicated <a href="/goethe-exam-preparation" class="text-amber-400 hover:underline font-semibold">Goethe exam preparation</a> module to ensure high first-attempt pass rates.'
+    a: 'Our courses provide module-by-module preparation for Reading (Lesen), Listening (Hören), Writing (Schreiben), and Speaking (Sprechen). Students practice with authentic timed mock exams, letter-writing evaluation, and oral exam drills under our dedicated <a href="/goethe-exam-preparation" class="text-amber-400 hover:underline font-semibold">Goethe exam preparation</a> module.'
   },
   {
     category: '100% Online Classes',

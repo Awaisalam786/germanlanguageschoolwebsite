@@ -26,7 +26,7 @@ export default function HowOnlineWorks({ setActiveTab, onOpenTrialModal }) {
             title: 'Live Interactive Zoom Classes',
             desc: (
               <>
-                Join live HD sessions with native German &amp; certified Pakistani teachers. Speak, practice dialogues, and explore our structured <Link href="/courses" className="text-amber-400 hover:underline font-medium">A1–B2 German courses</Link> in real-time.
+                Join live HD sessions with our German language instructors. Speak, practice dialogues, and explore our structured <Link href="/courses" className="text-amber-400 hover:underline font-medium">A1–B2 German courses</Link> in real-time.
               </>
             )
           },
@@ -48,7 +48,7 @@ export default function HowOnlineWorks({ setActiveTab, onOpenTrialModal }) {
             title: 'Goethe Exam Mock Drills',
             desc: (
               <>
-                Rigorous mock exams under realistic time limits with individual examiner feedback as part of our targeted <Link href="/goethe-exam-preparation" className="text-amber-400 hover:underline font-medium">Goethe exam preparation</Link>.
+                Rigorous mock exams under realistic time limits with individual feedback as part of our targeted <Link href="/goethe-exam-preparation" className="text-amber-400 hover:underline font-medium">Goethe exam preparation</Link>.
               </>
             )
           }

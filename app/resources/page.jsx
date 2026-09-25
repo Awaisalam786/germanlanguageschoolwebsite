@@ -428,7 +428,7 @@ export default function ResourcesPage() {
             <div className="bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 rounded-2xl p-6 space-y-4 text-center">
               <h3 className="text-lg font-bold text-white">Need live instructor guidance?</h3>
               <p className="text-xs sm:text-sm text-slate-400">
-                Join our live Zoom classes led by experienced instructors with real-time feedback and structured exam preparation.
+                Join our live Zoom classes taught live by our instructors with real-time feedback and structured exam preparation.
               </p>
               <Link href="/courses" className="inline-flex items-center justify-center gap-2 py-3 px-6 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl text-xs sm:text-sm transition-all">
                 <span>View Courses &amp; Fees</span>

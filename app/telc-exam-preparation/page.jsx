@@ -154,6 +154,9 @@ export default function TelcExamPreparation() {
             {/* H2: telc Exam Preparation in Pakistan (Overview & Distinction) */}
             <section className="bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-4 shadow-xl">
               <h2 className="text-2xl sm:text-3xl font-extrabold text-white">telc Exam Preparation in Pakistan</h2>
+              <p className="text-slate-200 leading-relaxed text-sm sm:text-base">
+                <strong className="text-white">Short answer:</strong> telc Deutsch exams test reading, listening, writing and speaking at a CEFR level, and many levels include a Sprachbausteine section on grammar and vocabulary in context. To prepare from Pakistan, practise every module under timed conditions and register for the official exam through an authorised telc test centre; German Learning School provides preparation only.
+              </p>
               <p className="text-slate-300 leading-relaxed text-sm sm:text-base">
                 telc (The European Language Certificates) examinations are internationally recognized standardized tests aligned with the Common European Framework of Reference for Languages (CEFR). telc certificates are widely accepted by German universities, employers, and immigration authorities for visa applications, vocational training (Ausbildung), job search, and professional licensing. If you are comparing certification options, read our complete guide on <Link href="/blog/goethe-vs-telc-which-german-exam-should-you-choose-in-pakistan" className="text-amber-400 hover:underline font-semibold">Goethe vs telc: Which German Exam Should You Choose in Pakistan?</Link>.
               </p>
