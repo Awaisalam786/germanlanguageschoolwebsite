@@ -15,8 +15,9 @@ import {
   AlertCircle
 } from 'lucide-react';
 import SchemaMarkup from '../../src/components/SchemaMarkup';
+import { withPageOpenGraph } from '../../src/lib/seo';
 
-export const metadata = {
+export const metadata = withPageOpenGraph({
   title: {
     absolute: 'Goethe Exam Preparation in Pakistan | German Learning School',
   },
@@ -37,7 +38,7 @@ export const metadata = {
     title: 'Goethe Exam Preparation in Pakistan | German Learning School',
     description: 'Prepare for the Goethe-Zertifikat in Pakistan with live online classes, mock exams, and module training for A1, A2, B1, and B2. Learn more and enroll today.',
   },
-};
+});
 
 const goetheFaqs = [
   {

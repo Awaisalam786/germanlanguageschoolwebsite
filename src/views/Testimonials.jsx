@@ -79,7 +79,7 @@ export default function Testimonials({ currentLang, setActiveTab }) {
       <div className="bg-slate-950 border border-slate-800 rounded-3xl p-8 text-center max-w-3xl mx-auto space-y-4">
         <h3 className="text-2xl font-bold text-white">Ready to Write Your German Success Story?</h3>
         <p className="text-xs text-slate-400">
-          Join our upcoming batch and get 1-on-1 exam prep guidance from certified evaluators.
+          Join our upcoming batch and get 1-on-1 guidance for German exam preparation.
         </p>
         <button
           onClick={() => setActiveTab('enroll')}

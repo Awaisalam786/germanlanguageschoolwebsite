@@ -1,6 +1,7 @@
 import PracticeTestLevelPage from '../../../src/components/PracticeTestLevelPage';
+import { withPageOpenGraph } from '../../../src/lib/seo';
 
-export const metadata = {
+export const metadata = withPageOpenGraph({
   title: {
     absolute: 'German B2 Practice Test Online | Free German Test',
   },
@@ -21,7 +22,7 @@ export const metadata = {
     title: 'German B2 Practice Test Online | Free German Test',
     description: 'Practice German B2 online with free mock exercises. Assess your upper-intermediate grammar, advanced vocabulary, and reading for Goethe B2 and TestDaF prep.',
   },
-};
+});
 
 export default function GermanB2PracticePage() {
   return <PracticeTestLevelPage level="B2" />;

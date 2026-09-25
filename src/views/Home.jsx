@@ -6,7 +6,6 @@ import {
   Users, 
   CheckCircle2, 
   ArrowRight, 
-  Star, 
   Play, 
   Sparkles,
   Video,
@@ -19,7 +18,6 @@ import { translations } from '../i18n/translations';
 import { useGlobalContent } from '../context/GlobalContentContext';
 import CertificateShowcase from '../components/CertificateShowcase';
 import GoogleReviewsWidget from '../components/GoogleReviewsWidget';
-import VideoTestimonialsReels from '../components/VideoTestimonialsReels';
 import ExamLogosRow from '../components/ExamLogosRow';
 import CourseCard from '../components/CourseCard';
 import CourseBundles from '../components/CourseBundles';
@@ -100,21 +98,12 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal, init
 
               {/* Quick Key Highlights */}
               <div className="pt-6 border-t border-slate-800/80 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-4 text-center sm:text-left">
-                <div className="bg-slate-900/50 sm:bg-transparent p-4 sm:p-0 rounded-2xl sm:rounded-none border border-slate-800/50 sm:border-none">
-                  <div className="text-3xl sm:text-2xl font-extrabold text-white">{t.hero.statStudents}</div>
-                  <div className="text-sm sm:text-xs text-slate-400 mt-1 sm:mt-0">{t.hero.statStudentsLabel}</div>
-                </div>
-                <div className="bg-slate-900/50 sm:bg-transparent p-4 sm:p-0 rounded-2xl sm:rounded-none border border-slate-800/50 sm:border-none">
-                  <div className="text-3xl sm:text-2xl font-extrabold text-amber-400">{t.hero.statPassRate}</div>
-                  <div className="text-sm sm:text-xs text-slate-400 mt-1 sm:mt-0">{t.hero.statPassRateLabel}</div>
-                </div>
-                <div className="bg-slate-900/50 sm:bg-transparent p-4 sm:p-0 rounded-2xl sm:rounded-none border border-slate-800/50 sm:border-none">
-                  <div className="text-3xl sm:text-2xl font-extrabold text-white flex items-center justify-center sm:justify-start gap-1">
-                    <span>{t.hero.statRating}</span>
-                    <Star className="w-5 h-5 sm:w-4 sm:h-4 fill-amber-400 text-amber-400 inline" />
+                {t.hero.highlights.map((item, i) => (
+                  <div key={item.label} className="bg-slate-900/50 sm:bg-transparent p-4 sm:p-0 rounded-2xl sm:rounded-none border border-slate-800/50 sm:border-none">
+                    <div className={`text-3xl sm:text-2xl font-extrabold ${i === 1 ? 'text-amber-400' : 'text-white'}`}>{item.value}</div>
+                    <div className="text-sm sm:text-xs text-slate-400 mt-1 sm:mt-0">{item.label}</div>
                   </div>
-                  <div className="text-sm sm:text-xs text-slate-400 mt-1 sm:mt-0">{t.hero.statRatingLabel}</div>
-                </div>
+                ))}
               </div>
 
               <p className="text-sm sm:text-base text-slate-400 leading-relaxed max-w-2xl">
@@ -122,7 +111,7 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal, init
                   settings.hero_description || t.hero.desc
                 ) : (
                   <>
-                    Join Pakistan&apos;s leading online German language institute. Whether you are preparing for studies or visas, our comprehensive <Link href="/courses" className="text-slate-200 font-semibold hover:text-amber-400 underline">German language course</Link> options deliver interactive <Link href="/howItWorks" className="text-slate-200 font-semibold hover:text-amber-400 underline">online German classes in Pakistan</Link> across <Link href="/courses" className="text-slate-200 font-semibold hover:text-amber-400 underline">A1, A2, B1, and B2 levels</Link>. Learn with certified teachers, targeted <Link href="/goethe-exam-preparation" className="text-slate-200 font-semibold hover:text-amber-400 underline">Goethe and telc exam preparation</Link>, free <Link href="/practice-tests" className="text-slate-200 font-semibold hover:text-amber-400 underline">German practice tests</Link>, and flexible batch timings.
+                    Learn German online from anywhere in Pakistan. Whether you are preparing for studies or visas, our comprehensive <Link href="/courses" className="text-slate-200 font-semibold hover:text-amber-400 underline">German language course</Link> options deliver interactive <Link href="/howItWorks" className="text-slate-200 font-semibold hover:text-amber-400 underline">online German classes in Pakistan</Link> across <Link href="/courses" className="text-slate-200 font-semibold hover:text-amber-400 underline">A1, A2, B1, and B2 levels</Link>. Learn with certified teachers, targeted <Link href="/goethe-exam-preparation" className="text-slate-200 font-semibold hover:text-amber-400 underline">Goethe and telc exam preparation</Link>, free <Link href="/practice-tests" className="text-slate-200 font-semibold hover:text-amber-400 underline">German practice tests</Link>, and flexible batch timings.
                   </>
                 )}
               </p>
@@ -349,7 +338,7 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal, init
         <div className="text-center mb-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-extrabold text-white mb-4">Student Reviews &amp; Success Stories</h2>
           <p className="text-slate-400 max-w-2xl mx-auto">
-            Join thousands of students who have successfully passed their German exams and transformed their careers.
+            Real exam certificates earned by our online students.
           </p>
         </div>
         
@@ -361,10 +350,9 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal, init
           <GoogleReviewsWidget />
         </div>
 
-        {/* 5. SHORT-FORM VIDEO REELS */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
-          <VideoTestimonialsReels />
-        </div>
+        {/* Short-form video reels removed: they were placeholder mock data
+            (stock Unsplash photos, simulated playback), not real students.
+            Re-add only with real, consented student videos. */}
       </section>
 
       {/* FREQUENTLY ASKED QUESTIONS (SEO) */}

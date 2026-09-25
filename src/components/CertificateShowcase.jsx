@@ -72,7 +72,7 @@ export default function CertificateShowcase() {
         <div className="text-center max-w-3xl mx-auto space-y-3 mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold border border-emerald-500/30">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>100% Verified Certificates • Protected Original Documents</span>
+            <span>Student Certificates • Protected Original Documents</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white">
             Real Student Certificate Showcase

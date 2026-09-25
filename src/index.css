@@ -164,3 +164,31 @@
   background-size: 800px 100%;
   animation: shimmer 1.6s infinite linear;
 }
+
+/* Blog article body (HTML from the CMS, rendered in src/views/BlogPost.jsx).
+   The `prose-*` utilities on that container need @tailwindcss/typography,
+   which is not installed, so section headings inside articles rendered at
+   body-text size. These rules give H2/H3 visible hierarchy in the existing
+   white/extrabold style without touching paragraphs, lists or tables. */
+.blog-content h2 {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  font-weight: 800;
+  color: var(--color-text-heading);
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.blog-content h3 {
+  font-size: 1.25rem;
+  line-height: 1.75rem;
+  font-weight: 700;
+  color: var(--color-text-heading);
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.blog-content > h2:first-child,
+.blog-content > h3:first-child {
+  margin-top: 0;
+}

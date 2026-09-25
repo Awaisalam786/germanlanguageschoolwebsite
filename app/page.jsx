@@ -1,5 +1,6 @@
 import { supabase } from '../src/lib/supabaseClient';
 import HomeClientPage from './HomeClientPage';
+import { DEFAULT_OG_IMAGE } from '../src/lib/seo';
 
 export const revalidate = 60;
 
@@ -23,6 +24,7 @@ export const metadata = {
     card: 'summary_large_image',
     title: 'German Language Course in Pakistan | German Learning School',
     description: 'Learn German online in Pakistan with live A1–B2 classes, expert teachers, exam preparation, practice sessions and flexible batches at German Learning School.',
+    images: [DEFAULT_OG_IMAGE.url],
   },
 };
 

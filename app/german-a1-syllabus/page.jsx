@@ -19,8 +19,9 @@ import {
   Layers
 } from 'lucide-react';
 import SchemaMarkup from '../../src/components/SchemaMarkup';
+import { withPageOpenGraph } from '../../src/lib/seo';
 
-export const metadata = {
+export const metadata = withPageOpenGraph({
   title: {
     absolute: 'German A1 Syllabus: Complete Beginner Course Guide | German Learning School',
   },
@@ -48,7 +49,7 @@ export const metadata = {
     title: 'German A1 Syllabus: Complete Beginner Course Guide | German Learning School',
     description: 'Explore the complete German A1 syllabus including grammar, vocabulary, speaking, listening, reading, writing, and exam preparation. Start learning German A1 online.',
   },
-};
+});
 
 const breadcrumbSchema = {
   "@context": "https://schema.org",

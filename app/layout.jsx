@@ -17,7 +17,9 @@ export const metadata = {
   openGraph: {
     title: 'German Language Course in Pakistan | German Learning School',
     description: 'Learn German online in Pakistan with live A1–B2 classes, expert teachers, exam preparation, practice sessions and flexible batches at German Learning School.',
-    url: 'https://germanlearningschool.com/',
+    // No `url` here on purpose: a global og:url would be inherited by every
+    // route without its own openGraph block and point them all at the
+    // homepage. Each route sets og:url from its canonical (see src/lib/seo.js).
     siteName: 'German Learning School',
     locale: 'en_PK',
     type: 'website',

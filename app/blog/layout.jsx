@@ -1,4 +1,6 @@
-export const metadata = {
+import { withPageOpenGraph } from '../../src/lib/seo';
+
+export const metadata = withPageOpenGraph({
   title: {
     absolute: 'German Learning Blog & Exam Tips | German Learning School',
   },
@@ -19,7 +21,7 @@ export const metadata = {
     title: 'German Learning Blog & Exam Tips | German Learning School',
     description: 'Explore German learning guides, Goethe and telc exam preparation tips, visa checklists, and study timelines for Pakistani students learning German.',
   },
-};
+});
 
 export default function Layout({ children }) {
   return <>{children}</>;

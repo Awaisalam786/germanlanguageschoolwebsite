@@ -182,9 +182,15 @@ const NounBuilderEngine = () => {
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [filteredNouns.length, isComplete]);
 
+  // The deck loads on the client, so the server-rendered HTML is the loading
+  // state. Keep the page's single H1 present in every state (visually hidden
+  // while loading / empty) so crawlers and screen readers always get it.
+  const pageHeading = 'German Noun Builder';
+
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-3">
+        <h1 className="sr-only">{pageHeading}</h1>
         <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
         <p className="text-sm text-slate-500 font-medium">Loading nouns...</p>
       </div>
@@ -194,6 +200,7 @@ const NounBuilderEngine = () => {
   if (nouns.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+        <h1 className="sr-only">{pageHeading}</h1>
         <div className="w-16 h-16 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center mb-4">
           <BookOpen className="w-7 h-7 text-slate-600" />
         </div>
@@ -214,7 +221,7 @@ const NounBuilderEngine = () => {
 
         <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-extrabold tracking-tight text-white">Noun Builder</h1>
+            <h1 className="text-2xl font-extrabold tracking-tight text-white">{pageHeading}</h1>
             <p className="text-sm text-slate-400 mt-1">Master German nouns and their articles &mdash; der, die, das.</p>
           </div>
 

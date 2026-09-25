@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Star, CheckCircle, ExternalLink, RefreshCw, AlertCircle } from 'lucide-react';
+import { Star, CheckCircle, ExternalLink, AlertCircle } from 'lucide-react';
 import { fetchLiveGoogleReviews } from '../utils/googleReviewsApi';
 
 export default function GoogleReviewsWidget() {
@@ -13,13 +13,12 @@ export default function GoogleReviewsWidget() {
     });
   }, []);
 
+  // Render nothing until live data arrives. This component is fetched on the
+  // client, so a loading placeholder was being server-rendered into the page
+  // HTML ("Loading Live Google Reviews...") and indexed by crawlers. If the
+  // Places API is not configured the widget stays hidden (see below).
   if (loading) {
-    return (
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 text-center space-y-3">
-        <RefreshCw className="w-6 h-6 text-amber-400 animate-spin mx-auto" />
-        <span className="text-xs text-slate-400 block font-medium">Loading Live Google Reviews...</span>
-      </div>
-    );
+    return null;
   }
 
   // If the live Google Places API is not configured or fails, gracefully hide to avoid fabricated ratings
@@ -50,7 +49,7 @@ export default function GoogleReviewsWidget() {
               </div>
             </div>
             <span className="text-xs text-slate-400">
-              {liveData?.isConfigured ? 'Live Google Business Profile API Sync' : 'Based on 348+ verified student reviews'} • {totalReviews} Total Reviews
+              Live Google Business Profile API Sync • {totalReviews} Total Reviews
             </span>
           </div>
         </div>
@@ -88,11 +87,21 @@ export default function GoogleReviewsWidget() {
               </div>
 
               <div className="pt-3 border-t border-slate-800/80 flex items-center gap-3">
-                <img 
-                  src={rev.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'} 
-                  alt={rev.author} 
-                  className="w-9 h-9 rounded-full object-cover border border-amber-500/30" 
-                />
+                {rev.avatar ? (
+                  <img
+                    src={rev.avatar}
+                    alt={rev.author}
+                    className="w-9 h-9 rounded-full object-cover border border-amber-500/30"
+                  />
+                ) : (
+                  // No stock-photo fallback for real reviewers: show their initial instead.
+                  <div
+                    aria-hidden="true"
+                    className="w-9 h-9 rounded-full border border-amber-500/30 bg-slate-800 text-amber-400 font-bold flex items-center justify-center"
+                  >
+                    {(rev.author || '?').trim().charAt(0).toUpperCase()}
+                  </div>
+                )}
                 <div className="text-xs">
                   <div className="font-bold text-white flex items-center gap-1">
                     <span>{rev.author}</span>

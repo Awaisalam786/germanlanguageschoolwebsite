@@ -121,11 +121,7 @@ export default function FreeGermanToolsWidget() {
           </Link>
 
         </div>
-        
-        {/* Footer */}
-        <div className="bg-slate-950 p-3 text-center border-t border-slate-800">
-          <p className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">More learning tools coming soon...</p>
-        </div>
+
       </div>
 
     </div>

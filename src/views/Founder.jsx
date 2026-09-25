@@ -34,7 +34,9 @@ export default function Founder({ setActiveTab }) {
             </div>
             <div className="text-center space-y-1.5">
               <span className="text-amber-400 font-bold text-sm block">{founderData.name}</span>
-              <span className="text-xs text-slate-400 block max-w-xs leading-relaxed">{founderData.credentials}</span>
+              {founderData.credentials && (
+                <span className="text-xs text-slate-400 block max-w-xs leading-relaxed">{founderData.credentials}</span>
+              )}
             </div>
           </div>
 
@@ -42,9 +44,11 @@ export default function Founder({ setActiveTab }) {
           <div className="md:col-span-7 space-y-6">
             
             <div>
-              <span className="px-3 py-1 rounded-md bg-amber-500/10 text-amber-400 text-xs font-extrabold border border-amber-500/30">
-                {founderData.experience}
-              </span>
+              {founderData.experience && (
+                <span className="px-3 py-1 rounded-md bg-amber-500/10 text-amber-400 text-xs font-extrabold border border-amber-500/30">
+                  {founderData.experience}
+                </span>
+              )}
               <h2 className="text-3xl font-extrabold text-white mt-2">{founderData.name}</h2>
               <div className="text-xs font-bold text-amber-400">{founderData.title}</div>
             </div>

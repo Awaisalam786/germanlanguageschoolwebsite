@@ -12,8 +12,9 @@ import {
   ExternalLink 
 } from 'lucide-react';
 import SchemaMarkup from '../../src/components/SchemaMarkup';
+import { withPageOpenGraph } from '../../src/lib/seo';
 
-export const metadata = {
+export const metadata = withPageOpenGraph({
   title: {
     absolute: 'German Learning Resources: Free Materials & Practice Tools | German Learning School',
   },
@@ -34,7 +35,7 @@ export const metadata = {
     title: 'German Learning Resources: Free Materials & Practice Tools | German Learning School',
     description: 'Explore free German learning resources, vocabulary cheat sheets, grammar tables, interactive practice tests, and study guides for Pakistani students.',
   },
-};
+});
 
 const breadcrumbSchema = {
   "@context": "https://schema.org",

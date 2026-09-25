@@ -78,16 +78,10 @@ export function GlobalContentProvider({ children }) {
         return merged;
       });
 
-      // Dynamically update favicon
-      if (newSettings.logo_url) {
-        let link = document.querySelector("link[rel~='icon']");
-        if (!link) {
-          link = document.createElement('link');
-          link.rel = 'icon';
-          document.head.appendChild(link);
-        }
-        link.href = newSettings.logo_url;
-      }
+      // The favicon is served statically via the App Router file convention
+      // (app/favicon.ico, app/icon.png, app/apple-icon.png). It is no longer
+      // swapped to logo_url at runtime: that overwrote the server-rendered
+      // <link rel="icon"> with the wide header logo after hydration.
     }
     setLoading(false);
   };

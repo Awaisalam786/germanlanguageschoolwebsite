@@ -2,6 +2,8 @@ import { supabase } from '../../../src/lib/supabaseClient';
 import BlogPostClient from '../../../src/views/BlogPost';
 import SchemaMarkup from '../../../src/components/SchemaMarkup';
 import { notFound } from 'next/navigation';
+import { normalizeBlogContentHeadings } from '../../../src/lib/blogContent';
+import { DEFAULT_OG_IMAGE } from '../../../src/lib/seo';
 
 export const revalidate = 60; // Revalidate cache every 60 seconds
 
@@ -13,7 +15,7 @@ export async function generateMetadata({ params }) {
   const title = data.meta_title || data.title;
   const description = data.meta_description || data.summary;
   const url = `https://germanlearningschool.com/blog/${resolvedParams.slug}`;
-  const images = data.image ? [data.image] : [];
+  const images = data.image ? [data.image] : [DEFAULT_OG_IMAGE];
   
   return {
     title: {
@@ -116,7 +118,10 @@ export default async function BlogPostPage({ params }) {
     <>
       <SchemaMarkup schema={breadcrumbSchema} />
       <SchemaMarkup schema={articleSchema} />
-      <BlogPostClient post={post} relatedPosts={relatedPosts} />
+      <BlogPostClient
+        post={{ ...post, content: normalizeBlogContentHeadings(post.content) }}
+        relatedPosts={relatedPosts}
+      />
     </>
   );
 }

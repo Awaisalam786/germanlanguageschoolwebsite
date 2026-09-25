@@ -72,7 +72,7 @@ export default function Navbar({
   // Dropdown 1: About Group
   const aboutMenuItems = [
     { id: 'about', label: t.nav.about, icon: Users, desc: 'Our mission & 100% online model' },
-    { id: 'founder', label: t.nav.founder, icon: UserCheck, desc: 'Prof. Dr. Michael Weber spotlight' },
+    { id: 'founder', label: t.nav.founder, icon: UserCheck, desc: 'Founder & head mentor profile' },
     { id: 'teachers', label: t.nav.teachers, icon: ShieldCheck, desc: 'Native German & Pakistani faculty' },
   ];
 

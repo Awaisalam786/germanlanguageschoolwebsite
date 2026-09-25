@@ -1,6 +1,7 @@
 import PracticeTestLevelPage from '../../../src/components/PracticeTestLevelPage';
+import { withPageOpenGraph } from '../../../src/lib/seo';
 
-export const metadata = {
+export const metadata = withPageOpenGraph({
   title: {
     absolute: 'German A1 Practice Test Online | Free German Test',
   },
@@ -21,7 +22,7 @@ export const metadata = {
     title: 'German A1 Practice Test Online | Free German Test',
     description: 'Practice German A1 online with free interactive tests. Test your beginner German grammar, vocabulary, and reading skills to prepare for the Goethe A1 exam.',
   },
-};
+});
 
 export default function GermanA1PracticePage() {
   return <PracticeTestLevelPage level="A1" />;

@@ -9,7 +9,7 @@ export default function ExamLogosRow() {
         
         <div className="text-center mb-6">
           <span className="text-[11px] font-bold uppercase tracking-widest text-slate-400">
-            Prepares You 100% For Official European Examination Standards
+            Preparation for Official German Language Exams
           </span>
         </div>
 

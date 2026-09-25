@@ -1,6 +1,7 @@
 import CourseLevelPage from '../../../src/components/CourseLevelPage';
+import { withPageOpenGraph } from '../../../src/lib/seo';
 
-export const metadata = {
+export const metadata = withPageOpenGraph({
   title: 'German B1 Classes & Course in Pakistan | German Learning School',
   description: 'Join live German B1 classes online in Pakistan. Master intermediate grammar, speaking, and vocabulary with expert teachers and Goethe B1 exam preparation.',
   alternates: {
@@ -19,7 +20,7 @@ export const metadata = {
     title: 'German B1 Classes & Course in Pakistan | German Learning School',
     description: 'Join live German B1 classes online in Pakistan. Master intermediate grammar, speaking, and vocabulary with expert teachers and Goethe B1 exam preparation.',
   },
-};
+});
 
 export default function GermanB1() {
   return <CourseLevelPage level="B1" />;

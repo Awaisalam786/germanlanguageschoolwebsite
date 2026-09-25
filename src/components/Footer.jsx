@@ -32,7 +32,7 @@ export default function Footer({ currentLang, setActiveTab }) {
               </span>
             </Link>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Pakistan’s premier 100% online German language academy. Live interactive Zoom classes, recorded lecture archives, and Goethe exam preparation for students across Pakistan.
+              A 100% online German language school for students in Pakistan. Live interactive Zoom classes, recorded lecture archives, and Goethe exam preparation for students across Pakistan.
             </p>
             <div className="flex items-center gap-2 text-xs text-emerald-400 font-medium">
               <CheckCircle2 className="w-4 h-4 text-emerald-400" />

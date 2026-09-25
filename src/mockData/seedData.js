@@ -154,14 +154,19 @@ export const examBodyLogos = [
   { name: 'ÖSD (Österreichisches Sprachdiplom)', badge: 'Austria & German Visa Standard' }
 ];
 
+// Shown on /founder. The previous entry was sample data (a fictional
+// "Prof. Dr. Michael Weber" with invented credentials). Until the real
+// founder's name, photo and verified background are added here, keep this
+// description generic and factual: no names, degrees, examiner status,
+// years of experience or student numbers.
 export const founderData = {
-  name: 'Prof. Dr. Michael Weber',
-  title: 'Founder & Academic Director',
-  credentials: 'Ph.D. in Germanic Linguistics (Heidelberg) • Former Goethe Examiner',
-  experience: '15+ Years Experience',
-  bio: 'Prof. Dr. Michael Weber founded German Learning School to provide world-class, communicative German language education directly to students across Pakistan. Having trained over 12,500 students, Dr. Weber leads our online curriculum and exam strategy.',
+  name: 'Founder & Head Mentor',
+  title: 'German Learning School',
+  credentials: '',
+  experience: '',
+  bio: 'German Learning School was founded to make live, structured online German classes available to students across Pakistan. The founder oversees the A1 to B2 course path and exam preparation for Goethe, telc, ÖSD and TestDaF, and is available on WhatsApp for guidance on choosing the right level or exam.',
   image: '',
-  message: 'My mission is to ensure every Pakistani student achieves fluent German communication and clears their Goethe, telc, or ÖSD exam on the first attempt, opening doors to tuition-free education and rewarding careers in Germany.'
+  message: 'Our aim is to help every student build practical German communication skills and prepare properly for the certificate their study, work or visa plans require.'
 };
 
 // EXACTLY 4 CEFR INDIVIDUAL LEVEL COURSES (A1, A2, B1, B2 ONLY)

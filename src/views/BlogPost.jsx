@@ -85,7 +85,7 @@ export default function BlogPost({ post, relatedPosts }) {
           {/* Main Article */}
           <div className="lg:col-span-8 space-y-8">
             <div 
-              className="prose prose-invert prose-amber max-w-none prose-lg
+              className="blog-content prose prose-invert prose-amber max-w-none prose-lg
                          prose-headings:font-extrabold prose-headings:text-white
                          prose-a:text-amber-400 hover:prose-a:text-amber-300
                          prose-img:rounded-2xl prose-img:border prose-img:border-slate-800
@@ -111,7 +111,7 @@ export default function BlogPost({ post, relatedPosts }) {
                 <GraduationCap className="w-5 h-5" />
                 <span>Recommended Next Steps &amp; Pathways</span>
               </div>
-              <h3 className="text-xl font-bold text-white">Continue Your German Journey</h3>
+              <h2 className="text-xl font-bold text-white">Continue Your German Journey</h2>
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
                 Take the next practical step toward your study or work goals in Germany with our structured courses and free testing tools:
               </p>
@@ -181,10 +181,10 @@ export default function BlogPost({ post, relatedPosts }) {
           <div className="lg:col-span-4 space-y-8">
             <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sticky top-24 space-y-6">
               <div>
-                <h3 className="text-lg font-extrabold text-white mb-4 flex items-center gap-2">
+                <h2 className="text-lg font-extrabold text-white mb-4 flex items-center gap-2">
                   <BookOpen className="w-5 h-5 text-amber-400" />
                   Related Articles
-                </h3>
+                </h2>
                 
                 <div className="space-y-4">
                   {relatedPosts && relatedPosts.length > 0 ? (
@@ -201,9 +201,9 @@ export default function BlogPost({ post, relatedPosts }) {
                             )}
                           </div>
                           <div className="space-y-1">
-                            <h4 className="text-xs font-bold text-white group-hover:text-amber-400 transition-colors leading-snug line-clamp-2">
+                            <h3 className="text-xs font-bold text-white group-hover:text-amber-400 transition-colors leading-snug line-clamp-2">
                               {rp.title}
-                            </h4>
+                            </h3>
                             <div className="text-[10px] text-slate-400">
                               {new Date(rp.created_at).toLocaleDateString()}
                             </div>

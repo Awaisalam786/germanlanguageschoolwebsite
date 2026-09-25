@@ -1,4 +1,6 @@
-export const metadata = {
+import { withPageOpenGraph } from '../../src/lib/seo';
+
+export const metadata = withPageOpenGraph({
   title: {
     absolute: 'How Online German Classes Work: Schedule & Batches | German Learning School',
   },
@@ -6,7 +8,7 @@ export const metadata = {
   alternates: {
     canonical: '/howItWorks',
   },
-};
+});
 
 export default function Layout({ children }) {
   return <>{children}</>;

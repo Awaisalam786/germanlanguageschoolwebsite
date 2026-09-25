@@ -15,8 +15,9 @@ import {
   AlertCircle
 } from 'lucide-react';
 import SchemaMarkup from '../../src/components/SchemaMarkup';
+import { withPageOpenGraph } from '../../src/lib/seo';
 
-export const metadata = {
+export const metadata = withPageOpenGraph({
   title: {
     absolute: 'telc Exam Preparation in Pakistan | German Learning School',
   },
@@ -37,7 +38,7 @@ export const metadata = {
     title: 'telc Exam Preparation in Pakistan | German Learning School',
     description: 'Prepare for telc German exams in Pakistan with structured online coaching. Master reading, listening, writing, and speaking for telc A1, A2, B1, and B2 levels.',
   },
-};
+});
 
 const telcFaqs = [
   {
