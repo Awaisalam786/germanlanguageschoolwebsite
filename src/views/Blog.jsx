@@ -101,7 +101,7 @@ export default function Blog({ initialPosts = [] }) {
                 <div className="flex items-center gap-3 text-[11px] text-slate-400">
                   <span className="flex items-center gap-1">
                     <Calendar className="w-3.5 h-3.5 text-amber-400" />
-                    <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                    <span>{new Date(post.created_at).toLocaleDateString('en-US', { timeZone: 'Asia/Karachi' })}</span>
                   </span>
                   <span>•</span>
                   <span className="flex items-center gap-1">

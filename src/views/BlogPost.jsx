@@ -66,7 +66,7 @@ export default function BlogPost({ post, relatedPosts }) {
               {post.category}
             </span>
             <div className="flex items-center gap-3 text-xs text-slate-300 font-medium">
-              <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5 text-amber-400" /> {new Date(post.created_at).toLocaleDateString()}</span>
+              <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5 text-amber-400" /> {new Date(post.created_at).toLocaleDateString('en-US', { timeZone: 'Asia/Karachi' })}</span>
               {post.read_time && <span className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-amber-400" /> {post.read_time}</span>}
               <span className="flex items-center gap-1"><User className="w-3.5 h-3.5 text-amber-400" /> {post.author || 'German Learning School Team'}</span>
             </div>
@@ -205,7 +205,7 @@ export default function BlogPost({ post, relatedPosts }) {
                               {rp.title}
                             </h3>
                             <div className="text-[10px] text-slate-400">
-                              {new Date(rp.created_at).toLocaleDateString()}
+                              {new Date(rp.created_at).toLocaleDateString('en-US', { timeZone: 'Asia/Karachi' })}
                             </div>
                           </div>
                         </div>
