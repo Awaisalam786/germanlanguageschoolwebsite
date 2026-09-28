@@ -31,6 +31,15 @@ export default function AppLayoutWrapper({ children }) {
   else if (pathname === '/enroll') activeTab = 'enroll';
   else if (pathname.startsWith('/admin')) activeTab = 'admin';
 
+  // Homepage language switch uses real URLs: Urdu lives at /ur (crawlable,
+  // server-rendered). Other pages keep the existing in-page switch.
+  const isUrduHome = pathname === '/ur';
+  const handleSetLanguage = (lang) => {
+    if (pathname === '/' && lang === 'ur') { router.push('/ur'); return; }
+    if (isUrduHome && lang !== 'ur') { setLanguage(lang); router.push('/'); return; }
+    setLanguage(lang);
+  };
+
   const handleSetActiveTab = (tab) => {
     // Navigate via Next.js router
     if (tab === 'home') router.push('/');
@@ -38,13 +47,13 @@ export default function AppLayoutWrapper({ children }) {
   };
 
   return (
-    <div className="flex flex-col min-h-screen w-full max-w-[100vw] overflow-x-hidden box-border">
+    <div dir={currentLang === 'ur' ? 'rtl' : 'ltr'} className="flex flex-col min-h-screen w-full max-w-[100vw] overflow-x-hidden box-border">
       {!pathname.startsWith('/admin') && <AnnouncementTicker />}
       
       {!pathname.startsWith('/admin') && (
         <Navbar
           currentLang={currentLang}
-          setLanguage={setLanguage}
+          setLanguage={handleSetLanguage}
           activeTab={activeTab}
           setActiveTab={handleSetActiveTab}
           onOpenTrialModal={() => setTrialModalOpen(true)}

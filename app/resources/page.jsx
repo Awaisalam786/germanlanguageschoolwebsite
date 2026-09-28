@@ -423,13 +423,6 @@ export default function ResourcesPage() {
                     <div className="text-[11px] text-slate-400">Interactive gender practice quiz</div>
                   </div>
                 </Link>
-                <Link href="/books" className="flex items-center gap-3 p-3 rounded-xl bg-slate-950 border border-slate-800 hover:border-amber-500/40 transition group">
-                  <BookOpen className="w-5 h-5 text-amber-400 shrink-0" />
-                  <div>
-                    <div className="text-xs sm:text-sm font-bold text-white group-hover:text-amber-400 transition">Books &amp; Study Materials</div>
-                    <div className="text-[11px] text-slate-400">Standard CEFR recommended textbooks</div>
-                  </div>
-                </Link>
               </div>
             </div>
 

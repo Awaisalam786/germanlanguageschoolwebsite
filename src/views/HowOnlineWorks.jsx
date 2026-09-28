@@ -37,13 +37,13 @@ export default function HowOnlineWorks({ setActiveTab, onOpenTrialModal }) {
             step: '02',
             icon: PlayCircle,
             title: 'HD Recorded Lecture Vault',
-            desc: 'Missed a class due to electricity load shedding or internet glitch? Every lecture is recorded and uploaded within 2 hours.'
+            desc: 'Missed a class because of load shedding or an internet problem? Live lectures are recorded so you can catch up and revise later.'
           },
           {
             step: '03',
             icon: Smartphone,
             title: 'Instructor WhatsApp Groups',
-            desc: 'Get 24/7 access to dedicated batch WhatsApp groups for daily vocabulary drills, homework reviews, and direct teacher guidance.'
+            desc: 'Join your batch WhatsApp group for vocabulary practice, homework questions and updates from your teacher.'
           },
           {
             step: '04',

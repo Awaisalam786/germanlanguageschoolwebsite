@@ -50,11 +50,23 @@ export default async function sitemap() {
     })
   );
 
+  // Homepage and its Urdu version (/ur) declare each other as language
+  // alternates, matching the hreflang links in their page metadata.
+  const homeLanguages = {
+    en: `${baseUrl}/`,
+    ur: `${baseUrl}/ur`,
+  };
+
   const staticRouteEntries = staticRoutes
     .filter((route) => !emptyRoutes.has(route))
     .map((route) => ({
-      url: `${baseUrl}${route}`
+      url: `${baseUrl}${route}`,
+      ...(route === '' ? { alternates: { languages: homeLanguages } } : {})
     }));
+  staticRouteEntries.splice(1, 0, {
+    url: `${baseUrl}/ur`,
+    alternates: { languages: homeLanguages }
+  });
 
   let blogRoutes = [];
   try {

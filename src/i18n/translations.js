@@ -100,7 +100,7 @@ export const translations = {
     dir: 'ltr',
     brand: 'German Learning School',
     tagline: '100% Online Deutsche Sprachschule',
-    subTagline: 'Lernen Sie Deutsch (A1 bis C2) von zu Hause. Vorbereitung auf Goethe, TestDaF, telc & ÖSD.',
+    subTagline: 'Lernen Sie Deutsch (A1 bis B2) von zu Hause. Vorbereitung auf Goethe, TestDaF, telc & ÖSD.',
     nav: {
       home: 'Startseite',
       about: 'Über Uns',
@@ -195,8 +195,8 @@ export const translations = {
   ur: {
     dir: 'rtl',
     brand: 'جرمن لینگویج اسکول',
-    tagline: 'پاکستان کا پہلا 100% آن لائن جرمن لینگویج اسکول',
-    subTagline: 'گھر بیٹھے تصدیق شدہ اساتذہ کے ساتھ جرمن زبان (A1 سے C2) سیکھیں۔ گوئٹے، ٹیسٹ ڈاف، ٹیلک اور ÖSD امتحانات کی مکمل تیاری۔',
+    tagline: 'پاکستان کا 100% آن لائن جرمن لینگویج اسکول',
+    subTagline: 'گھر بیٹھے لائیو کلاسز میں جرمن زبان (A1 سے B2) سیکھیں۔ گوئٹے، ٹیسٹ ڈاف، ٹیلک اور ÖSD امتحانات کی تیاری۔',
     nav: {
       home: 'ہوم',
       about: 'ہمارے بارے میں',

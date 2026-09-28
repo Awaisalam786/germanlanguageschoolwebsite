@@ -126,7 +126,7 @@ export const practiceTestData = {
       { title: 'Extended Reading Comprehension', desc: 'Analyzing multi-paragraph articles, commentary pieces, and official correspondence.' }
     ],
     whoShouldUse: [
-      'Pakistani candidates preparing for German vocational training (Ausbildung) programs where B1 is mandatory.',
+      'Pakistani candidates preparing for German vocational training (Ausbildung), where B1 German is normally required for the visa.',
       'Skilled workers, engineers, and IT professionals applying for German work and job seeker visas.',
       'Students preparing for the 4 modules (Lesen, Hören, Schreiben, Sprechen) of the Goethe B1 or telc B1 exam.',
       'Learners aiming to achieve independent language user status under CEFR.'

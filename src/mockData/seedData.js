@@ -290,14 +290,14 @@ export const initialBundles = [
     id: 'bundle-2',
     title: 'Visa-Ready Track (A1 + A2 + B1 Package)',
     badge: 'Save 15%',
-    recommendedRibbon: 'Most Popular for Job & Ausbildung Visas',
+    recommendedRibbon: 'A1 to B1 for Ausbildung & Work Routes',
     levelsIncluded: ['A1', 'A2', 'B1'],
     duration: '26 Weeks Total (260 Hours)',
     originalPricePKR: '₨125,000 PKR',
     bundlePricePKR: '₨106,000 PKR',
     bundlePriceEUR: '€360 EUR',
     youSaveText: 'Save ₨19,000 PKR (15% OFF)',
-    description: 'Our most popular bundle for Pakistani students targeting German Ausbildung, job seeker visas, and Chancenkarte.',
+    description: 'A1 to B1 in one track for Pakistani students aiming at Ausbildung (normally B1), work routes and the Opportunity Card (Chancenkarte).',
     isRecommended: true
   },
   {
@@ -310,7 +310,7 @@ export const initialBundles = [
     bundlePricePKR: '₨149,000 PKR',
     bundlePriceEUR: '€500 EUR',
     youSaveText: 'Save ₨31,000 PKR (17% OFF)',
-    description: 'Comprehensive track required for German university admission, engineering jobs, and Pakistani doctors preparing for Approbation.',
+    description: 'Complete A1 to B2 track for learners heading towards university study, professional work or medical German exams in Germany.',
     isRecommended: false
   }
 ];

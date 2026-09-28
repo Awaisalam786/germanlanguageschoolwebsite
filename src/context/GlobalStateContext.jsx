@@ -1,11 +1,22 @@
 'use client';
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 import { applyTheme, getActiveTheme } from '../utils/themeEngine';
 
 const GlobalStateContext = createContext();
 
 export function GlobalStateProvider({ children }) {
-  const [currentLang, setLanguage] = useState('en');
+  // Routes under /ur are the server-rendered Urdu pages, so they start in Urdu
+  // (same value on the server and in the browser, so no hydration mismatch).
+  const pathname = usePathname() || '';
+  const isUrduRoute = pathname === '/ur' || pathname.startsWith('/ur/');
+  const [currentLang, setLanguage] = useState(isUrduRoute ? 'ur' : 'en');
+  const wasUrduRoute = useRef(isUrduRoute);
+  useEffect(() => {
+    if (isUrduRoute) setLanguage('ur');
+    else if (wasUrduRoute.current) setLanguage((l) => (l === 'ur' ? 'en' : l));
+    wasUrduRoute.current = isUrduRoute;
+  }, [isUrduRoute]);
   const [trialModalOpen, setTrialModalOpen] = useState(false);
   const [selectedBlogPost, setSelectedBlogPost] = useState(null);
 

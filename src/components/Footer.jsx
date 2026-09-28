@@ -46,7 +46,7 @@ export default function Footer({ currentLang, setActiveTab }) {
               Quick Links
             </h4>
             <ul className="space-y-2 text-xs">
-              {['home', 'courses', 'howItWorks', 'gallery', 'blog', 'faq', 'contact'].map((page) => (
+              {['home', 'courses', 'howItWorks', 'blog', 'faq', 'contact'].map((page) => (
                 <li key={page}>
                   <Link href={page === "home" ? "/" : "/" + page}
                     className="hover:text-amber-400 transition-colors capitalize flex items-center gap-1.5"
@@ -56,6 +56,12 @@ export default function Footer({ currentLang, setActiveTab }) {
                   </Link>
                 </li>
               ))}
+              <li>
+                <Link href="/ur" lang="ur" className="hover:text-amber-400 transition-colors flex items-center gap-1.5 font-urdu">
+                  <ArrowRight className="w-3 h-3 text-slate-600" />
+                  <span>اردو میں پڑھیں</span>
+                </Link>
+              </li>
             </ul>
           </div>
 

@@ -11,6 +11,11 @@ export const metadata = {
   description: 'Learn German online in Pakistan with live A1–B2 Zoom classes, Goethe and telc exam prep, free practice tests and flexible batches at German Learning School.',
   alternates: {
     canonical: 'https://germanlearningschool.com/',
+    languages: {
+      en: 'https://germanlearningschool.com/',
+      ur: 'https://germanlearningschool.com/ur',
+      'x-default': 'https://germanlearningschool.com/',
+    },
   },
   openGraph: {
     title: 'German Language Course in Pakistan | German Learning School',

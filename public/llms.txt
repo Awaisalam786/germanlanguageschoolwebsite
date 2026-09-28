@@ -5,7 +5,7 @@
 ## Key facts
 - Name: German Learning School. Website: https://germanlearningschool.com
 - Format: online only — live classes on Zoom, with recorded lectures; no physical campus.
-- Market: learners in Pakistan. The website can be read in English, German and Urdu.
+- Market: learners in Pakistan. The website can be read in English, German and Urdu; an Urdu overview page is at https://germanlearningschool.com/ur
 - Levels taught: CEFR A1, A2, B1 and B2, taken in sequence. Typical duration per level: A1 6–8 weeks, A2 6–8 weeks, B1 8–10 weeks, B2 10–12 weeks.
 - Exam preparation: Goethe-Zertifikat, telc Deutsch (including telc B2 Medizin), ÖSD and TestDaF. Preparation only — not an exam centre.
 - Fees and batch dates: published in PKR on https://germanlearningschool.com/courses

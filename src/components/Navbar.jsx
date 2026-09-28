@@ -80,11 +80,11 @@ export default function Navbar({
   // Dropdown 2: Resources Group
   const resourcesMenuItems = [
     { id: 'resources', label: 'Free Resources', icon: Download, desc: 'Free vocabulary list & grammar cheat sheet' },
-    { id: 'books', label: 'Books & Resources', icon: BookOpen, desc: 'Official study materials & exam prep books' },
+    // 'books' and 'gallery' are hidden while those tables are empty (both pages
+    // are noindex). Re-add when genuine books / gallery items are published.
     { id: 'translator', label: 'Free Translator', icon: Languages, desc: 'Translate German text instantly' },
     { id: 'howItWorks', label: t.nav.howItWorks, icon: Laptop, desc: 'Live Zoom & HD lecture archive' },
     { id: 'practice-tests', label: 'Practice Tests', icon: CheckSquare, desc: 'Interactive HTML tests with auto-grading' },
-    { id: 'gallery', label: t.nav.gallery, icon: GalleryIcon, desc: 'Live class screenshots & events' },
     // 'testimonials' is hidden while there are no consented testimonials
     // (/testimonials is noindex). Re-add when real testimonials are published.
     { id: 'faq', label: t.nav.faq, icon: HelpCircle, desc: 'Common questions answered' },
@@ -183,7 +183,7 @@ export default function Navbar({
                 }`}
               >
                 <Users className={`w-[18px] h-[18px] ${isAboutActive ? 'text-red-500' : 'text-slate-400 group-hover:text-red-400'}`} />
-                <span>About</span>
+                <span>{currentLang === 'en' ? 'About' : t.nav.about}</span>
                 <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${activeDropdown === 'about' ? 'rotate-180 text-red-500' : 'text-slate-400'}`} />
               </button>
 
@@ -242,7 +242,7 @@ export default function Navbar({
                 }`}
               >
                 <Laptop className={`w-[18px] h-[18px] ${isResourcesActive ? 'text-red-500' : 'text-slate-400 group-hover:text-red-400'}`} />
-                <span>Resources</span>
+                <span>{currentLang === 'ur' ? 'وسائل' : currentLang === 'de' ? 'Ressourcen' : 'Resources'}</span>
                 <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${activeDropdown === 'resources' ? 'rotate-180 text-red-500' : 'text-slate-400'}`} />
               </button>
 
@@ -489,7 +489,7 @@ export default function Navbar({
               >
                 <div className="flex items-center gap-3.5">
                   <Users className="w-5 h-5 text-red-500 shrink-0" />
-                  <span>About</span>
+                  <span>{currentLang === 'en' ? 'About' : t.nav.about}</span>
                 </div>
                 <ChevronDown className={`w-4 h-4 text-red-500 transition-transform shrink-0 ${mobileAboutExpanded ? 'rotate-180' : ''}`} />
               </button>
@@ -533,7 +533,7 @@ export default function Navbar({
               >
                 <div className="flex items-center gap-3.5">
                   <Laptop className="w-5 h-5 text-red-500 shrink-0" />
-                  <span>Resources</span>
+                  <span>{currentLang === 'ur' ? 'وسائل' : currentLang === 'de' ? 'Ressourcen' : 'Resources'}</span>
                 </div>
                 <ChevronDown className={`w-4 h-4 text-red-500 transition-transform shrink-0 ${mobileResourcesExpanded ? 'rotate-180' : ''}`} />
               </button>
