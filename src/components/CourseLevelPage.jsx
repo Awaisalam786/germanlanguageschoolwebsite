@@ -50,6 +50,10 @@ export default async function CourseLevelPage({ level }) {
     "name": content.h1,
     "description": content.overview,
     "provider": ORGANIZATION_REF,
+    "hasCourseInstance": {
+      "@type": "CourseInstance",
+      "courseMode": "Online"
+    },
     ...(course?.price ? {
       "offers": {
         "@type": "Offer",
@@ -125,7 +129,21 @@ export default async function CourseLevelPage({ level }) {
             
             <section className="space-y-4">
               <h2 className="text-3xl font-extrabold text-white">Course Overview</h2>
+              {content.shortAnswer && (
+                <p className="text-slate-200 leading-relaxed">
+                  <strong className="text-white">Short answer:</strong> {content.shortAnswer}
+                </p>
+              )}
               <p className="text-slate-300 leading-relaxed">{content.overview}</p>
+              {level === 'B1' && (
+                <p className="text-slate-300 leading-relaxed">
+                  The level you need depends on your visa or work route. Check the{' '}
+                  <Link href="/german-language-requirements-germany" className="text-emerald-400 hover:underline">
+                    German language requirements for Germany
+                  </Link>
+                  {' '}for Ausbildung, work visas and the Opportunity Card.
+                </p>
+              )}
             </section>
 
             <section className="space-y-6">
@@ -247,7 +265,7 @@ export default async function CourseLevelPage({ level }) {
                     <Link href="/blog/what-german-level-do-you-need-for-a-germany-work-visa-a1-to-c1-explained" className="p-4 bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl transition flex items-center justify-between group block">
                       <div>
                         <h3 className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors">What German Level Do You Need for a Germany Work Visa?</h3>
-                        <p className="text-xs text-slate-400 mt-0.5">Why B1 is the key milestone for German vocational training (Ausbildung) and job seeker visas.</p>
+                        <p className="text-xs text-slate-400 mt-0.5">Where B1 fits for Ausbildung, the Opportunity Card and other work routes.</p>
                       </div>
                       <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-amber-400 shrink-0 ml-4" />
                     </Link>
@@ -261,7 +279,7 @@ export default async function CourseLevelPage({ level }) {
                     <Link href="/blog/goethe-vs-telc-which-german-exam-should-you-choose-in-pakistan" className="p-4 bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-xl transition flex items-center justify-between group block">
                       <div>
                         <h3 className="text-sm font-bold text-white group-hover:text-amber-400 transition-colors">Goethe vs telc: Which German Exam Should You Choose in Pakistan?</h3>
-                        <p className="text-xs text-slate-400 mt-0.5">Exam formats and modular re-take policies for intermediate learners.</p>
+                        <p className="text-xs text-slate-400 mt-0.5">How to choose between Goethe and telc based on who asks for your certificate.</p>
                       </div>
                       <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-amber-400 shrink-0 ml-4" />
                     </Link>
@@ -304,6 +322,9 @@ export default async function CourseLevelPage({ level }) {
                   </div>
                 ))}
               </div>
+              <p className="text-sm text-slate-400">
+                More questions about classes, fees and exams? See our <Link href="/faq" className="text-amber-400 hover:underline">German course FAQ</Link> or read <Link href="/howItWorks" className="text-amber-400 hover:underline">how our online classes work</Link>.
+              </p>
             </section>
           </div>
 
@@ -377,6 +398,12 @@ export default async function CourseLevelPage({ level }) {
                 </Link>
                 <Link href="/testdaf-preparation" className="text-sm text-slate-300 hover:text-white hover:underline">
                   &bull; TestDaF Preparation
+                </Link>
+                <Link href="/osd-exam-preparation" className="text-sm text-slate-300 hover:text-white hover:underline">
+                  &bull; ÖSD Exam Preparation
+                </Link>
+                <Link href="/german-language-requirements-germany" className="text-sm text-slate-300 hover:text-white hover:underline">
+                  &bull; German Language Requirements for Germany
                 </Link>
                 <Link href="/practice-tests" className="text-sm text-slate-300 hover:text-white hover:underline">
                   &bull; All German Practice Tests

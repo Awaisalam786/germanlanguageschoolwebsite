@@ -111,7 +111,7 @@ export default function Navbar({
                 {settings?.logo_url ? (
                   <img
                     src={settings.logo_url}
-                    alt="Logo"
+                    alt="German Learning School logo"
                     className="w-full h-full object-contain scale-[1.4]"
                     style={{ width: '100%', height: '100%' }}
                     loading="eager"
@@ -384,7 +384,7 @@ export default function Navbar({
                 {settings?.logo_url ? (
                   <img
                     src={settings.logo_url}
-                    alt="Logo"
+                    alt="German Learning School logo"
                     className="w-full h-full object-contain scale-[1.4]"
                     style={{ width: '100%', height: '100%' }}
                     loading="eager"

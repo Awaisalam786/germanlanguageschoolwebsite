@@ -8,13 +8,13 @@ export const metadata = {
   title: {
     absolute: 'German Language Course in Pakistan | German Learning School',
   },
-  description: 'Learn German online in Pakistan with live A1–B2 classes, expert teachers, exam preparation, practice sessions and flexible batches at German Learning School.',
+  description: 'Learn German online in Pakistan with live A1–B2 Zoom classes, Goethe and telc exam prep, free practice tests and flexible batches at German Learning School.',
   alternates: {
     canonical: 'https://germanlearningschool.com/',
   },
   openGraph: {
     title: 'German Language Course in Pakistan | German Learning School',
-    description: 'Learn German online in Pakistan with live A1–B2 classes, expert teachers, exam preparation, practice sessions and flexible batches at German Learning School.',
+    description: 'Learn German online in Pakistan with live A1–B2 Zoom classes, Goethe and telc exam prep, free practice tests and flexible batches at German Learning School.',
     url: 'https://germanlearningschool.com/',
     siteName: 'German Learning School',
     locale: 'en_PK',
@@ -23,7 +23,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'German Language Course in Pakistan | German Learning School',
-    description: 'Learn German online in Pakistan with live A1–B2 classes, expert teachers, exam preparation, practice sessions and flexible batches at German Learning School.',
+    description: 'Learn German online in Pakistan with live A1–B2 Zoom classes, Goethe and telc exam prep, free practice tests and flexible batches at German Learning School.',
     images: [DEFAULT_OG_IMAGE.url],
   },
 };
@@ -40,4 +40,4 @@ export default async function HomePage() {
     sortedData = coursesRes.data.sort((a, b) => (levelOrder[a.level] || 99) - (levelOrder[b.level] || 99));
   }
   return <HomeClientPage initialCourses={sortedData} initialBundles={bundlesRes.data || []} />;
-}
+}

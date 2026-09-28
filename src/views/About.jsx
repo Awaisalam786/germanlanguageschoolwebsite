@@ -107,7 +107,7 @@ export default function About({ currentLang, setActiveTab }) {
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform text-red-400" />
                 </h3>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Learn about our qualified instructors specializing in live Zoom classes, Goethe and telc exam preparation, and interactive German coaching.
+                  Learn about our instructors and how they teach live Zoom classes, Goethe and telc exam preparation, and interactive German coaching.
                 </p>
                 <span className="inline-flex items-center gap-1 text-xs font-bold text-red-400 pt-1">
                   View Faculty Members &rarr;

@@ -8,6 +8,7 @@ import {
   LogOut, LayoutDashboard, Languages, MessageCircle, Brain, Volume2
 } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 import ChapterVocabEngine from '../components/ChapterVocabEngine';
 import ReadingTestEngine from '../components/ReadingTestEngine';
 import AlphabetNumbersEngine from '../components/AlphabetNumbersEngine';
@@ -833,7 +834,7 @@ export default function PracticeTests() {
         <div className="max-w-6xl mx-auto w-full mt-4 flex-1 animate-fade-in">
           <section className="relative isolate min-h-[290px] overflow-hidden rounded-[2rem] border border-slate-800 bg-gradient-to-br from-[#101c35] via-slate-900 to-slate-950 px-6 py-10 sm:px-10 sm:py-12 lg:min-h-[330px] shadow-2xl shadow-black/30">
             <div aria-hidden="true" className="pointer-events-none absolute -right-12 -top-24 z-0 h-72 w-72 rounded-full bg-amber-500/15 blur-3xl" />
-            <div aria-hidden="true" className="absolute inset-y-0 right-0 z-0 hidden w-[58%] items-end justify-end overflow-hidden sm:flex"><img src="/berlin-gate.png" alt="" className="h-full w-full object-contain object-right-bottom opacity-95" /><div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/40 to-transparent" /></div>
+            <div aria-hidden="true" className="absolute inset-y-0 right-0 z-0 hidden w-[58%] items-end justify-end overflow-hidden sm:flex"><Image src="/berlin-gate.png" alt="" fill sizes="(min-width: 640px) 58vw, 1px" className="object-contain object-right-bottom opacity-95" /><div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-slate-900/40 to-transparent" /></div>
             <div className="relative z-10 max-w-3xl">
               <span className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1.5 text-xs font-bold text-emerald-300">
                 <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" />

@@ -542,17 +542,17 @@ export const initialFaqs = [
   {
     category: '100% Online Classes',
     q: 'What if I miss a live Zoom class due to load shedding or internet outage?',
-    a: 'Every live session is recorded in HD and uploaded to your student portal within 2 hours, so you never miss a lecture.'
+    a: 'Live sessions are recorded, so you can watch a class you missed and revise it later.'
   },
   {
     category: 'Goethe & Visa Exams',
     q: 'Are your courses aligned with Goethe, telc, and ÖSD exams?',
-    a: 'Yes. Our curriculum is aligned with the official CEFR frameworks of the Goethe-Zertifikat, telc, and ÖSD examination standards required for German Embassy visa applications in Islamabad and Karachi. We provide targeted preparation for these official exams.'
+    a: 'Yes. Our courses follow the CEFR levels (A1–B2) used by the Goethe-Zertifikat, telc and ÖSD exams, and we prepare you for each exam\'s format. Which certificate and level you need depends on your visa route, employer or university, so check its current requirements. We provide preparation only; you book the official exam with the exam provider.'
   },
   {
     category: 'Enrollment & Fees',
     q: 'How do I complete my enrollment and receive payment details?',
-    a: 'Simply click "Enroll Now" (03421189593) on any course card or form, and our admissions team will instantly assist you on WhatsApp.'
+    a: 'Simply click "Enroll Now" (03421189593) on any course card or form, and our admissions team will assist you on WhatsApp.'
   },
   {
     category: 'Enrollment & Fees',
@@ -562,16 +562,21 @@ export const initialFaqs = [
   {
     category: 'Course Duration & Schedule',
     q: 'How long does it take to complete German A1, A2, or B1?',
-    a: 'Foundational courses like <a href="/courses/german-a1" class="text-amber-400 hover:underline font-semibold">German A1</a> and <a href="/courses/german-a2" class="text-amber-400 hover:underline font-semibold">German A2</a> typically take 6 to 8 weeks depending on whether you join regular or weekend batches. Intermediate levels like <a href="/courses/german-b1" class="text-amber-400 hover:underline font-semibold">German B1</a> typically span 8 to 10 weeks of structured instruction.'
+    a: 'Foundational courses like <a href="/courses/german-a1" class="text-amber-400 hover:underline font-semibold">German A1</a> and <a href="/courses/german-a2" class="text-amber-400 hover:underline font-semibold">German A2</a> typically take 6 to 8 weeks depending on whether you join regular or weekend batches. <a href="/courses/german-b1" class="text-amber-400 hover:underline font-semibold">German B1</a> typically takes 8 to 10 weeks and <a href="/courses/german-b2" class="text-amber-400 hover:underline font-semibold">German B2</a> 10 to 12 weeks of live instruction.'
   },
   {
     category: 'Goethe & Visa Exams',
     q: 'How do your courses prepare students for official Goethe-Zertifikat and telc exams?',
-    a: 'Our courses provide module-by-module preparation for Reading (Lesen), Listening (Hören), Writing (Schreiben), and Speaking (Sprechen). Students practice with authentic timed mock exams, letter-writing evaluation, and oral exam drills under our dedicated <a href="/goethe-exam-preparation" class="text-amber-400 hover:underline font-semibold">Goethe exam preparation</a> module.'
+    a: 'Our courses provide module-by-module preparation for Reading (Lesen), Listening (Hören), Writing (Schreiben), and Speaking (Sprechen). Students practise with timed mock exams in the exam format, letter-writing feedback and oral exam drills under our dedicated <a href="/goethe-exam-preparation" class="text-amber-400 hover:underline font-semibold">Goethe exam preparation</a> module.'
   },
   {
     category: '100% Online Classes',
     q: 'Can I join online German classes from Karachi, Lahore, Islamabad, or other Pakistani cities?',
-    a: 'Yes. All classes are conducted 100% live online via Zoom, allowing students located in Karachi, Lahore, Islamabad, Rawalpindi, Peshawar, Multan, Faisalabad, and across Pakistan to participate without travel. This provides thorough preparation from home for official exams conducted at Goethe-Institut Karachi, Goethe-Zentrum Islamabad, or other certified examination centers across Pakistan.'
+    a: 'Yes. All classes are conducted 100% live online via Zoom, allowing students located in Karachi, Lahore, Islamabad, Rawalpindi, Peshawar, Multan, Faisalabad, and across Pakistan to participate without travel. We teach online only and have no physical campus, so you prepare from home and then sit the official exam at a Goethe, telc or ÖSD exam centre of your choice.'
+  },
+  {
+    category: 'Goethe & Visa Exams',
+    q: 'Which German level do I need to move to Germany?',
+    a: 'It depends on your route. The Opportunity Card (Chancenkarte) needs at least A1 German or B2 English, the vocational training (Ausbildung) visa normally needs B1, the spouse visa often needs basic German (A1), and doctors usually need B2 plus a medical language exam. Requirements change, so see our <a href="/german-language-requirements-germany" class="text-amber-400 hover:underline font-semibold">German language requirements for Germany</a> guide and confirm with the official source.'
   }
 ];

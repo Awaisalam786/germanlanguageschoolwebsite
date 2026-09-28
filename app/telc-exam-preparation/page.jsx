@@ -43,11 +43,11 @@ export const metadata = withPageOpenGraph({
 const telcFaqs = [
   {
     q: 'What is a telc German examination?',
-    a: 'telc (The European Language Certificates) is a standardized language testing system aligned with the CEFR framework. telc German certificates are recognized by German embassies, employers, vocational training centers (Ausbildung), and universities for visas, work permits, and study admission.'
+    a: 'telc (The European Language Certificates) is a standardized language testing system aligned with the CEFR framework. telc German certificates are widely used for visas, work, vocational training (Ausbildung) and study, but acceptance depends on the German mission, employer, recognition authority or university you apply to, so check its current requirements before booking.'
   },
   {
     q: 'Is telc accepted for German visas and university admission?',
-    a: 'Yes. telc Deutsch certificates from A1 to B2/C1 are officially accepted by the German Embassy for spouse visas (A1), skilled worker visas (B1/B2), and by many German universities for academic entrance (e.g., telc Deutsch C1 Hochschule or B2).'
+    a: 'telc Deutsch certificates are widely used as language proof, for example A1 for many spouse-visa cases and B1 for the vocational training (Ausbildung) visa. The work visa for qualified professionals has no legal German requirement. For university entrance, telc Deutsch C1 Hochschule is the telc exam designed for this purpose; always check which certificates your embassy appointment, university or employer accepts.'
   },
   {
     q: 'Is German Learning School an official telc examination center?',
@@ -59,7 +59,7 @@ const telcFaqs = [
   },
   {
     q: 'How does telc compare to the Goethe-Zertifikat?',
-    a: 'Both telc and Goethe-Zertifikat adhere to the identical CEFR standards (A1 to C2) and enjoy equivalent legal acceptance for German visas and employment. The primary difference lies in specific task formats and question structuring.'
+    a: 'Both telc and Goethe-Zertifikat adhere to the identical CEFR standards (A1 to C2) and are both widely accepted as proof of German, although the institution asking for a certificate decides which ones it accepts. The primary difference lies in specific task formats and question structuring.'
   },
   {
     q: 'Do you provide mock tests for telc preparation?',
@@ -194,28 +194,28 @@ export default function TelcExamPreparation() {
                   <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">CEFR A1</span>
                   <h3 className="text-lg font-bold text-white">telc Deutsch A1</h3>
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    Certifies beginner German skills for basic everyday interactions and satisfies language requirements for the German spousal visa.
+                    Certifies beginner German skills for basic everyday interactions and is commonly used as proof of basic German for the spouse visa in many family-reunion cases.
                   </p>
                 </div>
                 <div className="p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
                   <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">CEFR A2</span>
                   <h3 className="text-lg font-bold text-white">telc Deutsch A2</h3>
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    Validates elementary German proficiency, contributing points toward the Opportunity Card (Chancenkarte) and Au Pair programs.
+                    Validates elementary German proficiency, earning one point toward the Opportunity Card (Chancenkarte) points system.
                   </p>
                 </div>
                 <div className="p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
                   <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">CEFR B1</span>
                   <h3 className="text-lg font-bold text-white">telc Deutsch B1 / Zertifikat Deutsch</h3>
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    Independent communication proficiency, widely recognized for vocational training (Ausbildung), job search, and naturalization.
+                    Independent communication proficiency; B1 is the level normally required for the vocational training (Ausbildung) visa.
                   </p>
                 </div>
                 <div className="p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
                   <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">CEFR B2</span>
                   <h3 className="text-lg font-bold text-white">telc Deutsch B2 &amp; B2/C1 Medizin</h3>
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    Advanced language competence essential for university admissions, engineers, and foreign medical personnel seeking license recognition.
+                    Upper-intermediate German for university applicants and professionals; telc B2·C1 Medizin is a separate exam that some federal states accept for doctors.
                   </p>
                 </div>
               </div>
@@ -451,6 +451,14 @@ export default function TelcExamPreparation() {
                 </Link>
                 <Link href="/testdaf-preparation" className="text-slate-300 hover:text-amber-400 flex items-center justify-between py-1 border-b border-slate-800">
                   <span>TestDaF Preparation in Pakistan</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                <Link href="/osd-exam-preparation" className="text-slate-300 hover:text-amber-400 flex items-center justify-between py-1 border-b border-slate-800">
+                  <span>ÖSD Exam Preparation</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                <Link href="/german-language-requirements-germany" className="text-slate-300 hover:text-amber-400 flex items-center justify-between py-1 border-b border-slate-800">
+                  <span>German Language Requirements for Germany</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
                 <Link href="/practice-tests" className="text-slate-300 hover:text-amber-400 flex items-center justify-between py-1 border-b border-slate-800">

@@ -17,6 +17,8 @@ export default async function sitemap() {
     '/goethe-exam-preparation',
     '/telc-exam-preparation',
     '/testdaf-preparation',
+    '/osd-exam-preparation',
+    '/german-language-requirements-germany',
     '/about',
     '/contact',
     '/faq',

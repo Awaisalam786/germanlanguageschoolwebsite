@@ -30,6 +30,8 @@ export default function BlogPost({ post, relatedPosts }) {
   const isGoethe = text.includes('goethe') || slug.includes('goethe');
   const isTelc = text.includes('telc') || slug.includes('telc');
   const isTestdaf = text.includes('testdaf') || slug.includes('testdaf');
+  const isOsd = text.includes('ösd') || text.includes('osd') || slug.includes('osd');
+  const isPathway = /visa|ausbildung|opportunity card|chancenkarte|approbation|family reunion|spouse|blue card/.test(text) || /visa|ausbildung|medizin/.test(slug);
 
   return (
     <article className="pb-20">
@@ -156,6 +158,18 @@ export default function BlogPost({ post, relatedPosts }) {
                 {isTelc && (
                   <Link href="/telc-exam-preparation" className="p-3.5 bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl transition flex items-center justify-between group">
                     <span className="text-xs font-bold text-white group-hover:text-amber-400">telc Exam Preparation in Pakistan</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
+                  </Link>
+                )}
+                {isOsd && (
+                  <Link href="/osd-exam-preparation" className="p-3.5 bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl transition flex items-center justify-between group">
+                    <span className="text-xs font-bold text-white group-hover:text-amber-400">ÖSD Exam Preparation</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
+                  </Link>
+                )}
+                {isPathway && (
+                  <Link href="/german-language-requirements-germany" className="p-3.5 bg-slate-950 border border-slate-800 hover:border-amber-500/40 rounded-xl transition flex items-center justify-between group">
+                    <span className="text-xs font-bold text-white group-hover:text-amber-400">German Level Requirements for Germany</span>
                     <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
                   </Link>
                 )}

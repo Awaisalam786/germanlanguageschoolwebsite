@@ -337,6 +337,14 @@ export default function ResourcesPage() {
                   <h3 className="text-base font-bold text-white">TestDaF Preparation</h3>
                   <p className="text-xs text-slate-400 leading-relaxed">Academic German preparation targeting the TDN 4 university benchmark.</p>
                 </Link>
+                <Link href="/osd-exam-preparation" className="p-5 bg-slate-900 border border-slate-800 hover:border-amber-500 rounded-2xl transition-colors block space-y-2">
+                  <h3 className="text-base font-bold text-white">ÖSD Exam Preparation</h3>
+                  <p className="text-xs text-slate-400 leading-relaxed">Austrian ÖSD German exams from A1 to B2: levels, modules and how to prepare.</p>
+                </Link>
+                <Link href="/german-language-requirements-germany" className="p-5 bg-slate-900 border border-slate-800 hover:border-amber-500 rounded-2xl transition-colors block space-y-2">
+                  <h3 className="text-base font-bold text-white">German Language Requirements</h3>
+                  <p className="text-xs text-slate-400 leading-relaxed">Which German level you need for the Opportunity Card, Ausbildung, work, study and family reunion.</p>
+                </Link>
               </div>
             </section>
 

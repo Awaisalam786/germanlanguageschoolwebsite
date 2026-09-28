@@ -158,7 +158,7 @@ export default function GoetheExamPreparation() {
                 <strong className="text-white">Short answer:</strong> To prepare for a Goethe-Zertifikat exam from Pakistan, first confirm the level your visa, university or employer asks for (A1–B2), then practise all four modules — Lesen, Hören, Schreiben and Sprechen — under timed conditions. Register for the official exam with the Goethe-Institut; German Learning School provides preparation only.
               </p>
               <p className="text-slate-300 leading-relaxed text-sm sm:text-base">
-                The Goethe-Zertifikat is the gold standard for certifying German language proficiency worldwide. Recognized by the German Federal Foreign Office (Auswärtiges Amt), universities, and medical licensing boards, it serves as formal verification of your linguistic ability.
+                The Goethe-Zertifikat is one of the most widely used German certificates. It is commonly accepted for visas, study and work, although the institution you apply to decides which certificates it accepts, so check its current requirements first.
               </p>
               <p className="text-slate-300 leading-relaxed text-sm sm:text-base">
                 At German Learning School, we distinguish between standard language learning courses, targeted exam preparation, diagnostic practice tests, and the official examination itself:
@@ -194,28 +194,28 @@ export default function GoetheExamPreparation() {
                   <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">CEFR A1 • Beginner</span>
                   <h3 className="text-lg font-bold text-white">Goethe-Zertifikat A1 (Start Deutsch 1)</h3>
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    Required for the German Spouse / Family Reunion Visa (Ehegattennachzug) and Au Pair applications. Demonstrates basic everyday communication aligned with the <Link href="/german-a1-syllabus" className="text-amber-400 hover:underline">German A1 syllabus</Link>.
+                    Commonly used as proof of basic German for the spouse visa in many family-reunion cases (Ehegattennachzug), and the minimum German level for the points-based Opportunity Card. Demonstrates basic everyday communication aligned with the <Link href="/german-a1-syllabus" className="text-amber-400 hover:underline">German A1 syllabus</Link>.
                   </p>
                 </div>
                 <div className="p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
                   <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">CEFR A2 • Elementary</span>
                   <h3 className="text-lg font-bold text-white">Goethe-Zertifikat A2</h3>
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    Awards +1 point under the German Opportunity Card (Chancenkarte) system and verifies ability to handle routine social and workplace interactions.
+                    Earns one point under the German Opportunity Card (Chancenkarte) points system and verifies ability to handle routine social and workplace interactions.
                   </p>
                 </div>
                 <div className="p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
                   <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">CEFR B1 • Intermediate</span>
                   <h3 className="text-lg font-bold text-white">Goethe-Zertifikat B1</h3>
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    The essential milestone for German vocational training (Ausbildung), Studienkolleg entrance, job seeker visas, and permanent residency.
+                    The level normally required for the German vocational training (Ausbildung) visa, commonly asked for by Studienkollegs, and worth two Opportunity Card points.
                   </p>
                 </div>
                 <div className="p-5 bg-slate-900 border border-slate-800 rounded-2xl space-y-2">
                   <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">CEFR B2 • Upper Intermediate</span>
                   <h3 className="text-lg font-bold text-white">Goethe-Zertifikat B2</h3>
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    Required for university degree admission in Germany and mandatory for foreign healthcare professionals (doctors and nurses) pursuing licensing.
+                    A common target for university applicants and healthcare professionals. Doctors usually need B2 general German plus a separate medical language exam; many German-taught degrees ask for C1-level proof.
                   </p>
                 </div>
               </div>
@@ -451,6 +451,14 @@ export default function GoetheExamPreparation() {
                 </Link>
                 <Link href="/testdaf-preparation" className="text-slate-300 hover:text-amber-400 flex items-center justify-between py-1 border-b border-slate-800">
                   <span>TestDaF Preparation in Pakistan</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                <Link href="/osd-exam-preparation" className="text-slate-300 hover:text-amber-400 flex items-center justify-between py-1 border-b border-slate-800">
+                  <span>ÖSD Exam Preparation</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                <Link href="/german-language-requirements-germany" className="text-slate-300 hover:text-amber-400 flex items-center justify-between py-1 border-b border-slate-800">
+                  <span>German Language Requirements for Germany</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
                 <Link href="/practice-tests" className="text-slate-300 hover:text-amber-400 flex items-center justify-between py-1 border-b border-slate-800">

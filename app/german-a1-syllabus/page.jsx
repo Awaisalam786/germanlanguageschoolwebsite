@@ -287,6 +287,10 @@ export default function GermanA1SyllabusPage() {
             <Compass className="w-7 h-7 text-amber-400" />
             <h2 className="text-2xl sm:text-3xl font-extrabold text-white">What Is German A1?</h2>
           </div>
+
+          <p className="text-slate-200 text-sm sm:text-base leading-relaxed">
+            <strong className="text-white">Short answer:</strong> At German A1 you learn to introduce yourself, ask and answer simple personal questions, use numbers, times and dates, and handle everyday situations such as shopping and asking for directions. Grammar covers present-tense verbs, articles (der, die, das), basic word order and simple questions. A1 is tested by the Goethe-Zertifikat A1 and telc Deutsch A1 in reading, listening, writing and speaking.
+          </p>
           
           <div className="grid md:grid-cols-2 gap-8 text-slate-300 text-sm sm:text-base leading-relaxed">
             <div className="space-y-4">

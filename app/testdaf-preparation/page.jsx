@@ -434,6 +434,14 @@ export default function TestDaFPreparation() {
                   <span>telc Exam Preparation</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
+                <Link href="/osd-exam-preparation" className="text-slate-300 hover:text-amber-400 flex items-center justify-between py-1 border-b border-slate-800">
+                  <span>ÖSD Exam Preparation</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                <Link href="/german-language-requirements-germany" className="text-slate-300 hover:text-amber-400 flex items-center justify-between py-1 border-b border-slate-800">
+                  <span>German Language Requirements for Germany</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
                 <Link href="/practice-tests" className="text-slate-300 hover:text-amber-400 flex items-center justify-between py-1 border-b border-slate-800">
                   <span>Practice Tests Hub</span>
                   <ArrowRight className="w-3.5 h-3.5" />

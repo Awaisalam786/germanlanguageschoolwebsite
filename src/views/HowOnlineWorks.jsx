@@ -15,6 +15,9 @@ export default function HowOnlineWorks({ setActiveTab, onOpenTrialModal }) {
         <p className="text-sm text-slate-300">
           Learn German effectively from your home in Karachi, Lahore, Islamabad, Rawalpindi, Peshawar, Quetta, or anywhere in Pakistan.
         </p>
+        <p className="text-sm text-slate-200 leading-relaxed">
+          <strong className="text-white">Short answer:</strong> Classes are taught live on Zoom in scheduled batches. You join from a phone or laptop, practise speaking with your teacher and classmates in real time, and every session is recorded so you can review it later. Enrollment is handled on WhatsApp, and current fees and batch timings are listed on the <Link href="/courses" className="text-amber-400 hover:underline">Courses page</Link>.
+        </p>
       </div>
 
       {/* 4 Steps Grid */}

@@ -122,7 +122,7 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal, init
               <div className="relative rounded-2xl overflow-hidden border border-slate-700/80 shadow-2xl group">
                 <Image
                   src="https://images.unsplash.com/photo-1588196749597-9ff075ee6b5b?auto=format&fit=crop&w=800&q=80"
-                  alt="Students attending live online German language class in Pakistan"
+                  alt="Person learning German in an online video class"
                   width={800}
                   height={420}
                   priority
@@ -134,6 +134,7 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal, init
                 <div className="absolute inset-0 flex items-center justify-center">
                   <button 
                     onClick={onOpenTrialModal}
+                    aria-label="Book a free trial class"
                     className="w-16 h-16 rounded-full bg-red-600 hover:bg-red-500 text-white flex items-center justify-center shadow-lg shadow-red-500/40 hover:scale-110 transition duration-300 border border-red-400"
                   >
                     <Play className="w-7 h-7 fill-current ml-1" />
@@ -163,7 +164,7 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal, init
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 text-center">
         <h2 className="text-3xl font-extrabold text-white mb-4">Goethe &amp; telc Exam Preparation in Pakistan</h2>
         <p className="text-slate-400 max-w-3xl mx-auto mb-6 leading-relaxed">
-          Prepare for recognized German language certifications with structured practice for listening, reading, writing, and speaking. We provide targeted coaching for <Link href="/goethe-exam-preparation" className="text-amber-400 font-semibold hover:underline">Goethe Exam Preparation</Link>, <Link href="/telc-exam-preparation" className="text-emerald-400 font-semibold hover:underline">telc exam preparation</Link>, and <Link href="/testdaf-preparation" className="text-teal-400 font-semibold hover:underline">TestDaF Preparation</Link> to help students across Pakistan prepare for their exams.
+          Prepare for recognized German language certifications with structured practice for listening, reading, writing, and speaking. We provide targeted coaching for <Link href="/goethe-exam-preparation" className="text-amber-400 font-semibold hover:underline">Goethe Exam Preparation</Link>, <Link href="/telc-exam-preparation" className="text-emerald-400 font-semibold hover:underline">telc exam preparation</Link>, <Link href="/osd-exam-preparation" className="text-emerald-400 font-semibold hover:underline">ÖSD exam preparation</Link> and <Link href="/testdaf-preparation" className="text-teal-400 font-semibold hover:underline">TestDaF Preparation</Link> to help students across Pakistan prepare for their exams.
         </p>
         <div className="flex flex-wrap justify-center items-center gap-3 sm:gap-4 text-xs font-semibold">
           <Link href="/goethe-exam-preparation" className="text-amber-400 hover:underline">
@@ -176,6 +177,10 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal, init
           <span className="text-slate-600 hidden sm:inline">&bull;</span>
           <Link href="/testdaf-preparation" className="text-teal-400 hover:underline">
             TestDaF Preparation &rarr;
+          </Link>
+          <span className="text-slate-600 hidden sm:inline">&bull;</span>
+          <Link href="/german-language-requirements-germany" className="text-amber-400 hover:underline">
+            German Level Requirements for Germany &rarr;
           </Link>
         </div>
       </section>
@@ -362,7 +367,7 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal, init
         <div className="space-y-4">
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
             <h3 className="text-lg font-bold text-white mb-2">How can I join a German language course online in Pakistan?</h3>
-            <p className="text-slate-400 text-sm leading-relaxed">You can join our online German classes from Karachi, Lahore, Islamabad, or any city in Pakistan. We offer live interactive Zoom classes, class recordings, and personalized feedback.</p>
+            <p className="text-slate-400 text-sm leading-relaxed">You can join our online German classes from Karachi, Lahore, Islamabad, or any city in Pakistan. If you want to learn German in Karachi without travelling across the city, you attend the same live Zoom batches from home. We teach online only and do not run a physical campus, so there is no commute. You get live interactive classes, class recordings and personalised feedback.</p>
           </div>
           <div className="bg-slate-900 border border-slate-800 rounded-xl p-6">
             <h3 className="text-lg font-bold text-white mb-2">Which levels are covered in your German classes?</h3>

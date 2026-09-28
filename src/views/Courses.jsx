@@ -194,6 +194,12 @@ export default function Courses({ currentLang, setActiveTab, onOpenTrialModal, i
           <Link href="/testdaf-preparation" className="inline-block px-6 py-2 bg-slate-900 border border-slate-800 hover:border-emerald-500/50 text-emerald-400 rounded-full text-sm font-bold transition-all">
             TestDaF Preparation
           </Link>
+          <Link href="/osd-exam-preparation" className="inline-block px-6 py-2 bg-slate-900 border border-slate-800 hover:border-emerald-500/50 text-emerald-400 rounded-full text-sm font-bold transition-all">
+            ÖSD Exam Preparation
+          </Link>
+          <Link href="/german-language-requirements-germany" className="inline-block px-6 py-2 bg-slate-900 border border-slate-800 hover:border-emerald-500/50 text-emerald-400 rounded-full text-sm font-bold transition-all">
+            German Level Requirements for Germany
+          </Link>
           <Link href="/practice-tests" className="inline-block px-6 py-2 bg-slate-900 border border-slate-800 hover:border-emerald-500/50 text-emerald-400 rounded-full text-sm font-bold transition-all">
             Free German Practice Tests
           </Link>

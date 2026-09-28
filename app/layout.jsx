@@ -11,13 +11,13 @@ export const metadata = {
     default: 'German Language Course in Pakistan | German Learning School',
     template: '%s | German Learning School',
   },
-  description: 'Learn German online in Pakistan with live A1–B2 classes, expert teachers, exam preparation, practice sessions and flexible batches at German Learning School.',
+  description: 'Learn German online in Pakistan with live A1–B2 Zoom classes, Goethe and telc exam prep, free practice tests and flexible batches at German Learning School.',
   alternates: {
     canonical: 'https://germanlearningschool.com/',
   },
   openGraph: {
     title: 'German Language Course in Pakistan | German Learning School',
-    description: 'Learn German online in Pakistan with live A1–B2 classes, expert teachers, exam preparation, practice sessions and flexible batches at German Learning School.',
+    description: 'Learn German online in Pakistan with live A1–B2 Zoom classes, Goethe and telc exam prep, free practice tests and flexible batches at German Learning School.',
     // No `url` here on purpose: a global og:url would be inherited by every
     // route without its own openGraph block and point them all at the
     // homepage. Each route sets og:url from its canonical (see src/lib/seo.js).

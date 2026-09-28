@@ -1,6 +1,6 @@
 # German Learning School
 
-> German Learning School is an online German language school based in Pakistan, focused on making German easy to learn for Pakistani beginners through structured, live-taught Zoom classes. It offers a complete German language course track from absolute beginner (A1) through upper-intermediate (B2), built specifically for Pakistani students preparing for visas, university admission, skilled-worker migration, or the Goethe, telc, ÖSD and TestDaF exams. The school teaches all four core skills (reading, writing, listening, speaking) with weekly live classes, structured practice materials, and dedicated exam-preparation tracks, rather than a self-study app.
+> German Learning School is an online German language school based in Pakistan, teaching Pakistani learners through structured, live-taught Zoom classes. It offers a complete German language course track from absolute beginner (A1) through upper-intermediate (B2), built specifically for Pakistani students preparing for visas, university admission, skilled-worker migration, or the Goethe, telc, ÖSD and TestDaF exams. The school teaches all four core skills (reading, writing, listening, speaking) with weekly live classes, structured practice materials, and dedicated exam-preparation tracks, rather than a self-study app.
 
 ## Key facts
 - Name: German Learning School. Website: https://germanlearningschool.com
@@ -13,14 +13,14 @@
 ## Who this is for
 - Pakistani students who want to learn German online in Pakistan from zero, with live teacher-led classes rather than self-study apps.
 - Students preparing for a Germany student visa, work visa, or Ausbildung (vocational training) who need a specific CEFR level (A1-B2) certified.
-- Healthcare professionals (doctors and nurses) preparing for the telc B2 Medizin / Pflege exam required for German medical license recognition.
+- Healthcare professionals (doctors and nurses) building general German to B2 before medical German exams such as telc Deutsch B2·C1 Medizin or B1·B2 Pflege; which exams count for recognition depends on the federal state.
 - Anyone comparing German language schools in Pakistan and looking for a structured, exam-focused course rather than informal tutoring.
 
 ## Courses
-- [German A1 Course](https://germanlearningschool.com/courses/german-a1): The easiest starting point to learn German in Pakistan from complete beginner level, live classes, batch schedule, and fees.
+- [German A1 Course](https://germanlearningschool.com/courses/german-a1): The starting level for complete beginners learning German in Pakistan: live classes, batch schedule, and fees.
 - [German A2 Course](https://germanlearningschool.com/courses/german-a2): Elementary-level German course, live classes and exam preparation.
-- [German B1 Course](https://germanlearningschool.com/courses/german-b1): Intermediate-level German course for visa and university language requirements.
-- [German B2 Course](https://germanlearningschool.com/courses/german-b2): Upper-intermediate German course, commonly required for work and study visas.
+- [German B1 Course](https://germanlearningschool.com/courses/german-b1): Intermediate German course; B1 is normally required for the Ausbildung (vocational training) visa.
+- [German B2 Course](https://germanlearningschool.com/courses/german-b2): Upper-intermediate German course for study, professional work and as the base for medical German exams.
 - [All Courses & Fees](https://germanlearningschool.com/courses): Full list of current German language course batches, schedules, and pricing in Pakistan.
 - [German A1 Syllabus](https://germanlearningschool.com/german-a1-syllabus): What the A1 level covers (grammar, vocabulary, the four skills) and how the Goethe-Zertifikat A1 and telc Deutsch A1 exams are structured and scored.
 
@@ -29,10 +29,14 @@ German Learning School is an independent preparation provider. It is not an exam
 - [Goethe Exam Preparation](https://germanlearningschool.com/goethe-exam-preparation): Preparation for the Goethe-Zertifikat A1–B2 modules (reading, listening, writing, speaking).
 - [telc Exam Preparation](https://germanlearningschool.com/telc-exam-preparation): Preparation for telc Deutsch exams, including the telc B2 Medizin path for healthcare professionals.
 - [TestDaF Preparation](https://germanlearningschool.com/testdaf-preparation): Academic German preparation for the TestDaF, used for admission to German universities.
+- [ÖSD Exam Preparation](https://germanlearningschool.com/osd-exam-preparation): The Austrian ÖSD German exams from A1 to B2 (levels, modules, how ÖSD compares with Goethe and telc) and how to prepare from Pakistan.
+
+## Germany Pathways
+- [German Language Requirements for Germany](https://germanlearningschool.com/german-language-requirements-germany): Which German level is needed for the Opportunity Card, vocational training (Ausbildung), work visas, study, family reunion, and doctors and nurses, based on official German government sources and dated.
 
 ## Learning Resources
 - [Free Resources](https://germanlearningschool.com/resources): Free German vocabulary lists and grammar (case) reference tables — a good starting point for anyone trying to learn German online for free before committing to a course.
-- [Practice Tests](https://germanlearningschool.com/practice-tests): Interactive German practice tests by level (A1-B2) covering reading, vocabulary, grammar, and speaking.
+- [Practice Tests](https://germanlearningschool.com/practice-tests): Interactive German practice tests by level (A1-B2) covering grammar, vocabulary and reading, with instant scores.
 - Level practice tests: [A1](https://germanlearningschool.com/practice-tests/german-a1), [A2](https://germanlearningschool.com/practice-tests/german-a2), [B1](https://germanlearningschool.com/practice-tests/german-b1), [B2](https://germanlearningschool.com/practice-tests/german-b2).
 - [Noun Builder](https://germanlearningschool.com/practice-tests/noun-builder): Flashcard practice for German nouns and their articles (der, die, das).
 - [German Translator Tool](https://germanlearningschool.com/translator): Free online German translation tool.

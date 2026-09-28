@@ -417,7 +417,7 @@ export default function PracticeTestLevelPage({ level }) {
                 <Link href="/blog/what-german-level-do-you-need-for-a-germany-work-visa-a1-to-c1-explained" className="p-4 bg-slate-950 border border-slate-800 hover:border-slate-700 rounded-xl transition flex items-center justify-between group block">
                   <div>
                     <h3 className="text-sm font-bold text-white group-hover:text-amber-400">German Level for Work Visas &amp; Ausbildung</h3>
-                    <p className="text-xs text-slate-400 mt-0.5">Why B1 certification is mandatory for skilled immigration and training.</p>
+                    <p className="text-xs text-slate-400 mt-0.5">Which German work and training routes ask for B1, and which have no fixed requirement.</p>
                   </div>
                   <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-amber-400 shrink-0 ml-3" />
                 </Link>

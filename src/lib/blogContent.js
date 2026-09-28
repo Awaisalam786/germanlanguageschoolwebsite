@@ -10,3 +10,19 @@ export function normalizeBlogContentHeadings(html) {
     .replace(/<h1(\s[^>]*)?>/gi, (_, attrs = '') => `<h2${attrs}>`)
     .replace(/<\/h1\s*>/gi, '</h2>');
 }
+
+// Posts pasted into the editor store every space between words as a
+// non-breaking space (&nbsp;), so paragraphs cannot wrap and get clipped on
+// narrow screens. Turn them back into normal spaces. Text content is
+// otherwise unchanged; <pre> blocks are left alone.
+export function normalizeBlogContentSpaces(html) {
+  if (typeof html !== 'string' || !/&nbsp;|&#160;|\u00a0/.test(html)) return html;
+  return html
+    .split(/(<pre[\s\S]*?<\/pre>)/i)
+    .map((part) => (/^<pre/i.test(part) ? part : part.replace(/&nbsp;|&#160;|\u00a0/g, ' ')))
+    .join('');
+}
+
+export function normalizeBlogContent(html) {
+  return normalizeBlogContentSpaces(normalizeBlogContentHeadings(html));
+}

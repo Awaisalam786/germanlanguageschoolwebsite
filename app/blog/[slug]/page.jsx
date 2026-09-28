@@ -2,7 +2,7 @@ import { supabase } from '../../../src/lib/supabaseClient';
 import BlogPostClient from '../../../src/views/BlogPost';
 import SchemaMarkup from '../../../src/components/SchemaMarkup';
 import { notFound } from 'next/navigation';
-import { normalizeBlogContentHeadings } from '../../../src/lib/blogContent';
+import { normalizeBlogContent } from '../../../src/lib/blogContent';
 import { DEFAULT_OG_IMAGE, ORGANIZATION_REF, SITE_NAME } from '../../../src/lib/seo';
 
 export const revalidate = 60; // Revalidate cache every 60 seconds
@@ -99,7 +99,8 @@ export default async function BlogPostPage({ params }) {
     "description": post.meta_description || post.summary,
     "image": post.image ? [post.image] : [],
     "datePublished": post.created_at,
-    "dateModified": post.created_at,
+    // blog_posts has no updated_at column yet; once it exists it is used here.
+    "dateModified": post.updated_at || post.created_at,
     // "German Learning School Team" (the default byline) is the school itself,
     // not a person, so it points at the Organization entity.
     "author": isTeamAuthor(post.author)
@@ -123,7 +124,7 @@ export default async function BlogPostPage({ params }) {
       <SchemaMarkup schema={breadcrumbSchema} />
       <SchemaMarkup schema={articleSchema} />
       <BlogPostClient
-        post={{ ...post, content: normalizeBlogContentHeadings(post.content) }}
+        post={{ ...post, content: normalizeBlogContent(post.content) }}
         relatedPosts={relatedPosts}
       />
     </>
