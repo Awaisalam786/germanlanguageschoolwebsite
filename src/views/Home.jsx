@@ -17,7 +17,6 @@ import { supabase } from '../lib/supabaseClient';
 import { translations } from '../i18n/translations';
 import { useGlobalContent } from '../context/GlobalContentContext';
 import CertificateShowcase from '../components/CertificateShowcase';
-import GoogleReviewsWidget from '../components/GoogleReviewsWidget';
 import ExamLogosRow from '../components/ExamLogosRow';
 import CourseCard from '../components/CourseCard';
 import CourseBundles from '../components/CourseBundles';
@@ -347,7 +346,6 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal, init
 
         {/* 4. LIVE GOOGLE REVIEWS WIDGET */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
-          <GoogleReviewsWidget />
         </div>
 
         {/* Short-form video reels removed: they were placeholder mock data
