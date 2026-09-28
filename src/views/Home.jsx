@@ -285,7 +285,7 @@ export default function Home({ currentLang, setActiveTab, onOpenTrialModal, init
           <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
             <Video className="w-8 h-8 text-emerald-400 mb-4" />
             <h3 className="text-xl font-bold text-white mb-2">Live Zoom Classes</h3>
-            <p className="text-slate-400 text-sm">Interactive, real-time sessions with our <Link href="/teachers" className="text-amber-400 hover:underline">instructors</Link>. Ask questions, practice speaking, and get instant feedback.</p>
+            <p className="text-slate-400 text-sm">Interactive, real-time sessions with our instructors. Ask questions, practice speaking, and get instant feedback.</p>
           </div>
           <div className="bg-slate-900 border border-slate-800 p-6 rounded-2xl">
             <Laptop className="w-8 h-8 text-amber-400 mb-4" />

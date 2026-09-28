@@ -69,7 +69,8 @@ export default function About({ currentLang, setActiveTab }) {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Faculty card hidden while /teachers has no real profiles (noindex). */}
+        <div className="grid grid-cols-1 gap-6 max-w-3xl mx-auto w-full">
           <Link 
             href="/founder" 
             className="group block p-6 bg-slate-900 border border-slate-800 hover:border-amber-500/50 rounded-2xl transition-all duration-300 shadow-lg"
@@ -93,28 +94,6 @@ export default function About({ currentLang, setActiveTab }) {
             </div>
           </Link>
 
-          <Link 
-            href="/teachers" 
-            className="group block p-6 bg-slate-900 border border-slate-800 hover:border-amber-500/50 rounded-2xl transition-all duration-300 shadow-lg"
-          >
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-xl bg-red-500/10 text-red-500 flex items-center justify-center border border-red-500/30 shrink-0 group-hover:scale-105 transition-transform">
-                <Users className="w-6 h-6" />
-              </div>
-              <div className="space-y-2 flex-1">
-                <h3 className="text-lg font-bold text-white group-hover:text-red-400 transition-colors flex items-center gap-1.5">
-                  Meet Our Teaching Faculty
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform text-red-400" />
-                </h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
-                  Learn about our instructors and how they teach live Zoom classes, Goethe and telc exam preparation, and interactive German coaching.
-                </p>
-                <span className="inline-flex items-center gap-1 text-xs font-bold text-red-400 pt-1">
-                  View Faculty Members &rarr;
-                </span>
-              </div>
-            </div>
-          </Link>
         </div>
       </div>
 

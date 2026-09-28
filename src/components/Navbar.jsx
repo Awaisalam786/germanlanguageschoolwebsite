@@ -73,7 +73,8 @@ export default function Navbar({
   const aboutMenuItems = [
     { id: 'about', label: t.nav.about, icon: Users, desc: 'Our mission & 100% online model' },
     { id: 'founder', label: t.nav.founder, icon: UserCheck, desc: 'Founder & head mentor profile' },
-    { id: 'teachers', label: t.nav.teachers, icon: ShieldCheck, desc: 'Our teaching team' },
+    // 'teachers' is hidden while the teachers table has no real profiles
+    // (/teachers is noindex). Re-add when genuine profiles are published.
   ];
 
   // Dropdown 2: Resources Group
@@ -84,7 +85,8 @@ export default function Navbar({
     { id: 'howItWorks', label: t.nav.howItWorks, icon: Laptop, desc: 'Live Zoom & HD lecture archive' },
     { id: 'practice-tests', label: 'Practice Tests', icon: CheckSquare, desc: 'Interactive HTML tests with auto-grading' },
     { id: 'gallery', label: t.nav.gallery, icon: GalleryIcon, desc: 'Live class screenshots & events' },
-    { id: 'testimonials', label: t.nav.testimonials, icon: MessageSquare, desc: 'Graduation stories & reviews' },
+    // 'testimonials' is hidden while there are no consented testimonials
+    // (/testimonials is noindex). Re-add when real testimonials are published.
     { id: 'faq', label: t.nav.faq, icon: HelpCircle, desc: 'Common questions answered' },
     { id: 'blog', label: t.nav.blog, icon: FileText, desc: 'German visa & exam preparation tips' },
   ];
@@ -100,13 +102,13 @@ export default function Navbar({
       <div className="h-1 w-full german-flag-strip"></div>
 
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20 gap-2 sm:gap-4">
+        <div className="flex items-center justify-between h-20 gap-1.5 sm:gap-4">
           
           {/* Brand Logo */}
           <Link href="/"
-            className="flex items-center space-x-2 sm:space-x-3 cursor-pointer group min-w-0"
+            className="flex items-center gap-1.5 sm:gap-3 cursor-pointer group min-w-0"
           >
-            <div className="flex w-[48px] h-[48px] sm:w-[64px] sm:h-[64px] rounded-xl sm:rounded-2xl bg-gradient-to-tr from-slate-900 via-slate-800 to-slate-950 shadow-lg group-hover:scale-105 transition-transform duration-300 border border-amber-500/30 shrink-0">
+            <div className="flex w-10 h-10 min-[375px]:w-12 min-[375px]:h-12 sm:w-[64px] sm:h-[64px] rounded-xl sm:rounded-2xl bg-gradient-to-tr from-slate-900 via-slate-800 to-slate-950 shadow-lg group-hover:scale-105 transition-transform duration-300 border border-amber-500/30 shrink-0">
               <div className="w-full h-full flex items-center justify-center bg-slate-950 rounded-[10px] sm:rounded-[14px] p-0">
                 {settings?.logo_url ? (
                   <img
@@ -122,9 +124,9 @@ export default function Navbar({
                 )}
               </div>
             </div>
-            <div className="min-w-0">
-              <span className="text-[15px] sm:text-xl font-extrabold tracking-tight text-white font-sans flex items-center gap-1 sm:gap-1.5 leading-none truncate">
-                German <span className="text-red-500 font-extrabold ml-1">Learning School</span>
+            <div className="min-w-0" dir="ltr">
+              <span className="text-[14px] min-[375px]:text-[15px] sm:text-xl font-extrabold tracking-tight text-white font-sans flex flex-col sm:flex-row sm:items-center sm:gap-2.5 leading-tight sm:leading-none whitespace-nowrap">
+                <span>German</span> <span className="text-red-500 font-extrabold">Learning School</span>
               </span>
               <span className="hidden sm:block text-[9px] tracking-widest text-slate-400 uppercase font-bold mt-1 truncate">
                 {settings?.tagline || 'Learn, Practice, Pass Goethe'}
@@ -306,14 +308,14 @@ export default function Navbar({
           </nav>
 
           {/* Desktop Right Action Area: Language Switcher & Hamburger Button */}
-          <div className="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
+          <div className="flex items-center gap-1 sm:gap-3 shrink-0">
             
             {/* Language Switcher Badge */}
             <div className="relative flex items-center bg-slate-900 border border-slate-800 rounded-lg sm:rounded-xl p-0.5 sm:p-1 text-[10px] sm:text-xs shadow-inner">
               <Globe className="hidden sm:block w-3.5 h-3.5 text-slate-400 ml-1.5 mr-1 shrink-0" />
               <button
                 onClick={() => setLanguage('en')}
-                className={`px-1.5 py-1 sm:px-2 sm:py-1 rounded-md sm:rounded-lg font-bold transition-all duration-200 ${
+                className={`px-1 min-[375px]:px-1.5 py-1 sm:px-2 sm:py-1 rounded-md sm:rounded-lg font-bold transition-all duration-200 ${
                   currentLang === 'en' 
                     ? 'bg-red-600 text-white shadow-md sm:scale-105' 
                     : 'text-slate-400 hover:text-white'
@@ -323,7 +325,7 @@ export default function Navbar({
               </button>
               <button
                 onClick={() => setLanguage('de')}
-                className={`px-1.5 py-1 sm:px-2 sm:py-1 rounded-md sm:rounded-lg font-bold transition-all duration-200 ${
+                className={`px-1 min-[375px]:px-1.5 py-1 sm:px-2 sm:py-1 rounded-md sm:rounded-lg font-bold transition-all duration-200 ${
                   currentLang === 'de' 
                     ? 'bg-red-600 text-white shadow-md sm:scale-105' 
                     : 'text-slate-400 hover:text-white'
@@ -333,7 +335,7 @@ export default function Navbar({
               </button>
               <button
                 onClick={() => setLanguage('ur')}
-                className={`px-1.5 py-1 sm:px-2 sm:py-1 rounded-md sm:rounded-lg font-bold transition-all duration-200 font-urdu ${
+                className={`px-1 min-[375px]:px-1.5 py-1 sm:px-2 sm:py-1 rounded-md sm:rounded-lg font-bold transition-all duration-200 font-urdu ${
                   currentLang === 'ur' 
                     ? 'bg-red-600 text-white shadow-md sm:scale-105' 
                     : 'text-slate-400 hover:text-white'
