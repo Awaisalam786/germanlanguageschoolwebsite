@@ -46,6 +46,10 @@ const telcFaqs = [
     a: 'telc (The European Language Certificates) is a standardized language testing system aligned with the CEFR framework. telc German certificates are widely used for visas, work, vocational training (Ausbildung) and study, but acceptance depends on the German mission, employer, recognition authority or university you apply to, so check its current requirements before booking.'
   },
   {
+    q: 'Can I take the telc exam in Pakistan?',
+    a: 'telc exams are held only at licensed telc examination centres. To find a centre, dates and fees for Pakistan, use the official "Find a telc examination centre" search on telc.net, because centres and dates change. German Learning School provides preparation only: you register for the official exam directly with the exam centre.'
+  },
+  {
     q: 'Is telc accepted for German visas and university admission?',
     a: 'telc Deutsch certificates are widely used as language proof, for example A1 for many spouse-visa cases and B1 for the vocational training (Ausbildung) visa. The work visa for qualified professionals has no legal German requirement. For university entrance, telc Deutsch C1 Hochschule is the telc exam designed for this purpose; always check which certificates your embassy appointment, university or employer accepts.'
   },

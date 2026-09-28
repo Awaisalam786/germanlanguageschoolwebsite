@@ -25,7 +25,7 @@ export const metadata = withPageOpenGraph({
   title: {
     absolute: 'German A1 Syllabus: Complete Beginner Course Guide | German Learning School',
   },
-  description: 'Explore the complete German A1 syllabus including grammar, vocabulary, speaking, listening, reading, writing, and exam preparation. Start learning German A1 online.',
+  description: 'Complete German A1 syllabus: grammar, vocabulary, the four skills and the Goethe-Zertifikat A1 and telc A1 exam format, with a free A1 practice test.',
   alternates: {
     canonical: '/german-a1-syllabus',
   },
@@ -38,7 +38,7 @@ export const metadata = withPageOpenGraph({
   },
   openGraph: {
     title: 'German A1 Syllabus: Complete Beginner Course Guide | German Learning School',
-    description: 'Explore the complete German A1 syllabus including grammar, vocabulary, speaking, listening, reading, writing, and exam preparation. Start learning German A1 online.',
+    description: 'Complete German A1 syllabus: grammar, vocabulary, the four skills and the Goethe-Zertifikat A1 and telc A1 exam format, with a free A1 practice test.',
     url: 'https://germanlearningschool.com/german-a1-syllabus',
     siteName: 'German Learning School',
     locale: 'en_PK',
@@ -47,7 +47,7 @@ export const metadata = withPageOpenGraph({
   twitter: {
     card: 'summary_large_image',
     title: 'German A1 Syllabus: Complete Beginner Course Guide | German Learning School',
-    description: 'Explore the complete German A1 syllabus including grammar, vocabulary, speaking, listening, reading, writing, and exam preparation. Start learning German A1 online.',
+    description: 'Complete German A1 syllabus: grammar, vocabulary, the four skills and the Goethe-Zertifikat A1 and telc A1 exam format, with a free A1 practice test.',
   },
 });
 
@@ -252,7 +252,7 @@ export default function GermanA1SyllabusPage() {
         <header className="text-center max-w-4xl mx-auto space-y-6">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 text-amber-400 text-xs font-bold border border-amber-500/30">
             <Sparkles className="w-4 h-4" />
-            <span>Official CEFR Beginner Curriculum</span>
+            <span>CEFR Beginner Curriculum</span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
@@ -456,7 +456,7 @@ export default function GermanA1SyllabusPage() {
 
           <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-6 shadow-xl">
             <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-              Upon finishing the A1 syllabus, candidates commonly sit for formal international language exams. The two most widely accepted standardized examinations are the <strong>Goethe-Zertifikat A1: Start Deutsch 1</strong> and the <strong>telc Deutsch A1</strong>. Both examinations assess candidates across four distinct test modules:
+              Upon finishing the A1 syllabus, candidates commonly sit for formal international language exams. Two common A1 exams are the <strong>Goethe-Zertifikat A1: Start Deutsch 1</strong> and the <strong>telc Deutsch A1</strong>. Both examinations assess candidates across four distinct test modules:
             </p>
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs sm:text-sm">
