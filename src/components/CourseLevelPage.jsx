@@ -175,7 +175,7 @@ export default async function CourseLevelPage({ level }) {
                 <p><strong>Format:</strong> 100% Live Online Zoom Classes with real-time teacher interaction.</p>
                 {course && <p><strong>Duration:</strong> {course.duration || '6 to 8 weeks depending on batch'}</p>}
                 {course && <p><strong>Schedule:</strong> {course.schedule || 'Evening and weekend batches available'}</p>}
-                <p><strong>Class Recordings:</strong> Full recording access provided after each session for convenient revision anywhere in Pakistan.</p>
+                <p><strong>Class Recordings:</strong> Every live class is recorded, and the recording is shared with enrolled students for revision (upload timing may vary).</p>
                 <p><strong>Course Fee:</strong> {course ? (String(course.price).includes('PKR') || String(course.price).includes('₨') ? course.price : `PKR ${course.price}`) : 'Affordable pricing in PKR with installment options available. Check our Courses page for current batch fee.'}</p>
                 <div className="pt-2">
                   <Link href="/courses" className="text-amber-400 hover:underline text-sm font-semibold inline-flex items-center gap-1">

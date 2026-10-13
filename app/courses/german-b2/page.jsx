@@ -2,14 +2,16 @@ import CourseLevelPage from '../../../src/components/CourseLevelPage';
 import { withPageOpenGraph } from '../../../src/lib/seo';
 
 export const metadata = withPageOpenGraph({
-  title: 'German B2 Course in Pakistan | German Learning School',
-  description: 'Advance your fluency with our German B2 course in Pakistan. Live online classes covering professional German, advanced grammar, and Goethe B2 exam preparation.',
+  title: {
+    absolute: 'German B2 Course in Pakistan (Study & Work) | German Learning School',
+  },
+  description: 'Master upper-intermediate German with live online B2 classes in Pakistan. Comprehensive Goethe & telc B2 exam coaching for university admission and careers.',
   alternates: {
     canonical: '/courses/german-b2',
   },
   openGraph: {
-    title: 'German B2 Course in Pakistan | German Learning School',
-    description: 'Advance your fluency with our German B2 course in Pakistan. Live online classes covering professional German, advanced grammar, and Goethe B2 exam preparation.',
+    title: 'German B2 Course in Pakistan (Study & Work) | German Learning School',
+    description: 'Master upper-intermediate German with live online B2 classes in Pakistan. Comprehensive Goethe & telc B2 exam coaching for university admission and careers.',
     url: 'https://germanlearningschool.com/courses/german-b2',
     siteName: 'German Learning School',
     locale: 'en_PK',
@@ -17,8 +19,8 @@ export const metadata = withPageOpenGraph({
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'German B2 Course in Pakistan | German Learning School',
-    description: 'Advance your fluency with our German B2 course in Pakistan. Live online classes covering professional German, advanced grammar, and Goethe B2 exam preparation.',
+    title: 'German B2 Course in Pakistan (Study & Work) | German Learning School',
+    description: 'Master upper-intermediate German with live online B2 classes in Pakistan. Comprehensive Goethe & telc B2 exam coaching for university admission and careers.',
   },
 });
 

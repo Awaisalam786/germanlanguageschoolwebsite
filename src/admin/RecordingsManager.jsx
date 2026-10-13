@@ -64,7 +64,7 @@ export default function RecordingsManager() {
             <Video className="w-6 h-6 text-amber-400" />
             <span>Class & Zoom Lecture Recording Manager</span>
           </h2>
-          <p className="text-xs text-slate-400">Upload HD Zoom lecture recordings for enrolled Pakistani students to access anytime.</p>
+          <p className="text-xs text-slate-400">Upload Zoom lecture recordings for enrolled Pakistani students to access anytime.</p>
         </div>
 
         <button

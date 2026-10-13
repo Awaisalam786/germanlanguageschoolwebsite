@@ -16,7 +16,7 @@ export default function HowOnlineWorks({ setActiveTab, onOpenTrialModal }) {
           Learn German effectively from your home in Karachi, Lahore, Islamabad, Rawalpindi, Peshawar, Quetta, or anywhere in Pakistan.
         </p>
         <p className="text-sm text-slate-200 leading-relaxed">
-          <strong className="text-white">Short answer:</strong> Classes are taught live on Zoom in scheduled batches. You join from a phone or laptop, practise speaking with your teacher and classmates in real time, and every session is recorded so you can review it later. Enrollment is handled on WhatsApp, and current fees and batch timings are listed on the <Link href="/courses" className="text-amber-400 hover:underline">Courses page</Link>.
+          <strong className="text-white">Short answer:</strong> Classes are taught live on Zoom in scheduled batches. You join from a phone or laptop, practise speaking with your teacher and classmates in real time, and every live class is recorded and shared with enrolled students for revision (upload timing may vary). Enrollment is handled on WhatsApp, and current fees and batch timings are listed on the <Link href="/courses" className="text-amber-400 hover:underline">Courses page</Link>.
         </p>
       </div>
 
@@ -29,21 +29,21 @@ export default function HowOnlineWorks({ setActiveTab, onOpenTrialModal }) {
             title: 'Live Interactive Zoom Classes',
             desc: (
               <>
-                Join live HD sessions with our German language instructors. Speak, practice dialogues, and explore our structured <Link href="/courses" className="text-amber-400 hover:underline font-medium">A1–B2 German courses</Link> in real-time.
+                Join live interactive sessions with our German language instructors. Speak, practice dialogues, and explore our structured <Link href="/courses" className="text-amber-400 hover:underline font-medium">A1–B2 German courses</Link> in real-time.
               </>
             )
           },
           {
             step: '02',
             icon: PlayCircle,
-            title: 'HD Recorded Lecture Vault',
-            desc: 'Missed a class because of load shedding or an internet problem? Live lectures are recorded so you can catch up and revise later.'
+            title: 'Recorded Lecture Library',
+            desc: 'Missed a class due to load shedding or a busy schedule? Every live class is recorded, and the recording is shared with enrolled students for revision. Upload timing may vary.'
           },
           {
             step: '03',
             icon: Smartphone,
             title: 'Instructor WhatsApp Groups',
-            desc: 'Join your batch WhatsApp group for vocabulary practice, homework questions and updates from your teacher.'
+            desc: 'Join your batch WhatsApp group for class updates, practice materials, and homework coordination (teacher guidance provided during batch hours; response times may vary).'
           },
           {
             step: '04',
@@ -85,9 +85,9 @@ export default function HowOnlineWorks({ setActiveTab, onOpenTrialModal }) {
 
           <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-2">
             <Wifi className="w-6 h-6 text-emerald-400" />
-            <h4 className="text-base font-bold text-white">Internet Speed</h4>
+            <h4 className="text-base font-bold text-white">Internet Connection</h4>
             <p className="text-xs text-slate-400">
-              Standard 3G/4G mobile data or broadband Wi-Fi connection (1-2 Mbps is sufficient).
+              A stable broadband Wi-Fi or 3G/4G mobile data connection (a reliable connection is recommended for live video calls).
             </p>
           </div>
 
@@ -116,7 +116,7 @@ export default function HowOnlineWorks({ setActiveTab, onOpenTrialModal }) {
           <div className="bg-slate-950 p-6 rounded-2xl border border-slate-800 space-y-2">
             <h3 className="text-base font-bold text-white">Lecture Recordings for Review</h3>
             <p className="text-xs text-slate-400 leading-relaxed">
-              Every lecture is recorded and available for review, ensuring students never miss lessons due to load shedding or schedule conflicts.
+              Every live class is recorded, and the recording is shared with enrolled students for revision (upload timing may vary), ensuring students do not fall behind during load shedding or schedule conflicts.
             </p>
           </div>
 
@@ -132,7 +132,7 @@ export default function HowOnlineWorks({ setActiveTab, onOpenTrialModal }) {
       {/* CTA Box */}
       <div className="bg-gradient-to-r from-amber-600 to-red-600 rounded-3xl p-8 text-slate-950 text-center space-y-4 shadow-2xl">
         <h3 className="text-2xl font-extrabold">Experience a Live Online Demo Class First</h3>
-        <p className="text-xs font-medium">Book a 30-minute free trial session to see our interactive Zoom setup live!</p>
+        <p className="text-xs font-medium">Book a free live demonstration session to see our interactive Zoom classroom setup firsthand!</p>
         <button
           onClick={onOpenTrialModal}
           className="px-8 py-3 bg-slate-950 text-amber-400 font-extrabold rounded-xl text-xs shadow-2xl hover:scale-105 transition"

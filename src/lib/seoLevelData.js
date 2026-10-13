@@ -73,7 +73,7 @@ export const levelData = {
       },
       {
         q: 'What is the duration and class format for German A2?',
-        a: 'The course runs for approximately 6 to 8 weeks via live Zoom classes. All sessions are recorded and made available for review, accommodating university students and working professionals across Pakistan.'
+        a: 'The course runs for approximately 6 to 8 weeks via live Zoom classes. Every live class is recorded, and the recording is shared with enrolled students for revision (upload timing may vary), accommodating university students and working professionals across Pakistan.'
       },
       {
         q: 'Does the A2 course include Goethe exam preparation?',

@@ -53,7 +53,7 @@ export default async function sitemap() {
   // Homepage and its Urdu version (/ur) declare each other as language
   // alternates, matching the hreflang links in their page metadata.
   const homeLanguages = {
-    en: `${baseUrl}/`,
+    en: `${baseUrl}`,
     ur: `${baseUrl}/ur`,
   };
 

@@ -19,15 +19,15 @@ import { withPageOpenGraph } from '../../src/lib/seo';
 
 export const metadata = withPageOpenGraph({
   title: {
-    absolute: 'telc Exam Preparation in Pakistan | German Learning School',
+    absolute: 'telc Exam Preparation in Pakistan (A1–B2) | German Learning School',
   },
-  description: 'Prepare for telc German exams in Pakistan with structured online coaching. Master reading, listening, writing, and speaking for telc A1, A2, B1, and B2 levels.',
+  description: 'Prepare for telc German exams in Pakistan (A1, A2, B1, B2) with live online coaching. Master reading, listening, writing, speaking & Sprachbausteine with mock tests.',
   alternates: {
     canonical: '/telc-exam-preparation',
   },
   openGraph: {
-    title: 'telc Exam Preparation in Pakistan | German Learning School',
-    description: 'Prepare for telc German exams in Pakistan with structured online coaching. Master reading, listening, writing, and speaking for telc A1, A2, B1, and B2 levels.',
+    title: 'telc Exam Preparation in Pakistan (A1–B2) | German Learning School',
+    description: 'Prepare for telc German exams in Pakistan (A1, A2, B1, B2) with live online coaching. Master reading, listening, writing, speaking & Sprachbausteine with mock tests.',
     url: 'https://germanlearningschool.com/telc-exam-preparation',
     siteName: 'German Learning School',
     locale: 'en_PK',
@@ -35,8 +35,8 @@ export const metadata = withPageOpenGraph({
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'telc Exam Preparation in Pakistan | German Learning School',
-    description: 'Prepare for telc German exams in Pakistan with structured online coaching. Master reading, listening, writing, and speaking for telc A1, A2, B1, and B2 levels.',
+    title: 'telc Exam Preparation in Pakistan (A1–B2) | German Learning School',
+    description: 'Prepare for telc German exams in Pakistan (A1, A2, B1, B2) with live online coaching. Master reading, listening, writing, speaking & Sprachbausteine with mock tests.',
   },
 });
 
@@ -162,7 +162,7 @@ export default function TelcExamPreparation() {
                 <strong className="text-white">Short answer:</strong> telc Deutsch exams test reading, listening, writing and speaking at a CEFR level, and many levels include a Sprachbausteine section on grammar and vocabulary in context. To prepare from Pakistan, practise every module under timed conditions and register for the official exam through an authorised telc test centre; German Learning School provides preparation only.
               </p>
               <p className="text-slate-300 leading-relaxed text-sm sm:text-base">
-                telc (The European Language Certificates) examinations are internationally recognized standardized tests aligned with the Common European Framework of Reference for Languages (CEFR). telc certificates are widely accepted by German universities, employers, and immigration authorities for visa applications, vocational training (Ausbildung), job search, and professional licensing. If you are comparing certification options, read our complete guide on <Link href="/blog/goethe-vs-telc-which-german-exam-should-you-choose-in-pakistan" className="text-amber-400 hover:underline font-semibold">Goethe vs telc: Which German Exam Should You Choose in Pakistan?</Link>.
+                telc (The European Language Certificates) examinations are internationally recognized standardized tests aligned with the Common European Framework of Reference for Languages (CEFR). telc certificates are widely accepted by German universities, employers, and immigration authorities for visa applications, vocational training (Ausbildung), job search, and professional licensing. Healthcare professionals can also consult our guide on <Link href="/blog/telc-b2-medizin-the-medical-german-exam-pakistani-doctors-and-nurses-need-for-germany" className="text-amber-400 hover:underline font-semibold">telc B2 Medizin for Pakistani Doctors &amp; Nurses</Link>. If you are comparing certification options, read our guide on <Link href="/blog/goethe-vs-telc-which-german-exam-should-you-choose-in-pakistan" className="text-amber-400 hover:underline font-semibold">Goethe vs telc: Which German Exam Should You Choose in Pakistan?</Link>.
               </p>
               <p className="text-slate-300 leading-relaxed text-sm sm:text-base">
                 To help learners plan effectively, we clearly distinguish between standard German courses, specialized telc preparation, online practice quizzes, and the official telc examination:

@@ -83,7 +83,7 @@ export default function Navbar({
     // 'books' and 'gallery' are hidden while those tables are empty (both pages
     // are noindex). Re-add when genuine books / gallery items are published.
     { id: 'translator', label: 'Free Translator', icon: Languages, desc: 'Translate German text instantly' },
-    { id: 'howItWorks', label: t.nav.howItWorks, icon: Laptop, desc: 'Live Zoom & HD lecture archive' },
+    { id: 'howItWorks', label: t.nav.howItWorks, icon: Laptop, desc: 'Live Zoom & recorded lecture library' },
     { id: 'practice-tests', label: 'Practice Tests', icon: CheckSquare, desc: 'Interactive HTML tests with auto-grading' },
     // 'testimonials' is hidden while there are no consented testimonials
     // (/testimonials is noindex). Re-add when real testimonials are published.

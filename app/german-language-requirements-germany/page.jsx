@@ -12,9 +12,9 @@ const LAST_REVIEWED = '28 September 2026';
 
 export const metadata = withPageOpenGraph({
   title: {
-    absolute: 'German Language Requirements for Germany | German Learning School',
+    absolute: 'German Language Requirements for Germany (Work, Visa & Study) | German Learning School',
   },
-  description: 'The German level needed for the Opportunity Card, Ausbildung, work, study, family reunion and doctors, from official sources, explained for Pakistani applicants.',
+  description: 'Official German language levels for Pakistani applicants: Opportunity Card (A1/B2), Ausbildung (B1), work visas, university study, and family reunion.',
   alternates: {
     canonical: '/german-language-requirements-germany',
   },

@@ -1,124 +1,57 @@
-import React, { useState, useEffect } from 'react';
-import { Star, CheckCircle, ExternalLink, AlertCircle } from 'lucide-react';
-import { fetchLiveGoogleReviews } from '../utils/googleReviewsApi';
+'use client';
+
+import React, { useEffect } from 'react';
+import Script from 'next/script';
+import { Star } from 'lucide-react';
 
 export default function GoogleReviewsWidget() {
-  const [liveData, setLiveData] = useState(null);
-  const [loading, setLoading] = useState(true);
-
+  // Ensure Elfsight widget re-initializes on client-side route transitions
   useEffect(() => {
-    fetchLiveGoogleReviews().then((data) => {
-      setLiveData(data);
-      setLoading(false);
-    });
+    if (typeof window !== 'undefined' && window.elfsight) {
+      try {
+        if (typeof window.elfsight.initialize === 'function') {
+          window.elfsight.initialize();
+        }
+      } catch {
+        // Ignore initialization errors if script is still parsing
+      }
+    }
   }, []);
 
-  // Render nothing until live data arrives. This component is fetched on the
-  // client, so a loading placeholder was being server-rendered into the page
-  // HTML ("Loading Live Google Reviews...") and indexed by crawlers. If the
-  // Places API is not configured the widget stays hidden (see below).
-  if (loading) {
-    return null;
-  }
-
-  // If the live Google Places API is not configured or fails, gracefully hide to avoid fabricated ratings
-  if (!liveData || liveData.error || !liveData.isConfigured || !liveData.averageRating) {
-    return null;
-  }
-
-  const rating = liveData.averageRating;
-  const totalReviews = liveData.totalReviews || 0;
-  const reviewsList = liveData.reviews && liveData.reviews.length > 0 ? liveData.reviews : [];
-
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-6 shadow-xl">
-      
-      {/* Top Header Badge */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-slate-800 pb-6">
-        <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 rounded-2xl bg-white text-slate-950 flex items-center justify-center font-extrabold text-2xl shadow">
-            G
+    <div className="w-full min-w-0">
+      {/* Lazy-load Elfsight platform script only on the homepage */}
+      <Script
+        src="https://elfsightcdn.com/platform.js"
+        strategy="lazyOnload"
+      />
+
+      <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-5 sm:p-8 md:p-10 shadow-2xl relative min-w-0 overflow-hidden backdrop-blur-sm">
+        {/* Subtle background glow */}
+        <div className="absolute top-0 right-1/4 w-80 h-40 bg-amber-500/5 blur-[80px] pointer-events-none rounded-full" />
+
+        {/* Section Header */}
+        <div className="text-center max-w-2xl mx-auto mb-6 sm:mb-8 space-y-2 relative z-10">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/30 text-xs font-bold">
+            <Star className="w-3.5 h-3.5 fill-current" />
+            <span>Verified Student Feedback</span>
           </div>
-          <div>
-            <div className="flex items-center gap-1.5 text-white font-extrabold text-lg">
-              <span>{rating} / 5.0 Rating on Google</span>
-              <div className="flex text-amber-400">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-4 h-4 fill-current" />
-                ))}
-              </div>
-            </div>
-            <span className="text-xs text-slate-400">
-              Live Google Business Profile API Sync • {totalReviews} Total Reviews
-            </span>
-          </div>
+          <h3 className="text-2xl sm:text-3xl font-extrabold text-white">
+            Google Reviews from Our Students
+          </h3>
+          <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+            Live reviews from students across Pakistan learning German online for study, work, and visa goals.
+          </p>
         </div>
 
-        <a
-          href={liveData?.placeUrl || "https://search.google.com/local/reviews"}
-          target="_blank"
-          rel="noreferrer"
-          className="px-4 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs font-bold text-slate-300 hover:text-white flex items-center gap-1.5 transition"
-        >
-          <span>View Live Google Profile</span>
-          <ExternalLink className="w-3.5 h-3.5" />
-        </a>
+        {/* Elfsight Google Reviews Embed Container */}
+        <div className="min-w-0 w-full overflow-hidden relative z-10">
+          <div
+            className="elfsight-app-163b6584-4ab0-4b8f-9ed3-52ea3d79c7a4"
+            data-elfsight-app-lazy
+          />
+        </div>
       </div>
-
-      {/* Alert Banner Removed - Keys are now managed securely via ENV */}
-
-      {/* Review Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {reviewsList.length > 0 ? (
-          reviewsList.map((rev) => (
-            <div key={rev.id} className="bg-slate-950 border border-slate-800/80 rounded-2xl p-5 space-y-3 flex flex-col justify-between">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex text-amber-400">
-                    {[...Array(rev.rating || 5)].map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 fill-current" />
-                    ))}
-                  </div>
-                  <span className="text-[10px] text-slate-500 font-semibold">{rev.date}</span>
-                </div>
-                <p className="text-xs text-slate-300 leading-relaxed italic line-clamp-4">
-                  "{rev.text}"
-                </p>
-              </div>
-
-              <div className="pt-3 border-t border-slate-800/80 flex items-center gap-3">
-                {rev.avatar ? (
-                  <img
-                    src={rev.avatar}
-                    alt={rev.author}
-                    className="w-9 h-9 rounded-full object-cover border border-amber-500/30"
-                  />
-                ) : (
-                  // No stock-photo fallback for real reviewers: show their initial instead.
-                  <div
-                    aria-hidden="true"
-                    className="w-9 h-9 rounded-full border border-amber-500/30 bg-slate-800 text-amber-400 font-bold flex items-center justify-center"
-                  >
-                    {(rev.author || '?').trim().charAt(0).toUpperCase()}
-                  </div>
-                )}
-                <div className="text-xs">
-                  <div className="font-bold text-white flex items-center gap-1">
-                    <span>{rev.author}</span>
-                    <CheckCircle className="w-3 h-3 text-emerald-400" />
-                  </div>
-                  <div className="text-[10px] text-amber-400 font-medium">{rev.location || 'Verified Google Review'}</div>
-                </div>
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="col-span-3 text-center py-8 text-xs text-slate-400 bg-slate-950 rounded-2xl border border-slate-800">
-            No live Google reviews available at this time.
-          </div>
-        )}
-      </div>
-
     </div>
   );
 }

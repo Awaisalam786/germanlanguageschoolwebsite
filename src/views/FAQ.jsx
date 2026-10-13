@@ -89,7 +89,7 @@ export default function FAQ({ currentLang, setActiveTab }) {
       {/* Still Have Questions Box */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 text-center space-y-3">
         <h3 className="text-base font-bold text-white">Still Have Unanswered Questions?</h3>
-        <p className="text-xs text-slate-400">Our academic counselors are available on WhatsApp for instant assistance.</p>
+        <p className="text-xs text-slate-400">Our academic counselors are available on WhatsApp to assist with course details and admissions.</p>
         <button
           onClick={() => setActiveTab('contact')}
           className="px-6 py-2.5 bg-amber-500 text-slate-950 font-bold rounded-xl text-xs shadow-gold-glow hover:bg-amber-400 transition"
