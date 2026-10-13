@@ -3,11 +3,14 @@ import { BookOpen, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useGlobalContent } from '../context/GlobalContentContext';
 import BookCard from '../components/BookCard';
+import BookOrderModal from '../components/BookOrderModal';
 
 export default function Books() {
   const { settings } = useGlobalContent();
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedBookForOrder, setSelectedBookForOrder] = useState(null);
+  const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -20,17 +23,12 @@ export default function Books() {
     fetchBooks();
   }, []);
 
-  const handleWhatsAppOrder = (bookTitle, couponCode = null) => {
-    let msg = `Hi, I want to order ${bookTitle}.`;
-    if (couponCode) {
-      msg += ` I am applying the coupon code: ${couponCode}.`;
-    }
-    msg += ` Please confirm price and availability.`;
-    
-    const phone = settings?.whatsapp_number || '923421189593';
-    // If it starts with 0, replace with 92 for wa.me link
-    const formattedPhone = phone.startsWith('0') ? '92' + phone.slice(1) : phone;
-    window.open(`https://wa.me/${formattedPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+  const phone = settings?.whatsapp_number || '923421189593';
+  const formattedPhone = phone.startsWith('0') ? '92' + phone.slice(1) : phone.replace(/[^0-9]/g, '');
+
+  const handleOpenOrderModal = (book) => {
+    setSelectedBookForOrder(book);
+    setIsOrderModalOpen(true);
   };
 
   return (
@@ -43,7 +41,7 @@ export default function Books() {
         </span>
         <h1 className="text-4xl font-extrabold text-white">Books & Resources</h1>
         <p className="text-sm text-slate-300">
-          Get the official German language textbooks, exam preparation materials, and dictionaries delivered to your doorstep in Pakistan.
+          Get official German language textbooks (including Netzwerk Neu), exam preparation materials, and grammar guides delivered to your doorstep anywhere in Pakistan.
         </p>
       </div>
 
@@ -53,17 +51,33 @@ export default function Books() {
           <Loader2 className="w-10 h-10 text-amber-500 animate-spin mb-4" />
           <p>Loading books...</p>
         </div>
+      ) : books.length === 0 ? (
+        <div className="bg-slate-900 border border-slate-800 rounded-3xl p-12 text-center space-y-3 max-w-xl mx-auto">
+          <BookOpen className="w-12 h-12 text-amber-400/40 mx-auto" />
+          <h3 className="text-lg font-bold text-white">New Books Arriving Soon</h3>
+          <p className="text-xs text-slate-400">
+            Official German textbooks and exam prep guides are being updated. Check back shortly or reach out to admissions on WhatsApp for inquiries.
+          </p>
+        </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {books.map((book) => (
             <BookCard 
               key={book.id} 
               book={book} 
-              onOrder={handleWhatsAppOrder} 
+              onOrder={handleOpenOrderModal} 
             />
           ))}
         </div>
       )}
+
+      {/* Order Modal */}
+      <BookOrderModal
+        book={selectedBookForOrder}
+        isOpen={isOrderModalOpen}
+        onClose={() => setIsOrderModalOpen(false)}
+        businessPhone={formattedPhone}
+      />
     </div>
   );
 }
