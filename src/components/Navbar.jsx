@@ -4,6 +4,7 @@ import {
   Menu, 
   X, 
   BookOpen, 
+  Book,
   PhoneCall, 
   GraduationCap, 
   Users,
@@ -80,8 +81,7 @@ export default function Navbar({
   // Dropdown 2: Resources Group
   const resourcesMenuItems = [
     { id: 'resources', label: 'Free Resources', icon: Download, desc: 'Free vocabulary list & grammar cheat sheet' },
-    // 'books' and 'gallery' are hidden while those tables are empty (both pages
-    // are noindex). Re-add when genuine books / gallery items are published.
+    { id: 'books', label: currentLang === 'ur' ? 'کتب اور وسائل' : currentLang === 'de' ? 'Bücher & Ressourcen' : 'Books & Resources', icon: Book, desc: 'Official German textbooks & doorstep delivery' },
     { id: 'translator', label: 'Free Translator', icon: Languages, desc: 'Translate German text instantly' },
     { id: 'howItWorks', label: t.nav.howItWorks, icon: Laptop, desc: 'Live Zoom & recorded lecture library' },
     { id: 'practice-tests', label: 'Practice Tests', icon: CheckSquare, desc: 'Interactive HTML tests with auto-grading' },
@@ -166,6 +166,22 @@ export default function Navbar({
               <span>{t.nav.courses}</span>
               <span className={`absolute bottom-0 left-0 h-[2px] rounded-full bg-red-500 transition-all duration-300 ${
                 activeTab === 'courses' ? 'w-full opacity-100' : 'w-0 group-hover:w-full opacity-80'
+              }`} />
+            </Link>
+
+            {/* 3. Direct Link: Books & Resources */}
+            <Link
+              href="/books"
+              className={`relative group px-3.5 py-2 rounded-xl text-[13px] font-semibold tracking-wide transition-all duration-300 flex items-center gap-2 ${
+                activeTab === 'books'
+                  ? 'text-white bg-red-600/20 border border-red-500/40 shadow-sm font-bold' 
+                  : 'text-slate-300 hover:text-white hover:bg-slate-900 border border-transparent'
+              }`}
+            >
+              <Book className={`w-[18px] h-[18px] ${activeTab === 'books' ? 'text-red-500' : 'text-slate-400 group-hover:text-red-400'}`} />
+              <span>{t.nav.books}</span>
+              <span className={`absolute bottom-0 left-0 h-[2px] rounded-full bg-red-500 transition-all duration-300 ${
+                activeTab === 'books' ? 'w-full opacity-100' : 'w-0 group-hover:w-full opacity-80'
               }`} />
             </Link>
 
@@ -475,6 +491,19 @@ export default function Navbar({
             >
               <GraduationCap className="w-5 h-5 text-red-500 shrink-0" />
               <span>{t.nav.courses}</span>
+            </Link>
+
+            {/* Mobile Direct Link: Books & Resources */}
+            <Link
+              href="/books" onClick={() => setMobileMenuOpen(false)}
+              className={`w-full text-left px-4 py-3.5 rounded-xl text-base font-bold flex items-center gap-3.5 transition-all ${
+                activeTab === 'books' 
+                  ? 'bg-red-600/20 text-white border border-red-500/40' 
+                  : 'text-slate-300 hover:bg-slate-900 border border-transparent'
+              }`}
+            >
+              <Book className="w-5 h-5 text-red-500 shrink-0" />
+              <span>{t.nav.books}</span>
             </Link>
           </div>
 

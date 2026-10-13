@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, ShoppingBag, Send, CheckCircle2, AlertCircle, Loader2, MapPin, Phone, User, ExternalLink } from 'lucide-react';
+import { validateAndNormalizePhone } from '../lib/phoneValidation';
 
 export default function BookOrderModal({ book, isOpen, onClose, businessPhone = '923421189593' }) {
   const [fullName, setFullName] = useState('');
@@ -19,14 +20,40 @@ export default function BookOrderModal({ book, isOpen, onClose, businessPhone = 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitting(true);
     setErrorMessage('');
 
-    if (quantity < 1 || quantity > 20) {
-      setErrorMessage('Quantity must be between 1 and 20.');
-      setSubmitting(false);
+    // Client-side validations (inline error display, no throwing)
+    const trimmedName = fullName.trim();
+    if (!trimmedName || trimmedName.length < 2 || trimmedName.length > 100) {
+      setErrorMessage('Please provide your full name (2–100 characters).');
       return;
     }
+
+    const phoneValidation = validateAndNormalizePhone(phoneNumber);
+    if (!phoneValidation.isValid) {
+      setErrorMessage(phoneValidation.error || 'Please provide a valid phone or WhatsApp number (7–25 digits).');
+      return;
+    }
+
+    const trimmedCity = city.trim();
+    if (!trimmedCity || trimmedCity.length < 2 || trimmedCity.length > 50) {
+      setErrorMessage('Please specify your city (2–50 characters).');
+      return;
+    }
+
+    const trimmedAddress = deliveryAddress.trim();
+    if (!trimmedAddress || trimmedAddress.length < 5 || trimmedAddress.length > 300) {
+      setErrorMessage('Please provide a complete delivery address (5–300 characters).');
+      return;
+    }
+
+    const qtyNumber = Number(quantity);
+    if (isNaN(qtyNumber) || qtyNumber < 1 || qtyNumber > 20) {
+      setErrorMessage('Quantity must be between 1 and 20.');
+      return;
+    }
+
+    setSubmitting(true);
 
     try {
       const response = await fetch('/api/book-orders/create', {
@@ -34,28 +61,30 @@ export default function BookOrderModal({ book, isOpen, onClose, businessPhone = 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           book_id: book.id,
-          customer_name: fullName.trim(),
-          phone_number: phoneNumber.trim(),
-          delivery_address: deliveryAddress.trim(),
-          city: city.trim(),
-          quantity: Number(quantity)
+          customer_name: trimmedName,
+          phone_number: phoneValidation.normalized,
+          delivery_address: trimmedAddress,
+          city: trimmedCity,
+          quantity: qtyNumber
         })
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
+
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to submit order request.');
+        setErrorMessage(data?.error || 'Failed to submit order request. Please try again or reach out on WhatsApp.');
+        setSubmitting(false);
+        return;
       }
 
       setOrderResult(data);
 
       // Open WhatsApp automatically
-      if (data.whatsapp_url) {
+      if (data?.whatsapp_url) {
         window.open(data.whatsapp_url, '_blank', 'noopener,noreferrer');
       }
     } catch (err) {
-      console.error('Order submission error:', err);
-      setErrorMessage(err.message || 'Network error. Please try again or reach out on WhatsApp.');
+      setErrorMessage('Network error connecting to the server. Please check your connection or contact us directly on WhatsApp.');
     } finally {
       setSubmitting(false);
     }

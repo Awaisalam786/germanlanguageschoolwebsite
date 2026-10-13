@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
+import { validateAndNormalizePhone } from '../../../../src/lib/phoneValidation';
 
 // In-memory instance-level rate limiting map (IP -> timestamps).
 // NOTE: On Vercel serverless, this provides per-instance burst throttling.
@@ -56,9 +57,13 @@ export async function POST(request) {
     if (!customer_name || typeof customer_name !== 'string' || customer_name.trim().length < 2 || customer_name.trim().length > 100) {
       return NextResponse.json({ error: 'Please provide a valid full name (2–100 characters).' }, { status: 400 });
     }
-    if (!phone_number || typeof phone_number !== 'string' || phone_number.trim().length < 7 || phone_number.trim().length > 25) {
-      return NextResponse.json({ error: 'Please provide a valid phone or WhatsApp number (7–25 digits).' }, { status: 400 });
+
+    const phoneValidation = validateAndNormalizePhone(phone_number);
+    if (!phoneValidation.isValid) {
+      return NextResponse.json({ error: phoneValidation.error || 'Please provide a valid phone or WhatsApp number (7–25 digits).' }, { status: 400 });
     }
+    const cleanPhone = phoneValidation.normalized;
+
     if (!delivery_address || typeof delivery_address !== 'string' || delivery_address.trim().length < 5 || delivery_address.trim().length > 300) {
       return NextResponse.json({ error: 'Please provide a complete delivery address (5–300 characters).' }, { status: 400 });
     }
@@ -127,7 +132,7 @@ export async function POST(request) {
         book_id: book.id,
         book_title: book.title,
         customer_name: customer_name.trim(),
-        phone_number: phone_number.trim(),
+        phone_number: cleanPhone,
         delivery_address: delivery_address.trim(),
         city: city.trim(),
         quantity: qty,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BookOpen, Loader2 } from 'lucide-react';
+import { BookOpen, Loader2, AlertCircle } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import { useGlobalContent } from '../context/GlobalContentContext';
 import BookCard from '../components/BookCard';
@@ -9,18 +9,45 @@ export default function Books() {
   const { settings } = useGlobalContent();
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(null);
   const [selectedBookForOrder, setSelectedBookForOrder] = useState(null);
   const [isOrderModalOpen, setIsOrderModalOpen] = useState(false);
 
   useEffect(() => {
+    let isMounted = true;
     const fetchBooks = async () => {
-      const { data, error } = await supabase.from('books').select('*').order('created_at', { ascending: false });
-      if (!error && data) {
-        setBooks(data);
+      try {
+        setLoading(true);
+        setFetchError(null);
+        const { data, error } = await supabase
+          .from('books')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Diagnostic [Books]: Failed to load books catalog.', error.message || error);
+          if (isMounted) {
+            setFetchError('Unable to load book catalogue at this time. Please try again or reach out on WhatsApp.');
+          }
+        } else if (isMounted) {
+          setBooks(data || []);
+        }
+      } catch (err) {
+        console.error('Diagnostic [Books]: Unexpected error loading books.', err?.message || err);
+        if (isMounted) {
+          setFetchError('Unable to load book catalogue at this time. Please try again or reach out on WhatsApp.');
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
-      setLoading(false);
     };
     fetchBooks();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const phone = settings?.whatsapp_number || '923421189593';
@@ -50,6 +77,24 @@ export default function Books() {
         <div className="flex flex-col items-center justify-center py-20 text-slate-400">
           <Loader2 className="w-10 h-10 text-amber-500 animate-spin mb-4" />
           <p>Loading books...</p>
+        </div>
+      ) : fetchError ? (
+        <div className="bg-red-950/30 border border-red-800/60 rounded-3xl p-12 text-center space-y-4 max-w-xl mx-auto">
+          <AlertCircle className="w-12 h-12 text-red-400 mx-auto" />
+          <h3 className="text-lg font-bold text-white">Temporary Loading Issue</h3>
+          <p className="text-xs text-slate-300">
+            {fetchError}
+          </p>
+          <div className="pt-2">
+            <a
+              href={`https://wa.me/${formattedPhone}?text=${encodeURIComponent('Hi, I would like to inquire about German learning books.')}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition shadow-lg"
+            >
+              Contact on WhatsApp
+            </a>
+          </div>
         </div>
       ) : books.length === 0 ? (
         <div className="bg-slate-900 border border-slate-800 rounded-3xl p-12 text-center space-y-3 max-w-xl mx-auto">
