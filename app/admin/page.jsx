@@ -20,6 +20,7 @@ import TestimonialManager from '../../src/admin/TestimonialManager';
 import GalleryManager from '../../src/admin/GalleryManager';
 import GoogleReviewsSettings from '../../src/admin/GoogleReviewsSettings';
 import BooksManager from '../../src/admin/BooksManager';
+import BookBundlesManager from '../../src/admin/BookBundlesManager';
 import BookOrdersTracker from '../../src/admin/BookOrdersTracker';
 import CouponManager from '../../src/admin/CouponManager';
 import AnnouncementsManager from '../../src/admin/AnnouncementsManager';
@@ -79,6 +80,7 @@ export default function AdminPage() {
       case 'testimonialsManager': return <TestimonialManager />;
       case 'galleryManager': return <GalleryManager />;
       case 'booksManager': return <BooksManager />;
+      case 'bookBundles': return <BookBundlesManager />;
       case 'bookOrders': return <BookOrdersTracker />;
       case 'couponManager': return <CouponManager />;
       case 'analytics': return <Analytics />;

@@ -28,6 +28,7 @@ import {
   ShoppingCart,
   Ticket,
   Megaphone,
+  Sparkles,
   FileCode2,
   Trophy,
   ChevronDown,
@@ -59,6 +60,7 @@ export default function AdminLayout({
     { id: 'recordings', label: t.admin.recordings, icon: Video, badge: 'HD' },
     { id: 'certificateManager', label: t.admin.certificateManager, icon: Award, badge: 'Carousel' },
     { id: 'booksManager', label: 'Books Manager', icon: BookOpen },
+    { id: 'bookBundles', label: 'Bundle Offers', icon: Sparkles, badge: 'New' },
     { id: 'bookOrders', label: 'Book Orders', icon: ShoppingCart },
     { id: 'paymentStatus', label: t.admin.paymentStatus, icon: CreditCard },
     { id: 'couponManager', label: 'Coupon Manager', icon: Ticket },
@@ -89,7 +91,7 @@ export default function AdminLayout({
     { id: 'people', label: 'People', itemIds: ['students', 'teachersManager', 'inquiries'] },
     { id: 'learning', label: 'Learning', itemIds: ['coursesManager', 'recordings', 'certificateManager', 'practiceTests', 'nounBuilder', 'chapterVocab', 'smartVocabResults', 'grammarChapters', 'grammarResults', 'readingPassages', 'readingResults'] },
     { id: 'content', label: 'Website Content', itemIds: ['announcements', 'documents', 'blogCMS', 'testimonialsManager', 'galleryManager', 'googleReviews'] },
-    { id: 'commerce', label: 'Orders & Payments', itemIds: ['booksManager', 'bookOrders', 'paymentStatus', 'couponManager'] },
+    { id: 'commerce', label: 'Orders & Payments', itemIds: ['booksManager', 'bookBundles', 'bookOrders', 'paymentStatus', 'couponManager'] },
     { id: 'settings', label: 'Settings', itemIds: ['themeCustomizer', 'notifications', 'globalContent', 'settings'] },
   ].map((group) => ({ ...group, items: group.itemIds.map((id) => menuItemById[id]).filter(Boolean) }));
 
