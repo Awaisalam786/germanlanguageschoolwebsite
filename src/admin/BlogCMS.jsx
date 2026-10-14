@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Newspaper, Plus, Edit, Trash2, Calendar, Clock, X, Loader2, Save, Send, Eye, Link as LinkIcon, Settings, Tag, Globe } from 'lucide-react';
+import { Newspaper, Plus, Edit, Trash2, Calendar, Clock, X, Loader2, Save, Send, Eye, Link as LinkIcon, Settings, Tag, Globe, FileText } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 import dynamic from 'next/dynamic';
 import 'react-quill-new/dist/quill.snow.css';
@@ -33,6 +33,10 @@ export default function BlogCMS() {
 
   const [activeTab, setActiveTab] = useState('content'); // 'content' | 'seo'
   const [filterStatus, setFilterStatus] = useState('All');
+  const [savingSeo, setSavingSeo] = useState(false);
+  const [seoFeedback, setSeoFeedback] = useState(null);
+  const [savingContent, setSavingContent] = useState(false);
+  const [contentFeedback, setContentFeedback] = useState(null);
 
   useEffect(() => {
     fetchPosts();
@@ -49,6 +53,8 @@ export default function BlogCMS() {
 
   const handleOpenAdd = () => {
     setEditingPost(null);
+    setSeoFeedback(null);
+    setContentFeedback(null);
     setFormData({
       title: '',
       slug: '',
@@ -69,6 +75,8 @@ export default function BlogCMS() {
 
   const handleOpenEdit = (post) => {
     setEditingPost(post);
+    setSeoFeedback(null);
+    setContentFeedback(null);
     setFormData({ 
       title: post.title || '',
       slug: post.slug || '',
@@ -81,10 +89,96 @@ export default function BlogCMS() {
       image: post.image || '',
       status: post.status || 'Draft',
       meta_title: post.meta_title || '',
-      meta_description: post.meta_description || ''
+      meta_description: post.meta_description || post.summary || ''
     });
     setActiveTab('content');
     setShowModal(true);
+  };
+
+  const handleSaveSeoOnly = async () => {
+    if (!editingPost?.id) return;
+    setSavingSeo(true);
+    setSeoFeedback(null);
+
+    const seoPayload = {
+      meta_title: (formData.meta_title || '').trim(),
+      meta_description: (formData.meta_description || '').trim()
+    };
+
+    try {
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .update(seoPayload)
+        .eq('id', editingPost.id)
+        .select('id, meta_title, meta_description')
+        .single();
+
+      if (error) throw error;
+
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === editingPost.id
+            ? { ...p, meta_title: data.meta_title, meta_description: data.meta_description }
+            : p
+        )
+      );
+      setEditingPost((prev) => ({
+        ...prev,
+        meta_title: data.meta_title,
+        meta_description: data.meta_description
+      }));
+      setSeoFeedback({ type: 'success', message: 'SEO metadata updated successfully!' });
+    } catch (err) {
+      console.error('Failed to update SEO metadata:', err);
+      setSeoFeedback({
+        type: 'error',
+        message: err.message || 'Failed to update SEO metadata.'
+      });
+    } finally {
+      setSavingSeo(false);
+    }
+  };
+
+  const handleSaveContentOnly = async () => {
+    if (!editingPost?.id) return;
+    setSavingContent(true);
+    setContentFeedback(null);
+
+    const contentPayload = {
+      content: formData.content || ''
+    };
+
+    try {
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .update(contentPayload)
+        .eq('id', editingPost.id)
+        .select('id, content')
+        .single();
+
+      if (error) throw error;
+
+      setPosts((prev) =>
+        prev.map((p) =>
+          p.id === editingPost.id
+            ? { ...p, content: data.content }
+            : p
+        )
+      );
+      setEditingPost((prev) => ({
+        ...prev,
+        content: data.content
+      }));
+      setContentFeedback({ type: 'success', message: 'Article content updated successfully!' });
+    } catch (err) {
+      console.error('Failed to update article content:', err);
+      setContentFeedback({
+        type: 'error',
+        message: err.message || 'Failed to update article content.'
+      });
+    } finally {
+      setSavingContent(false);
+    }
   };
 
   const handleDelete = async (id) => {
@@ -339,6 +433,39 @@ export default function BlogCMS() {
                     {formData.status === 'Published' ? <Send className="w-4 h-4" /> : <Save className="w-4 h-4" />}
                     <span>{formData.status === 'Published' ? (editingPost ? 'Update & Publish' : 'Publish Now') : 'Save as Draft'}</span>
                   </button>
+
+                  {editingPost && (
+                    <div className="pt-2 border-t border-slate-800 space-y-2">
+                      <button
+                        type="button"
+                        onClick={handleSaveContentOnly}
+                        disabled={savingContent}
+                        className="w-full py-2.5 px-3 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 disabled:opacity-50"
+                      >
+                        {savingContent ? (
+                          <>
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            <span>Saving Article Content...</span>
+                          </>
+                        ) : (
+                          <>
+                            <FileText className="w-3.5 h-3.5" />
+                            <span>Save Article Content Only</span>
+                          </>
+                        )}
+                      </button>
+
+                      {contentFeedback && (
+                        <div className={`p-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 ${
+                          contentFeedback.type === 'success'
+                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                            : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                        }`}>
+                          <span>{contentFeedback.message}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Settings Accordion */}
@@ -417,22 +544,53 @@ export default function BlogCMS() {
                         onChange={(e) => setFormData({ ...formData, meta_title: e.target.value })}
                         className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"
                       />
-                      <div className="text-[9px] text-slate-500 mt-1 text-right">{formData.meta_title.length} / 60 chars</div>
+                      <div className="text-[9px] text-slate-500 mt-1 text-right">{(formData.meta_title || '').length} / 60 chars</div>
                     </div>
 
                     <div>
-                      <label className="block text-[10px] text-slate-400 font-bold mb-1">Meta Description (Google Description) & Excerpt</label>
+                      <label className="block text-[10px] text-slate-400 font-bold mb-1">Meta Description (Google Description)</label>
                       <textarea
                         rows={3}
-                        placeholder="Brief summary for search engines and blog cards..."
-                        value={formData.summary}
-                        onChange={(e) => {
-                          setFormData({ ...formData, summary: e.target.value, meta_description: e.target.value });
-                        }}
+                        placeholder="Brief summary for search engine snippet..."
+                        value={formData.meta_description}
+                        onChange={(e) => setFormData({ ...formData, meta_description: e.target.value })}
                         className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-emerald-500"
                       />
-                      <div className="text-[9px] text-slate-500 mt-1 text-right">{formData.summary.length} / 160 chars</div>
+                      <div className="text-[9px] text-slate-500 mt-1 text-right">{(formData.meta_description || '').length} / 160 chars</div>
                     </div>
+
+                    {editingPost && (
+                      <div className="pt-2">
+                        <button
+                          type="button"
+                          onClick={handleSaveSeoOnly}
+                          disabled={savingSeo}
+                          className="w-full py-2.5 px-3 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 rounded-lg text-xs font-bold transition flex items-center justify-center gap-2 disabled:opacity-50"
+                        >
+                          {savingSeo ? (
+                            <>
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                              <span>Saving SEO Metadata...</span>
+                            </>
+                          ) : (
+                            <>
+                              <Globe className="w-3.5 h-3.5" />
+                              <span>Save SEO Metadata Only</span>
+                            </>
+                          )}
+                        </button>
+
+                        {seoFeedback && (
+                          <div className={`mt-2 p-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 ${
+                            seoFeedback.type === 'success'
+                              ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                              : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                          }`}>
+                            <span>{seoFeedback.message}</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
 

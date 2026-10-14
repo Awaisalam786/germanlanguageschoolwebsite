@@ -144,6 +144,16 @@ export default function UrduHomePage() {
               </div>
             ))}
           </div>
+
+          <div className="p-5 bg-slate-900/80 border border-slate-800 rounded-2xl text-slate-300 leading-loose">
+            <p>
+              <strong className="text-white">شروعات کے لیے رہنمائی:</strong> اگر آپ بالکل پہلی بار جرمن زبان سیکھ رہے ہیں تو تلفظ، بنیادی جملوں اور ابتدائی گرامر کے لیے ہمارا گائیڈ مضمون{' '}
+              <Link href="/blog/learn-german-in-urdu" className={link}>اردو میں جرمن زبان سیکھیں (ابتدائی گائیڈ)</Link>{' '}
+              پڑھیں، اور امتحان کے تفصیلی موضوعات کے لیے{' '}
+              <Link href="/german-a1-syllabus" className={link}>جرمن A1 نصاب (<span dir="ltr">German A1 Syllabus</span>)</Link>{' '}
+              ملاحظہ کریں۔
+            </p>
+          </div>
         </section>
 
         <section className="space-y-4">

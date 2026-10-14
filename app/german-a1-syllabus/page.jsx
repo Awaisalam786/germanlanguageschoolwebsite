@@ -23,9 +23,9 @@ import { withPageOpenGraph } from '../../src/lib/seo';
 
 export const metadata = withPageOpenGraph({
   title: {
-    absolute: 'German A1 Syllabus: Complete Beginner Course Guide | German Learning School',
+    absolute: 'German A1 Syllabus & Exam Guide | German Learning School',
   },
-  description: 'Complete German A1 syllabus: grammar, vocabulary, the four skills and the Goethe-Zertifikat A1 and telc A1 exam format, with a free A1 practice test.',
+  description: 'Explore the complete German A1 syllabus covering essential grammar topics, vocabulary, Goethe & telc exam guidance, and a free online A1 practice test.',
   alternates: {
     canonical: '/german-a1-syllabus',
   },
@@ -37,8 +37,8 @@ export const metadata = withPageOpenGraph({
     'max-video-preview': -1,
   },
   openGraph: {
-    title: 'German A1 Syllabus: Complete Beginner Course Guide | German Learning School',
-    description: 'Complete German A1 syllabus: grammar, vocabulary, the four skills and the Goethe-Zertifikat A1 and telc A1 exam format, with a free A1 practice test.',
+    title: 'German A1 Syllabus & Exam Guide | German Learning School',
+    description: 'Explore the complete German A1 syllabus covering essential grammar topics, vocabulary, Goethe & telc exam guidance, and a free online A1 practice test.',
     url: 'https://germanlearningschool.com/german-a1-syllabus',
     siteName: 'German Learning School',
     locale: 'en_PK',
@@ -46,8 +46,8 @@ export const metadata = withPageOpenGraph({
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'German A1 Syllabus: Complete Beginner Course Guide | German Learning School',
-    description: 'Complete German A1 syllabus: grammar, vocabulary, the four skills and the Goethe-Zertifikat A1 and telc A1 exam format, with a free A1 practice test.',
+    title: 'German A1 Syllabus & Exam Guide | German Learning School',
+    description: 'Explore the complete German A1 syllabus covering essential grammar topics, vocabulary, Goethe & telc exam guidance, and a free online A1 practice test.',
   },
 });
 
