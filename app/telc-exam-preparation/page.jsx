@@ -59,7 +59,7 @@ const telcFaqs = [
   },
   {
     q: 'What is unique about the telc exam format?',
-    a: 'telc examinations feature a unique "Sprachbausteine" section within the reading module that specifically tests grammar and vocabulary in context (prepositions, connectors, idioms). Our classes provide dedicated drills for these exercises.'
+    a: 'In standard general examinations such as telc Deutsch B1 and B2, the written test includes a dedicated "Sprachbausteine" section testing grammar, connectors, and vocabulary in context (typically formatted as multiple-choice and word-bank gap-fill exercises). However, task formats vary for specialized or professional examinations (such as telc Medizin or Beruf), while A1 and A2 do not include this section. Candidates should always review the official model test (Modellsatz) for their specific examination.'
   },
   {
     q: 'How does telc compare to the Goethe-Zertifikat?',
@@ -68,6 +68,10 @@ const telcFaqs = [
   {
     q: 'Do you provide mock tests for telc preparation?',
     a: 'Yes, we provide free online practice tests across A1, A2, B1, and B2 levels on our website, in addition to full-length timed mock exams in our live preparation batches.'
+  },
+  {
+    q: 'Can I retake only a failed part of a telc exam?',
+    a: 'Retake and partial-examination options depend on the exact telc qualification. Under official telc regulations (§7.3), for eligible qualifications (such as standard telc Deutsch B1 and B2), a candidate who passed either the complete written or oral examination may retake the failed examination part within 12 months of the results sheet. However, individual sub-tests cannot be retaken on their own, and partial retakes are not permitted for A1, A2, or specified dual-level examinations, which must be repeated in full. Candidates should consult the official telc examination regulations for their qualification and confirm procedures with their licensed examination centre.'
   }
 ];
 
@@ -155,9 +159,9 @@ export default function TelcExamPreparation() {
         <div className="grid lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2 space-y-12">
             
-            {/* H2: telc Exam Preparation in Pakistan (Overview & Distinction) */}
+            {/* H2: Online telc Preparation for Pakistani Students and Professionals */}
             <section className="bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-4 shadow-xl">
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white">telc Exam Preparation in Pakistan</h2>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white">Online telc Preparation for Pakistani Students and Professionals</h2>
               <p className="text-slate-200 leading-relaxed text-sm sm:text-base">
                 <strong className="text-white">Short answer:</strong> telc Deutsch exams test reading, listening, writing and speaking at a CEFR level, and many levels include a Sprachbausteine section on grammar and vocabulary in context. To prepare from Pakistan, practise every module under timed conditions and register for the official exam through an authorised telc test centre; German Learning School provides preparation only.
               </p>
@@ -184,6 +188,45 @@ export default function TelcExamPreparation() {
                   <span className="font-bold text-purple-400 block mb-1">4. Official telc Examination</span>
                   <p className="text-slate-400">The formal standardized test administered exclusively by licensed telc examination centers worldwide.</p>
                 </div>
+              </div>
+            </section>
+
+            {/* H2: Taking a telc Exam from Pakistan */}
+            <section className="bg-slate-900 border border-slate-800 rounded-3xl p-8 space-y-4 shadow-xl">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white">Taking a telc Exam from Pakistan</h2>
+              <p className="text-slate-300 leading-relaxed text-sm sm:text-base">
+                If you are planning to take a telc German examination from Pakistan, it is important to clearly understand the distinction between preparation and official test registration:
+              </p>
+              <ul className="space-y-3 text-slate-300 text-sm sm:text-base">
+                <li className="flex gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-white">Independent Preparation:</strong> German Learning School provides online preparation courses, targeted Sprachbausteine drills, and timed mock testing. We are an independent language institute and not an authorized telc examination centre.
+                  </div>
+                </li>
+                <li className="flex gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-white">Authorized Examination Centres:</strong> Official telc certificates can only be issued by licensed, authorized telc examination centres. The availability of licensed centres, specific exam dates, and offered CEFR levels can change periodically.
+                  </div>
+                </li>
+                <li className="flex gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-white">Direct Centre Verification:</strong> Students must independently verify whether an authorized telc centre currently offers their required examination and level. All registration procedures, available test dates, and examination fees should be confirmed directly with the authorized centre.
+                  </div>
+                </li>
+              </ul>
+              <div className="pt-2">
+                <a
+                  href="https://www.telc.net/en/language-examinations/find-a-telc-examination-centre/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm font-bold text-amber-400 hover:text-amber-300 underline underline-offset-4"
+                >
+                  <span>Find an authorized telc examination centre on telc.net</span>
+                  <ExternalLink className="w-4 h-4" />
+                </a>
               </div>
             </section>
 
@@ -273,7 +316,7 @@ export default function TelcExamPreparation() {
                 <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
                   <BookOpen className="w-8 h-8 text-emerald-400 mb-3" />
                   <h3 className="text-xl font-bold text-white mb-2">Lesen &amp; Sprachbausteine</h3>
-                  <p className="text-xs sm:text-sm text-slate-400">Comprehending articles, notices, and correspondence. Includes intensive drills for Sprachbausteine (grammar and vocabulary fill-in tasks in context).</p>
+                  <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">Reading comprehension of notices, correspondence, and reports, accompanied in standard intermediate exams (such as telc Deutsch B1 and B2) by the signature Sprachbausteine section. In standard general B1/B2 exams, this tests grammar and sentence connectors in Teil 1 (multiple-choice), and contextual vocabulary with collocations in Teil 2 (word-bank gap fill). Task formats differ for specialized exams like telc Medizin; always consult the official model test (Modellsatz) for your exact qualification.</p>
                 </div>
                 <div className="p-6 bg-slate-900 border border-slate-800 rounded-2xl">
                   <Headset className="w-8 h-8 text-blue-400 mb-3" />
@@ -353,7 +396,7 @@ export default function TelcExamPreparation() {
                 <li className="flex gap-3">
                   <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
                   <div>
-                    <strong>Sprachbausteine Practice:</strong> Pay close attention to prepositions, fixed verb-preposition combinations, and connector logic tested specifically in telc reading modules.
+                    <strong>Sprachbausteine &amp; Language Logic:</strong> For examinations that feature Sprachbausteine (such as standard telc Deutsch B1 and B2), practise grammar structures, sentence linkers, and prepositional collocations under timed conditions. Because task formats differ across general and specialized qualifications, review the official model test (Modellsatz) for your exact exam level to prepare with the correct question format.
                   </div>
                 </li>
                 <li className="flex gap-3">
@@ -372,6 +415,12 @@ export default function TelcExamPreparation() {
                   <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
                   <div>
                     <strong>Writing Reviews:</strong> Submit letter and email assignments to receive detailed instructor corrections, formatting advice, and vocabulary enrichments.
+                  </div>
+                </li>
+                <li className="flex gap-3">
+                  <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                  <div>
+                    <strong>Exam Retake &amp; Partial Options:</strong> Retake rules and partial-credit eligibility depend on the exact telc qualification. Under official telc regulations (§7.3), candidates sitting for eligible examinations (such as standard telc Deutsch B1 and B2) who passed either the written or oral examination may retake the failed examination part within 12 months of the results sheet. However, individual sub-tests cannot be retaken separately, and partial examinations are not available for A1, A2, or specified dual-level exams (which must be repeated completely). Review the official <a href="https://www.telc.net/en/language-examinations/examination-regulations/" target="_blank" rel="noopener noreferrer" className="text-amber-400 hover:underline font-semibold inline-flex items-center gap-1">telc examination regulations <ExternalLink className="w-3.5 h-3.5" /></a> for your qualification and confirm registration deadlines with your licensed centre.
                   </div>
                 </li>
               </ul>
