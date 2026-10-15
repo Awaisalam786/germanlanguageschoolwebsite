@@ -3,15 +3,15 @@ import { withPageOpenGraph } from '../../../src/lib/seo';
 
 export const metadata = withPageOpenGraph({
   title: {
-    absolute: 'German A1 Course in Pakistan (Live Online) | German Learning School',
+    absolute: 'German A1 Course Online in Pakistan | German Learning School',
   },
-  description: 'Enroll in our live online German A1 course in Pakistan. Master beginner grammar, vocabulary & speaking with Goethe & telc A1 exam preparation on Zoom.',
+  description: 'Join our live online German A1 course in Pakistan on Zoom. Master beginner grammar, everyday vocabulary, and speaking with comprehensive Goethe A1 exam preparation.',
   alternates: {
     canonical: '/courses/german-a1',
   },
   openGraph: {
-    title: 'German A1 Course in Pakistan (Live Online) | German Learning School',
-    description: 'Enroll in our live online German A1 course in Pakistan. Master beginner grammar, vocabulary & speaking with Goethe & telc A1 exam preparation on Zoom.',
+    title: 'German A1 Course Online in Pakistan | German Learning School',
+    description: 'Join our live online German A1 course in Pakistan on Zoom. Master beginner grammar, everyday vocabulary, and speaking with comprehensive Goethe A1 exam preparation.',
     url: 'https://germanlearningschool.com/courses/german-a1',
     siteName: 'German Learning School',
     locale: 'en_PK',
@@ -19,8 +19,8 @@ export const metadata = withPageOpenGraph({
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'German A1 Course in Pakistan (Live Online) | German Learning School',
-    description: 'Enroll in our live online German A1 course in Pakistan. Master beginner grammar, vocabulary & speaking with Goethe & telc A1 exam preparation on Zoom.',
+    title: 'German A1 Course Online in Pakistan | German Learning School',
+    description: 'Join our live online German A1 course in Pakistan on Zoom. Master beginner grammar, everyday vocabulary, and speaking with comprehensive Goethe A1 exam preparation.',
   },
 });
 

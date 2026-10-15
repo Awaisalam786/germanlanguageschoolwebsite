@@ -18,6 +18,13 @@ export default async function CourseLevelPage({ level }) {
   const content = levelData[level] || levelData['A1'];
   const pageUrl = `https://germanlearningschool.com/courses/german-${level.toLowerCase()}`;
 
+  const verifiedDurations = {
+    'A1': '8 Weeks (80 Hours)',
+    'A2': '8 Weeks (80 Hours)',
+    'B1': '10 Weeks (100 Hours)',
+    'B2': '12 Weeks (120 Hours)'
+  };
+
   // Build BreadcrumbList Schema
   const breadcrumbSchema = {
     "@context": "https://schema.org",
@@ -144,6 +151,15 @@ export default async function CourseLevelPage({ level }) {
                   {' '}for Ausbildung, work visas and the Opportunity Card.
                 </p>
               )}
+              {level === 'B2' && (
+                <p className="text-slate-300 leading-relaxed">
+                  Check the{' '}
+                  <Link href="/german-language-requirements-germany" className="text-emerald-400 hover:underline">
+                    German language requirements for Germany
+                  </Link>
+                  {' '}for academic admissions, healthcare licensing and work pathways.
+                </p>
+              )}
             </section>
 
             <section className="space-y-6">
@@ -173,7 +189,7 @@ export default async function CourseLevelPage({ level }) {
               <h2 className="text-3xl font-extrabold text-white">Course Format, Schedule & Fees</h2>
               <div className="space-y-4 text-slate-300 leading-relaxed bg-slate-900/60 border border-slate-800 p-6 rounded-2xl">
                 <p><strong>Format:</strong> 100% Live Online Zoom Classes with real-time teacher interaction.</p>
-                {course && <p><strong>Duration:</strong> {course.duration || '6 to 8 weeks depending on batch'}</p>}
+                {course && <p><strong>Duration:</strong> {course.duration || verifiedDurations[level] || '8 to 12 weeks depending on level'}</p>}
                 {course && <p><strong>Schedule:</strong> {course.schedule || 'Evening and weekend batches available'}</p>}
                 <p><strong>Class Recordings:</strong> Every live class is recorded, and the recording is shared with enrolled students for revision (upload timing may vary).</p>
                 <p><strong>Course Fee:</strong> {course ? (String(course.price).includes('PKR') || String(course.price).includes('₨') ? course.price : `PKR ${course.price}`) : 'Affordable pricing in PKR with installment options available. Check our Courses page for current batch fee.'}</p>
@@ -193,6 +209,96 @@ export default async function CourseLevelPage({ level }) {
             <section className="space-y-4">
               <h2 className="text-3xl font-extrabold text-white">Goethe & telc Exam Preparation</h2>
               <p className="text-slate-300 leading-relaxed">{content.examPrep}</p>
+              {level === 'A1' && (
+                <div className="text-xs sm:text-sm text-slate-400 leading-relaxed bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1.5">
+                  <p>
+                    <strong className="text-slate-300">Visa &amp; Opportunity Card Note:</strong> While Goethe or telc A1 satisfies language requirements for many German spouse and family reunion visas, it represents only a baseline language threshold under the points-based Opportunity Card (Chancenkarte), which generally requires German A1 or English B2 alongside independent qualifications and scoring criteria. Holding an A1 certificate does not guarantee visa approval.
+                  </p>
+                  <p>
+                    Verify the latest points matrix and language guidelines directly on the official{' '}
+                    <a
+                      href="https://www.make-it-in-germany.com/en/visa-residence/opportunity-card/job-search"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-emerald-400 hover:underline font-semibold"
+                    >
+                      Make it in Germany Opportunity Card portal
+                    </a>
+                    .
+                  </p>
+                </div>
+              )}
+              {level === 'A2' && (
+                <div className="text-xs sm:text-sm text-slate-400 leading-relaxed bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1.5">
+                  <p>
+                    <strong className="text-slate-300">Visa &amp; Opportunity Card Note:</strong> A certified German A2 credential earns 1 point under Germany&apos;s points-based Opportunity Card (Chancenkarte) system and meets language requirements for specific routes such as foreign qualification recognition. However, an A2 certificate alone does not guarantee visa issuance; applicants must independently satisfy criteria regarding degree recognition, minimum points, and financial proof.
+                  </p>
+                  <p>
+                    Consult official requirements on the{' '}
+                    <a
+                      href="https://www.make-it-in-germany.com/en/visa-residence/opportunity-card/job-search"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-emerald-400 hover:underline font-semibold"
+                    >
+                      Make it in Germany Opportunity Card portal
+                    </a>
+                    .
+                  </p>
+                </div>
+              )}
+              {level === 'B1' && (
+                <div className="text-xs sm:text-sm text-slate-400 leading-relaxed bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1.5">
+                  <p>
+                    <strong className="text-slate-300">Visa &amp; Pathway Notice:</strong> A certified German B1 credential is typically required for the German vocational training (Ausbildung) visa and awards 2 points under Germany&apos;s points-based Opportunity Card (Chancenkarte) system. However, obtaining a B1 certificate does not grant automatic visa approval; applicants must independently meet all specific requirements including training contracts, qualification recognition, and consular proof.
+                  </p>
+                  <p>
+                    Review current official criteria on the{' '}
+                    <a
+                      href="https://www.make-it-in-germany.com/en/visa-residence/opportunity-card/job-search"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-emerald-400 hover:underline font-semibold"
+                    >
+                      Make it in Germany Opportunity Card portal
+                    </a>
+                    {' '}and our detailed{' '}
+                    <Link
+                      href="/german-language-requirements-germany"
+                      className="text-emerald-400 hover:underline font-semibold"
+                    >
+                      German Language Requirements Guide
+                    </Link>
+                    .
+                  </p>
+                </div>
+              )}
+              {level === 'B2' && (
+                <div className="text-xs sm:text-sm text-slate-400 leading-relaxed bg-slate-900/60 border border-slate-800 p-4 rounded-xl space-y-1.5">
+                  <p>
+                    <strong className="text-slate-300">Visa, University &amp; Healthcare Pathway Notice:</strong> A certified German B2 credential awards 3 points under Germany&apos;s points-based Opportunity Card (Chancenkarte) system and is standard for healthcare recognition (such as nursing and preliminary medical licensing). For international doctors, general B2 is required before taking the state-administered medical German exam (Fachsprachprüfung / FSP) for Approbation. For university admissions, most German-taught degree programmes require C1-level proof (e.g. TestDaF or telc C1 Hochschule). Holding a B2 certificate does not guarantee visa approval, university admission, or professional licensing.
+                  </p>
+                  <p>
+                    Consult official requirements on the{' '}
+                    <a
+                      href="https://www.make-it-in-germany.com/en/working-in-germany/professions-in-demand/physicians"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-emerald-400 hover:underline font-semibold"
+                    >
+                      Make it in Germany portal
+                    </a>
+                    {' '}and explore our{' '}
+                    <Link
+                      href="/german-language-requirements-germany"
+                      className="text-emerald-400 hover:underline font-semibold"
+                    >
+                      German Language Requirements Guide
+                    </Link>
+                    .
+                  </p>
+                </div>
+              )}
               <div className="flex flex-wrap gap-4 pt-2">
                 <Link href="/goethe-exam-preparation" className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-400 hover:underline">
                   <GraduationCap className="w-4 h-4" /> Goethe Exam Preparation Details

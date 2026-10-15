@@ -3,15 +3,15 @@ import { withPageOpenGraph } from '../../../src/lib/seo';
 
 export const metadata = withPageOpenGraph({
   title: {
-    absolute: 'German A2 Course in Pakistan (Live Online) | German Learning School',
+    absolute: 'German A2 Course Online in Pakistan | German Learning School',
   },
-  description: 'Advance your German with live online A2 classes in Pakistan. Master conversational past tense, Dative case & Goethe and telc A2 exam preparation.',
+  description: 'Advance with our live online German A2 course in Pakistan on Zoom. Master conversational past tense (Perfekt), Dative case, and targeted Goethe A2 exam prep.',
   alternates: {
     canonical: '/courses/german-a2',
   },
   openGraph: {
-    title: 'German A2 Course in Pakistan (Live Online) | German Learning School',
-    description: 'Advance your German with live online A2 classes in Pakistan. Master conversational past tense, Dative case & Goethe and telc A2 exam preparation.',
+    title: 'German A2 Course Online in Pakistan | German Learning School',
+    description: 'Advance with our live online German A2 course in Pakistan on Zoom. Master conversational past tense (Perfekt), Dative case, and targeted Goethe A2 exam prep.',
     url: 'https://germanlearningschool.com/courses/german-a2',
     siteName: 'German Learning School',
     locale: 'en_PK',
@@ -19,8 +19,8 @@ export const metadata = withPageOpenGraph({
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'German A2 Course in Pakistan (Live Online) | German Learning School',
-    description: 'Advance your German with live online A2 classes in Pakistan. Master conversational past tense, Dative case & Goethe and telc A2 exam preparation.',
+    title: 'German A2 Course Online in Pakistan | German Learning School',
+    description: 'Advance with our live online German A2 course in Pakistan on Zoom. Master conversational past tense (Perfekt), Dative case, and targeted Goethe A2 exam prep.',
   },
 });
 

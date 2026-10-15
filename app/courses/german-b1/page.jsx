@@ -3,15 +3,15 @@ import { withPageOpenGraph } from '../../../src/lib/seo';
 
 export const metadata = withPageOpenGraph({
   title: {
-    absolute: 'German B1 Course in Pakistan (Ausbildung & Work) | German Learning School',
+    absolute: 'German B1 Course Online in Pakistan | German Learning School',
   },
-  description: 'Join live online German B1 classes in Pakistan. Prepare for the German vocational training (Ausbildung) visa and work permits with Goethe & telc B1 coaching.',
+  description: 'Join our live online German B1 course in Pakistan on Zoom. Master intermediate grammar, independent speaking, and comprehensive Goethe & telc B1 exam preparation.',
   alternates: {
     canonical: '/courses/german-b1',
   },
   openGraph: {
-    title: 'German B1 Course in Pakistan (Ausbildung & Work) | German Learning School',
-    description: 'Join live online German B1 classes in Pakistan. Prepare for the German vocational training (Ausbildung) visa and work permits with Goethe & telc B1 coaching.',
+    title: 'German B1 Course Online in Pakistan | German Learning School',
+    description: 'Join our live online German B1 course in Pakistan on Zoom. Master intermediate grammar, independent speaking, and comprehensive Goethe & telc B1 exam preparation.',
     url: 'https://germanlearningschool.com/courses/german-b1',
     siteName: 'German Learning School',
     locale: 'en_PK',
@@ -19,8 +19,8 @@ export const metadata = withPageOpenGraph({
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'German B1 Course in Pakistan (Ausbildung & Work) | German Learning School',
-    description: 'Join live online German B1 classes in Pakistan. Prepare for the German vocational training (Ausbildung) visa and work permits with Goethe & telc B1 coaching.',
+    title: 'German B1 Course Online in Pakistan | German Learning School',
+    description: 'Join our live online German B1 course in Pakistan on Zoom. Master intermediate grammar, independent speaking, and comprehensive Goethe & telc B1 exam preparation.',
   },
 });
 
