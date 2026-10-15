@@ -104,6 +104,12 @@ export default function UrduHomePage() {
   return (
     <>
       <SchemaMarkup schema={faqSchema} />
+      <script
+        id="ur-lang-init"
+        dangerouslySetInnerHTML={{
+          __html: "document.documentElement.lang='ur';document.documentElement.dir='rtl';",
+        }}
+      />
       <div lang="ur" dir="rtl" className="font-urdu max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-14">
         <header className="space-y-5 text-center">
           <span className="inline-block px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 text-sm font-bold border border-amber-500/30">

@@ -349,16 +349,18 @@ export default function Navbar({
               >
                 DE
               </button>
-              <button
-                onClick={() => setLanguage('ur')}
-                className={`px-1 min-[375px]:px-1.5 py-1 sm:px-2 sm:py-1 rounded-md sm:rounded-lg font-bold transition-all duration-200 font-urdu ${
+              <Link
+                href="/ur"
+                lang="ur"
+                aria-label="اردو میں دیکھیے (View in Urdu)"
+                className={`px-1 min-[375px]:px-1.5 py-1 sm:px-2 sm:py-1 rounded-md sm:rounded-lg font-bold transition-all duration-200 font-urdu inline-flex items-center justify-center ${
                   currentLang === 'ur' 
                     ? 'bg-red-600 text-white shadow-md sm:scale-105' 
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
                 اردو
-              </button>
+              </Link>
             </div>
 
             {/* Mobile Hamburger Toggle Button */}
@@ -450,14 +452,17 @@ export default function Navbar({
             >
               DE
             </button>
-            <button
-              onClick={() => setLanguage('ur')}
-              className={`flex-1 py-1.5 rounded-lg font-bold transition-all duration-200 font-urdu ${
+            <Link
+              href="/ur"
+              onClick={() => setMobileMenuOpen(false)}
+              lang="ur"
+              aria-label="اردو میں دیکھیے (View in Urdu)"
+              className={`flex-1 py-1.5 rounded-lg font-bold transition-all duration-200 font-urdu text-center inline-flex items-center justify-center ${
                 currentLang === 'ur' ? 'bg-red-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
               }`}
             >
               اردو
-            </button>
+            </Link>
           </div>
         </div>
 
