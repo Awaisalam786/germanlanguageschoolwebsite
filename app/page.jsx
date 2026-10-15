@@ -8,7 +8,7 @@ export const metadata = {
   title: {
     absolute: 'German Language Course in Pakistan | German Learning School',
   },
-  description: 'Learn German online in Pakistan with live A1–B2 Zoom classes, Goethe and telc exam prep, free practice tests and flexible batches at German Learning School.',
+  description: 'German language course in Karachi—online A1–B2 Zoom classes, Goethe/telc exam prep and free practice tests, available across Pakistan.',
   alternates: {
     canonical: 'https://germanlearningschool.com/',
     languages: {
@@ -19,7 +19,7 @@ export const metadata = {
   },
   openGraph: {
     title: 'German Language Course in Pakistan | German Learning School',
-    description: 'Learn German online in Pakistan with live A1–B2 Zoom classes, Goethe and telc exam prep, free practice tests and flexible batches at German Learning School.',
+    description: 'German language course in Karachi—online A1–B2 Zoom classes, Goethe/telc exam prep and free practice tests, available across Pakistan.',
     url: 'https://germanlearningschool.com/',
     siteName: 'German Learning School',
     locale: 'en_PK',
@@ -28,7 +28,7 @@ export const metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'German Language Course in Pakistan | German Learning School',
-    description: 'Learn German online in Pakistan with live A1–B2 Zoom classes, Goethe and telc exam prep, free practice tests and flexible batches at German Learning School.',
+    description: 'German language course in Karachi—online A1–B2 Zoom classes, Goethe/telc exam prep and free practice tests, available across Pakistan.',
     images: [DEFAULT_OG_IMAGE.url],
   },
 };
