@@ -7,6 +7,7 @@ import {
   UserCheck, 
   Newspaper, 
   MessageSquare, 
+  MessageSquarePlus,
   BarChart3, 
   Bell, 
   Settings as SettingsIcon, 
@@ -35,6 +36,7 @@ import {
   Search
 } from 'lucide-react';
 import { translations } from '../i18n/translations';
+import { supabase } from '../lib/supabaseClient';
 
 export default function AdminLayout({ 
   currentTab, 
@@ -48,7 +50,28 @@ export default function AdminLayout({
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [openGroups, setOpenGroups] = useState({ overview: true });
   const [menuSearch, setMenuSearch] = useState('');
+  const [pendingSuggestionsCount, setPendingSuggestionsCount] = useState(0);
   const t = translations[currentLang];
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchPendingCount = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const headers = {};
+        if (session?.access_token) headers['Authorization'] = `Bearer ${session.access_token}`;
+        const res = await fetch('/api/vocab-suggestions?count_only=true', { headers });
+        const data = await res.json().catch(() => ({}));
+        if (isMounted && data?.pendingCount !== undefined) {
+          setPendingSuggestionsCount(data.pendingCount);
+        }
+      } catch (e) {
+        // fail silently
+      }
+    };
+    fetchPendingCount();
+    return () => { isMounted = false; };
+  }, [currentTab]);
 
   const menuItems = [
     { id: 'dashboard', label: t.admin.dashboard, icon: LayoutDashboard },
@@ -68,6 +91,12 @@ export default function AdminLayout({
     { id: 'practiceTests', label: 'Practice Tests', icon: FileCode2, badge: 'New' },
     { id: 'nounBuilder', label: 'Noun Builder', icon: BookOpen, badge: 'New' },
     { id: 'chapterVocab', label: 'Chapter Vocab', icon: BookOpen, badge: 'New' },
+    {
+      id: 'vocabSuggestions',
+      label: 'Vocab Suggestions',
+      icon: MessageSquarePlus,
+      badge: pendingSuggestionsCount > 0 ? `${pendingSuggestionsCount}` : null
+    },
     { id: 'smartVocabResults', label: 'Smart Vocab Results', icon: Trophy, badge: 'New' },
     { id: 'grammarChapters', label: 'Grammar Chapters', icon: BookOpen, badge: 'New' },
     { id: 'grammarResults', label: 'Grammar Results', icon: Trophy, badge: 'New' },
@@ -89,7 +118,7 @@ export default function AdminLayout({
   const menuGroups = [
     { id: 'overview', label: 'Overview', itemIds: ['dashboard', 'analytics'] },
     { id: 'people', label: 'People', itemIds: ['students', 'teachersManager', 'inquiries'] },
-    { id: 'learning', label: 'Learning', itemIds: ['coursesManager', 'recordings', 'certificateManager', 'practiceTests', 'nounBuilder', 'chapterVocab', 'smartVocabResults', 'grammarChapters', 'grammarResults', 'readingPassages', 'readingResults'] },
+    { id: 'learning', label: 'Learning', itemIds: ['coursesManager', 'recordings', 'certificateManager', 'practiceTests', 'nounBuilder', 'chapterVocab', 'vocabSuggestions', 'smartVocabResults', 'grammarChapters', 'grammarResults', 'readingPassages', 'readingResults'] },
     { id: 'content', label: 'Website Content', itemIds: ['announcements', 'documents', 'blogCMS', 'testimonialsManager', 'galleryManager', 'googleReviews'] },
     { id: 'commerce', label: 'Orders & Payments', itemIds: ['booksManager', 'bookBundles', 'bookOrders', 'paymentStatus', 'couponManager'] },
     { id: 'settings', label: 'Settings', itemIds: ['themeCustomizer', 'notifications', 'globalContent', 'settings'] },
@@ -222,7 +251,13 @@ export default function AdminLayout({
                               <span className="truncate">{item.label}</span>
                             </span>
                             {item.badge && item.badge !== '3' && (
-                              <span className={`shrink-0 rounded-md px-1.5 py-0.5 text-[9px] font-bold ${isActive ? 'bg-amber-300/15 text-amber-200' : 'bg-slate-800 text-slate-500'}`}>
+                              <span className={`shrink-0 rounded-md px-1.5 py-0.5 text-[9px] font-bold ${
+                                item.id === 'vocabSuggestions'
+                                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30'
+                                  : isActive
+                                  ? 'bg-amber-300/15 text-amber-200'
+                                  : 'bg-slate-800 text-slate-500'
+                              }`}>
                                 {item.badge}
                               </span>
                             )}

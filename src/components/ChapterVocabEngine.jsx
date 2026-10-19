@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabaseClient';
-import { BookOpen, PlayCircle, Loader2, CheckCircle, AlertCircle, ArrowLeft, RotateCcw, Type, List, CheckSquare, XCircle, Trophy } from 'lucide-react';
+import { BookOpen, PlayCircle, Loader2, CheckCircle, AlertCircle, ArrowLeft, RotateCcw, Type, List, CheckSquare, XCircle, Trophy, MessageSquarePlus, Send, X, Check } from 'lucide-react';
 
 const UmlautKeyboard = ({ onInsert }) => {
   const characters = ['Ä', 'Ö', 'Ü', 'ß', 'ä', 'ö', 'ü'];
@@ -49,6 +49,14 @@ export default function ChapterVocabEngine({
   const [savedPayload, setSavedPayload] = useState(null);
   const [wordResults, setWordResults] = useState([]);
   const [timeLeft, setTimeLeft] = useState(null); // seconds remaining
+
+  // Suggestion State (Detailed Review)
+  const [activeSuggestionIdx, setActiveSuggestionIdx] = useState(null);
+  const [suggestionInput, setSuggestionInput] = useState('');
+  const [suggestionTargetLang, setSuggestionTargetLang] = useState('english');
+  const [suggestionLoading, setSuggestionLoading] = useState(false);
+  const [suggestionMsg, setSuggestionMsg] = useState(null);
+  const [submittedSuggestions, setSubmittedSuggestions] = useState({});
 
   // Interaction State
   const [userAnswer, setUserAnswer] = useState('');
@@ -132,6 +140,10 @@ export default function ChapterVocabEngine({
           normalizedWord.accepted_answers = word.english.accepted || [];
         }
         
+        normalizedWord.chapterId = chap.id;
+        normalizedWord.chapterNumber = chap.chapter_number;
+        normalizedWord.chapterLevel = chap.level || level;
+
         return normalizedWord;
       });
       
@@ -203,7 +215,11 @@ export default function ChapterVocabEngine({
       german: currentWord.german,
       english: currentWord.english,
       userAnswer: option,
-      isCorrect
+      isCorrect,
+      chapterId: currentWord.chapterId,
+      chapterNumber: currentWord.chapterNumber,
+      level: currentWord.chapterLevel || currentWord.level || level,
+      testFormat: currentWord.testFormat
     }]);
 
     setTimeout(() => {
@@ -252,7 +268,11 @@ export default function ChapterVocabEngine({
       german: currentWord.german,
       english: currentWord.english,
       userAnswer: userAnswer.trim(),
-      isCorrect
+      isCorrect,
+      chapterId: currentWord.chapterId,
+      chapterNumber: currentWord.chapterNumber,
+      level: currentWord.chapterLevel || currentWord.level || level,
+      testFormat: currentWord.testFormat
     }]);
 
     setTimeout(() => {
@@ -362,6 +382,66 @@ export default function ChapterVocabEngine({
     setUserAnswer(prev => prev + char);
   };
 
+  const openSuggestionForWord = (word, idx) => {
+    setActiveSuggestionIdx(idx);
+    setSuggestionMsg(null);
+    setSuggestionTargetLang(word.testFormat === 'type_de' ? 'german' : 'english');
+    setSuggestionInput(word.userAnswer && word.userAnswer.trim() ? word.userAnswer.trim() : '');
+  };
+
+  const handleSuggestionSubmit = async (word, idx) => {
+    const trimmedInput = suggestionInput.trim();
+    if (!trimmedInput) return;
+    setSuggestionLoading(true);
+    setSuggestionMsg(null);
+
+    try {
+      const res = await fetch('/api/vocab-suggestions/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          chapter_id: word.chapterId || null,
+          level: word.level || level || 'A1',
+          chapter_number: word.chapterNumber || 1,
+          word_german: word.german,
+          word_english: word.english,
+          target_language: suggestionTargetLang,
+          user_answer: word.userAnswer || null,
+          suggested_synonym: trimmedInput,
+          submitted_by_name: studentName || (storedFreeUser?.email ? storedFreeUser.email.split('@')[0] : 'Learner'),
+          user_type: userType || 'anonymous',
+        }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        if (data.pending_migration) {
+          throw new Error('Vocab suggestions database table is pending setup in Supabase.');
+        }
+        throw new Error(data.error || 'Failed to submit suggestion.');
+      }
+
+      setSubmittedSuggestions(prev => ({ ...prev, [idx]: true }));
+      setSuggestionMsg({
+        type: 'success',
+        text: data.message || 'Thank you! Suggestion submitted for admin review.',
+      });
+      setTimeout(() => {
+        setActiveSuggestionIdx(null);
+        setSuggestionMsg(null);
+      }, 2500);
+
+    } catch (err) {
+      setSuggestionMsg({
+        type: 'error',
+        text: err.message || 'Error submitting suggestion.',
+      });
+    } finally {
+      setSuggestionLoading(false);
+    }
+  };
+
   const resetEngine = () => {
     setTestStarted(false);
     setFinished(false);
@@ -369,6 +449,9 @@ export default function ChapterVocabEngine({
     setSaveError(null);
     setSavedSuccess(false);
     setSavedPayload(null);
+    setActiveSuggestionIdx(null);
+    setSuggestionMsg(null);
+    setSubmittedSuggestions({});
   };
 
   if (loading) {
@@ -714,15 +797,108 @@ export default function ChapterVocabEngine({
           <h3 className="text-xl font-bold text-white mb-4 border-b border-slate-800 pb-2">Detailed Review</h3>
           <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
             {wordResults.map((word, idx) => (
-              <div key={idx} className={`p-4 rounded-xl border flex items-center justify-between ${word.isCorrect ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-red-500/10 border-red-500/30'}`}>
-                <div>
-                  <p className="text-sm text-slate-400 font-bold mb-0.5">{word.english}</p>
-                  <p className="text-lg font-extrabold text-white">{word.german}</p>
-                  {!word.isCorrect && (
-                    <p className="text-xs text-red-400 mt-1">You answered: {word.userAnswer}</p>
-                  )}
+              <div key={idx} className={`p-4 rounded-xl border flex flex-col gap-2 ${word.isCorrect ? 'bg-emerald-500/10 border-emerald-500/30' : 'bg-red-500/10 border-red-500/30'}`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm text-slate-400 font-bold mb-0.5">{word.english}</p>
+                    <p className="text-lg font-extrabold text-white">{word.german}</p>
+                    {!word.isCorrect && (
+                      <p className="text-xs text-red-400 mt-1">You answered: <span className="font-semibold">{word.userAnswer || '(none)'}</span></p>
+                    )}
+                  </div>
+                  {word.isCorrect ? <CheckCircle className="w-6 h-6 text-emerald-500 shrink-0" /> : <XCircle className="w-6 h-6 text-red-500 shrink-0" />}
                 </div>
-                {word.isCorrect ? <CheckCircle className="w-6 h-6 text-emerald-500 shrink-0" /> : <XCircle className="w-6 h-6 text-red-500 shrink-0" />}
+
+                {!word.isCorrect && (
+                  <div className="mt-1 pt-2 border-t border-red-500/20">
+                    {submittedSuggestions[idx] ? (
+                      <div className="inline-flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                        <Check className="w-3.5 h-3.5" />
+                        <span>Suggestion submitted for admin review</span>
+                      </div>
+                    ) : activeSuggestionIdx === idx ? (
+                      <div className="space-y-2 p-3 bg-slate-950/80 rounded-xl border border-slate-800">
+                        <div className="flex items-center justify-between text-xs text-slate-300 font-semibold">
+                          <span>Suggest alternative synonym / correction:</span>
+                          <button
+                            type="button"
+                            onClick={() => { setActiveSuggestionIdx(null); setSuggestionMsg(null); }}
+                            className="text-slate-400 hover:text-white p-1"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+
+                        <div className="flex items-center gap-2 text-xs">
+                          <span className="text-slate-500 text-[11px]">Add as synonym for:</span>
+                          <button
+                            type="button"
+                            onClick={() => setSuggestionTargetLang('english')}
+                            className={`px-2 py-0.5 rounded text-[11px] font-semibold border transition ${
+                              suggestionTargetLang === 'english'
+                                ? 'bg-amber-500/20 border-amber-500/50 text-amber-300'
+                                : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                            }`}
+                          >
+                            English ({word.english})
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setSuggestionTargetLang('german')}
+                            className={`px-2 py-0.5 rounded text-[11px] font-semibold border transition ${
+                              suggestionTargetLang === 'german'
+                                ? 'bg-amber-500/20 border-amber-500/50 text-amber-300'
+                                : 'bg-slate-900 border-slate-800 text-slate-400 hover:text-white'
+                            }`}
+                          >
+                            German ({word.german})
+                          </button>
+                        </div>
+
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="text"
+                            value={suggestionInput}
+                            onChange={(e) => setSuggestionInput(e.target.value)}
+                            placeholder={suggestionTargetLang === 'german' ? 'Enter valid German synonym...' : 'Enter valid English synonym...'}
+                            className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400"
+                            disabled={suggestionLoading}
+                          />
+                          <button
+                            type="button"
+                            disabled={suggestionLoading || !suggestionInput.trim()}
+                            onClick={() => handleSuggestionSubmit(word, idx)}
+                            className="px-3 py-1.5 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-bold text-xs rounded-lg flex items-center gap-1.5 transition shrink-0"
+                          >
+                            {suggestionLoading ? (
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                            ) : (
+                              <>
+                                <Send className="w-3.5 h-3.5" />
+                                <span>Submit</span>
+                              </>
+                            )}
+                          </button>
+                        </div>
+
+                        {suggestionMsg && (
+                          <p className={`text-xs ${suggestionMsg.type === 'error' ? 'text-red-400' : 'text-emerald-400'}`}>
+                            {suggestionMsg.text}
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => openSuggestionForWord(word, idx)}
+                        className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-amber-400 hover:bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-800 hover:border-amber-500/40 transition"
+                      >
+                        <MessageSquarePlus className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Suggest correction / synonym</span>
+                      </button>
+                    )}
+                  </div>
+                )}
               </div>
             ))}
           </div>
