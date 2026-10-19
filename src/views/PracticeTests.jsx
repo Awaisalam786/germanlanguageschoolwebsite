@@ -13,6 +13,7 @@ import ChapterVocabEngine from '../components/ChapterVocabEngine';
 import ReadingTestEngine from '../components/ReadingTestEngine';
 import AlphabetNumbersEngine from '../components/AlphabetNumbersEngine';
 import GrammarEngine from '../components/GrammarEngine';
+import GrammarTranslationEngine from '../components/GrammarTranslationEngine';
 
 export default function PracticeTests() {
   // Navigation Steps:
@@ -1007,6 +1008,22 @@ export default function PracticeTests() {
               </div>
             </button>
 
+            <button
+              onClick={() => setStep('grammar_translation_engine')}
+              className="group relative flex min-h-[184px] items-center gap-5 overflow-hidden rounded-2xl border border-teal-400/40 bg-gradient-to-br from-teal-500/[0.20] via-slate-900 to-slate-900 p-5 text-left shadow-lg shadow-black/10 transition duration-300 hover:-translate-y-1 hover:border-teal-400/50 hover:shadow-xl hover:shadow-teal-500/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400 sm:p-6"
+            >
+              <div className="w-20 h-20 shrink-0 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-teal-500/20">
+                <Languages className="w-8 h-8 text-slate-950" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <h3 className="text-xl font-bold text-white group-hover:text-teal-400 transition-colors">Sentence Translation</h3>
+                  <span className="px-2 py-0.5 bg-teal-500/20 text-teal-400 text-[10px] font-bold rounded-full uppercase">New</span>
+                </div>
+                <p className="text-sm text-slate-400">Translate English sentences into German with base-form verb and noun hints.</p>
+              </div>
+            </button>
+
             {htmlTestsEnabled && (
               <button
                 onClick={() => navigateToContent('Vocab Test')}
@@ -1058,6 +1075,20 @@ export default function PracticeTests() {
           <GrammarEngine 
             level={selectedLevel} 
             onBack={() => setStep(3)} 
+            userType={userType}
+            storedFreeUser={storedFreeUser}
+            studentName={studentName}
+            verifiedCode={verifiedCode}
+          />
+        </div>
+      )}
+
+      {/* ───── STEP: Grammar Translation Engine ───── */}
+      {step === 'grammar_translation_engine' && (
+        <div className="w-full mt-4 flex-1">
+          <GrammarTranslationEngine
+            level={selectedLevel}
+            onBack={() => setStep(3)}
             userType={userType}
             storedFreeUser={storedFreeUser}
             studentName={studentName}
