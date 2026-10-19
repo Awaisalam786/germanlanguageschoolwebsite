@@ -34,6 +34,8 @@ import ReadingPassagesManager from '../../src/admin/ReadingPassagesManager';
 import ReadingResultsManager from '../../src/admin/ReadingResultsManager';
 import NounBuilderAdmin from '../../src/admin/noun-builder/NounBuilderAdmin';
 import VocabSuggestionsManager from '../../src/admin/VocabSuggestionsManager';
+import GrammarTranslationManager from '../../src/admin/GrammarTranslationManager';
+import GrammarTranslationSuggestionsManager from '../../src/admin/GrammarTranslationSuggestionsManager';
 import { useGlobalState } from '../../src/context/GlobalStateContext';
 import { useRouter } from 'next/navigation';
 
@@ -92,6 +94,8 @@ export default function AdminPage() {
       case 'announcements': return <AnnouncementsManager />;
       case 'nounBuilder': return <NounBuilderAdmin />;
       case 'vocabSuggestions': return <VocabSuggestionsManager />;
+      case 'grammarTranslation': return <GrammarTranslationManager initialTab="topics" />;
+      case 'grammarTranslationSuggestions': return <GrammarTranslationSuggestionsManager />;
       default: return <Dashboard setCurrentTab={setAdminTab} />;
     }
   };

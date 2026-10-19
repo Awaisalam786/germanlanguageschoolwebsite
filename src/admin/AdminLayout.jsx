@@ -33,7 +33,8 @@ import {
   FileCode2,
   Trophy,
   ChevronDown,
-  Search
+  Search,
+  Layers
 } from 'lucide-react';
 import { translations } from '../i18n/translations';
 import { supabase } from '../lib/supabaseClient';
@@ -51,6 +52,7 @@ export default function AdminLayout({
   const [openGroups, setOpenGroups] = useState({ overview: true });
   const [menuSearch, setMenuSearch] = useState('');
   const [pendingSuggestionsCount, setPendingSuggestionsCount] = useState(0);
+  const [pendingGrammarCount, setPendingGrammarCount] = useState(0);
   const t = translations[currentLang];
 
   useEffect(() => {
@@ -60,10 +62,19 @@ export default function AdminLayout({
         const { data: { session } } = await supabase.auth.getSession();
         const headers = {};
         if (session?.access_token) headers['Authorization'] = `Bearer ${session.access_token}`;
-        const res = await fetch('/api/vocab-suggestions?count_only=true', { headers });
-        const data = await res.json().catch(() => ({}));
-        if (isMounted && data?.pendingCount !== undefined) {
-          setPendingSuggestionsCount(data.pendingCount);
+
+        const [vocabData, grammarData] = await Promise.all([
+          fetch('/api/vocab-suggestions?count_only=true', { headers }).then((r) => r.json()).catch(() => ({})),
+          fetch('/api/admin/grammar-translation/suggestions?count_only=true', { headers }).then((r) => r.json()).catch(() => ({}))
+        ]);
+
+        if (isMounted) {
+          if (vocabData?.pendingCount !== undefined) {
+            setPendingSuggestionsCount(vocabData.pendingCount);
+          }
+          if (grammarData?.pendingCount !== undefined) {
+            setPendingGrammarCount(grammarData.pendingCount);
+          }
         }
       } catch (e) {
         // fail silently
@@ -99,6 +110,18 @@ export default function AdminLayout({
     },
     { id: 'smartVocabResults', label: 'Smart Vocab Results', icon: Trophy, badge: 'New' },
     { id: 'grammarChapters', label: 'Grammar Chapters', icon: BookOpen, badge: 'New' },
+    {
+      id: 'grammarTranslation',
+      label: 'Grammar Translation',
+      icon: Layers,
+      badge: pendingGrammarCount > 0 ? `${pendingGrammarCount}` : 'New'
+    },
+    {
+      id: 'grammarTranslationSuggestions',
+      label: 'Translation Suggestions',
+      icon: MessageSquarePlus,
+      badge: pendingGrammarCount > 0 ? `${pendingGrammarCount}` : null
+    },
     { id: 'grammarResults', label: 'Grammar Results', icon: Trophy, badge: 'New' },
     { id: 'readingPassages', label: 'Reading Passages', icon: BookOpen, badge: 'New' },
     { id: 'readingResults', label: 'Reading Results', icon: Trophy, badge: 'New' },
@@ -118,7 +141,7 @@ export default function AdminLayout({
   const menuGroups = [
     { id: 'overview', label: 'Overview', itemIds: ['dashboard', 'analytics'] },
     { id: 'people', label: 'People', itemIds: ['students', 'teachersManager', 'inquiries'] },
-    { id: 'learning', label: 'Learning', itemIds: ['coursesManager', 'recordings', 'certificateManager', 'practiceTests', 'nounBuilder', 'chapterVocab', 'vocabSuggestions', 'smartVocabResults', 'grammarChapters', 'grammarResults', 'readingPassages', 'readingResults'] },
+    { id: 'learning', label: 'Learning', itemIds: ['coursesManager', 'recordings', 'certificateManager', 'practiceTests', 'nounBuilder', 'chapterVocab', 'vocabSuggestions', 'smartVocabResults', 'grammarChapters', 'grammarTranslation', 'grammarTranslationSuggestions', 'grammarResults', 'readingPassages', 'readingResults'] },
     { id: 'content', label: 'Website Content', itemIds: ['announcements', 'documents', 'blogCMS', 'testimonialsManager', 'galleryManager', 'googleReviews'] },
     { id: 'commerce', label: 'Orders & Payments', itemIds: ['booksManager', 'bookBundles', 'bookOrders', 'paymentStatus', 'couponManager'] },
     { id: 'settings', label: 'Settings', itemIds: ['themeCustomizer', 'notifications', 'globalContent', 'settings'] },
