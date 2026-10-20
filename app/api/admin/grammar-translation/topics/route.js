@@ -152,8 +152,56 @@ export async function PUT(req) {
     if (is_active !== undefined) updatePayload.is_active = Boolean(is_active);
 
     if (Array.isArray(questions)) {
-      updatePayload.questions = questions;
-      updatePayload.question_count = questions.length;
+      const sanitizedQuestions = [];
+      for (let i = 0; i < questions.length; i++) {
+        const q = questions[i];
+        if (!q || typeof q !== 'object') {
+          return NextResponse.json(
+            { error: `Question at index ${i} is not a valid question object.` },
+            { status: 400 }
+          );
+        }
+        const english = String(
+          q.english_sentence ||
+          q.english_prompt ||
+          q.prompt ||
+          q.english ||
+          q.sentence ||
+          ''
+        ).trim();
+
+        const german = String(
+          q.target_german ||
+          q.german_sentence ||
+          q.german ||
+          q.correct_german ||
+          q.target ||
+          ''
+        ).trim();
+
+        if (!english) {
+          return NextResponse.json(
+            { error: `Question index ${i} (${q.id || 'unnamed'}) is missing required english_sentence prompt.` },
+            { status: 400 }
+          );
+        }
+
+        if (!german) {
+          return NextResponse.json(
+            { error: `Question index ${i} (${q.id || 'unnamed'}) is missing required target_german translation.` },
+            { status: 400 }
+          );
+        }
+
+        sanitizedQuestions.push({
+          ...q,
+          english_sentence: english,
+          target_german: german,
+        });
+      }
+
+      updatePayload.questions = sanitizedQuestions;
+      updatePayload.question_count = sanitizedQuestions.length;
     }
 
     const { data, error } = await supabase

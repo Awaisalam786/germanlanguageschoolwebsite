@@ -40,6 +40,31 @@ const UmlautKeyboard = ({ onInsert }) => {
   );
 };
 
+// Robust schema getters to reliably retrieve English prompt and target German answer across all schema variations
+export const getQuestionPrompt = (q) => {
+  if (!q) return '';
+  return String(
+    q.english_sentence ||
+    q.english_prompt ||
+    q.prompt ||
+    q.english ||
+    q.sentence ||
+    ''
+  ).trim();
+};
+
+export const getQuestionTarget = (q) => {
+  if (!q) return '';
+  return String(
+    q.target_german ||
+    q.german_sentence ||
+    q.german ||
+    q.correct_german ||
+    q.target ||
+    ''
+  ).trim();
+};
+
 export default function GrammarTranslationEngine({
   level = 'A1',
   onBack,
@@ -230,6 +255,11 @@ export default function GrammarTranslationEngine({
 
   const handleRecordAnswer = (e) => {
     e.preventDefault();
+    const prompt = getQuestionPrompt(currentQuestion);
+    if (!prompt) {
+      alert('Cannot submit answer: The English prompt for this question is missing or blank.');
+      return;
+    }
     if (!userTypedInput.trim() || isAnswerRecorded) return;
 
     // Record answer silently without revealing correctness
@@ -284,13 +314,13 @@ export default function GrammarTranslationEngine({
 
   const evaluateAttempt = (attempt) => {
     const userNorm = normalizeSentence(attempt.userAnswer);
-    const officialTarget = attempt.question.target_german;
+    const officialTarget = getQuestionTarget(attempt.question);
     const acceptedList = Array.isArray(attempt.question.accepted_answers)
       ? attempt.question.accepted_answers
       : [];
 
-    const allValid = [officialTarget, ...acceptedList].map(normalizeSentence);
-    const isCorrect = allValid.includes(userNorm);
+    const allValid = [officialTarget, ...acceptedList].filter(Boolean).map(normalizeSentence);
+    const isCorrect = allValid.length > 0 && allValid.includes(userNorm);
 
     return {
       isCorrect,
@@ -338,8 +368,8 @@ export default function GrammarTranslationEngine({
         level: level,
         topic_title: resultItem.question.topic || 'Grammar Translation',
         question_id: resultItem.question.id,
-        english_sentence: resultItem.question.english_sentence,
-        official_german: resultItem.question.target_german,
+        english_sentence: getQuestionPrompt(resultItem.question),
+        official_german: getQuestionTarget(resultItem.question),
         user_typed_answer: resultItem.userAnswer || null,
         suggested_alternative: cleanSynonym,
         notes: suggestionNotes.trim() || null,
@@ -579,6 +609,9 @@ export default function GrammarTranslationEngine({
     const attemptedCount = currentIdx + (isAnswerRecorded ? 1 : 0);
     const progressPercent = Math.round((attemptedCount / sessionQuestions.length) * 100);
 
+    const promptText = getQuestionPrompt(currentQuestion);
+    const isPromptMissing = !promptText;
+
     return (
       <div className="max-w-3xl mx-auto w-full flex flex-col flex-1 pb-12 animate-fade-in">
         {/* Header Bar */}
@@ -623,9 +656,22 @@ export default function GrammarTranslationEngine({
             <span className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-400">
               Translate into German:
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white leading-relaxed">
-              "{currentQuestion.english_sentence}"
-            </h2>
+            {promptText ? (
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white leading-relaxed">
+                "{promptText}"
+              </h2>
+            ) : (
+              <div className="bg-red-500/10 border border-red-500/30 rounded-2xl p-4 text-center space-y-1">
+                <div className="flex items-center justify-center gap-2 text-red-400 font-bold text-sm">
+                  <AlertCircle className="w-5 h-5 shrink-0" />
+                  <span>English sentence prompt is missing or blank for this question.</span>
+                </div>
+                <p className="text-xs text-slate-400">
+                  Answer submission is disabled. Please skip to the next question or report question ID{' '}
+                  <span className="font-mono text-slate-300">{currentQuestion.id || 'N/A'}</span>.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* German Typing Input */}
@@ -640,15 +686,15 @@ export default function GrammarTranslationEngine({
                 rows="3"
                 value={userTypedInput}
                 onChange={(e) => setUserTypedInput(e.target.value)}
-                placeholder="Type the full German sentence..."
-                disabled={isAnswerRecorded}
-                className="w-full bg-slate-950 border border-slate-700 rounded-2xl p-4 text-white text-base sm:text-lg placeholder-slate-600 focus:outline-none focus:border-emerald-400 transition resize-none disabled:opacity-75"
-                autoFocus
+                placeholder={isPromptMissing ? 'Answering disabled: English prompt is missing.' : 'Type the full German sentence...'}
+                disabled={isAnswerRecorded || isPromptMissing}
+                className="w-full bg-slate-950 border border-slate-700 rounded-2xl p-4 text-white text-base sm:text-lg placeholder-slate-600 focus:outline-none focus:border-emerald-400 transition resize-none disabled:opacity-50"
+                autoFocus={!isPromptMissing}
               />
             </div>
 
             {/* German Character Buttons */}
-            {!isAnswerRecorded && <UmlautKeyboard onInsert={handleInsertChar} />}
+            {!isAnswerRecorded && !isPromptMissing && <UmlautKeyboard onInsert={handleInsertChar} />}
 
             {/* Structured Hint Pills (Base forms only) */}
             <div className="pt-2">
@@ -699,13 +745,33 @@ export default function GrammarTranslationEngine({
             {/* Action Buttons: Check Answer (Silent Record) & Next Question */}
             <div className="pt-2 flex flex-col sm:flex-row gap-3">
               {!isAnswerRecorded ? (
-                <button
-                  type="submit"
-                  disabled={!userTypedInput.trim()}
-                  className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-slate-950 font-extrabold rounded-xl transition shadow-lg shadow-emerald-500/20 text-base"
-                >
-                  Check & Record Answer
-                </button>
+                isPromptMissing ? (
+                  <div className="w-full space-y-3">
+                    <button
+                      type="button"
+                      disabled
+                      className="w-full py-4 bg-slate-800 text-slate-500 font-extrabold rounded-xl text-base cursor-not-allowed"
+                    >
+                      Answer Submission Disabled (Prompt Missing)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleNextQuestion}
+                      className="w-full py-4 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 font-extrabold rounded-xl transition border border-amber-500/30 flex items-center justify-center gap-2 text-base"
+                    >
+                      <span>{currentIdx + 1 < sessionQuestions.length ? 'Skip to Next Question' : 'Complete Session'}</span>
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={!userTypedInput.trim()}
+                    className="w-full py-4 bg-emerald-500 hover:bg-emerald-400 disabled:opacity-50 text-slate-950 font-extrabold rounded-xl transition shadow-lg shadow-emerald-500/20 text-base"
+                  >
+                    Check & Record Answer
+                  </button>
+                )
               ) : (
                 <div className="w-full space-y-3">
                   <div className="p-3 bg-emerald-500/10 border border-emerald-500/30 rounded-xl text-center text-xs font-bold text-emerald-400 flex items-center justify-center gap-2">
@@ -813,7 +879,9 @@ export default function GrammarTranslationEngine({
                 <div className="flex items-start justify-between gap-3">
                   <div className="space-y-1.5 flex-1">
                     <span className="text-xs font-bold text-slate-400">English Prompt:</span>
-                    <p className="text-base font-extrabold text-white">"{result.question.english_sentence}"</p>
+                    <p className="text-base font-extrabold text-white">
+                      {getQuestionPrompt(result.question) ? `"${getQuestionPrompt(result.question)}"` : <span className="text-red-400 italic">[Blank Prompt]</span>}
+                    </p>
 
                     <div className="text-xs space-y-1 pt-1">
                       <p className={result.isCorrect ? 'text-emerald-300' : 'text-red-300'}>
@@ -824,7 +892,7 @@ export default function GrammarTranslationEngine({
                       {!result.isCorrect && (
                         <p className="text-emerald-400 font-semibold">
                           <span className="font-bold text-slate-400">Accepted Answer: </span>
-                          {result.officialAnswer}
+                          {result.officialAnswer || <span className="text-red-400 italic">[Missing Target Answer]</span>}
                         </p>
                       )}
                     </div>
