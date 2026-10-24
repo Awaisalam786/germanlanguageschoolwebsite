@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import GrammarTranslationSuggestionsManager from './GrammarTranslationSuggestionsManager';
 import {
@@ -15,8 +15,10 @@ import {
   HelpCircle,
   CheckCircle,
   AlertCircle,
+  AlertTriangle,
   Loader2,
   Upload,
+  FileText,
   RefreshCw,
   Eye,
   ChevronDown,
@@ -60,6 +62,111 @@ export default function GrammarTranslationManager({ initialTab = 'topics' }) {
   // JSON batch import / export modal
   const [showJsonModal, setShowJsonModal] = useState(false);
   const [jsonInput, setJsonInput] = useState('');
+  const fileInputRef = useRef(null);
+  const [selectedFileName, setSelectedFileName] = useState('');
+  const [fileError, setFileError] = useState('');
+  const [fileSuccess, setFileSuccess] = useState('');
+
+  const handleClearSelectedFile = () => {
+    setSelectedFileName('');
+    setFileError('');
+    setFileSuccess('');
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setFileError('');
+    setFileSuccess('');
+
+    // Check extension
+    if (!file.name.toLowerCase().endsWith('.json')) {
+      setFileError('Invalid file type: Please select a file with a .json extension.');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = (event) => {
+      try {
+        const text = event.target?.result;
+        if (!text || typeof text !== 'string') {
+          throw new Error('File is empty or could not be read.');
+        }
+
+        let parsed;
+        try {
+          parsed = JSON.parse(text);
+        } catch (jsonErr) {
+          throw new Error('Invalid JSON syntax: ' + jsonErr.message);
+        }
+
+        if (!Array.isArray(parsed)) {
+          throw new Error('Root JSON value must be an array of question objects.');
+        }
+
+        if (parsed.length === 0) {
+          throw new Error('JSON array is empty. Please provide a file with at least one question.');
+        }
+
+        // Validate each item for required question fields expected by importer
+        for (let i = 0; i < parsed.length; i++) {
+          const item = parsed[i];
+          if (!item || typeof item !== 'object') {
+            throw new Error(`Item at index ${i} is not a valid question object.`);
+          }
+
+          const english = String(
+            item.english_sentence ||
+            item.english_prompt ||
+            item.prompt ||
+            item.english ||
+            item.sentence ||
+            ''
+          ).trim();
+
+          const german = String(
+            item.target_german ||
+            item.german_sentence ||
+            item.german ||
+            item.correct_german ||
+            item.target ||
+            ''
+          ).trim();
+
+          if (!english) {
+            throw new Error(
+              `Question #${i + 1} (${item.id || 'unnamed'}) is missing an English sentence prompt ("english_sentence" or "prompt").`
+            );
+          }
+
+          if (!german) {
+            throw new Error(
+              `Question #${i + 1} (${item.id || 'unnamed'}) is missing a primary German translation ("target_german" or "german").`
+            );
+          }
+        }
+
+        setSelectedFileName(file.name);
+        setJsonInput(JSON.stringify(parsed, null, 2));
+        setFileSuccess(`Loaded ${parsed.length} valid question(s) from "${file.name}". Click "Apply JSON to Topic" below when ready.`);
+      } catch (err) {
+        setFileError(err.message || 'Failed to read or validate JSON file.');
+      } finally {
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      }
+    };
+
+    reader.onerror = () => {
+      setFileError('Error reading file from disk. Please try again.');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+
+    reader.readAsText(file);
+  };
 
   const getAdminAuthHeaders = async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -314,6 +421,15 @@ export default function GrammarTranslationManager({ initialTab = 'topics' }) {
         return;
       }
 
+      // If replacing existing questions, clearly confirm with admin
+      const existingCount = Array.isArray(selectedTopic?.questions) ? selectedTopic.questions.length : 0;
+      if (existingCount > 0) {
+        const proceed = window.confirm(
+          `Warning: Applying this JSON will replace all ${existingCount} existing questions in "${selectedTopic.topic_title}". Are you sure you want to proceed?`
+        );
+        if (!proceed) return;
+      }
+
       // Basic validation and field normalization
       const sanitized = parsed.map((item, idx) => {
         const english = String(
@@ -372,6 +488,7 @@ export default function GrammarTranslationManager({ initialTab = 'topics' }) {
       await persistTopicQuestions(sanitized);
       setShowJsonModal(false);
       setJsonInput('');
+      handleClearSelectedFile();
       alert(`Imported ${sanitized.length} questions successfully!`);
     } catch (err) {
       alert('Invalid JSON: ' + err.message);
@@ -611,6 +728,7 @@ export default function GrammarTranslationManager({ initialTab = 'topics' }) {
                     type="button"
                     onClick={() => {
                       setJsonInput(JSON.stringify(selectedTopic.questions || [], null, 2));
+                      handleClearSelectedFile();
                       setShowJsonModal(true);
                     }}
                     className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-bold transition flex items-center gap-1.5"
@@ -1041,36 +1159,149 @@ export default function GrammarTranslationManager({ initialTab = 'topics' }) {
       {/* MODAL 3: JSON Batch Import / Export */}
       {/* ---------------------------------------------------------------------- */}
       {showJsonModal && (
-        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-2xl w-full p-6 shadow-2xl space-y-4 my-8 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <h3 className="text-lg font-bold text-white">JSON Batch Import / Export</h3>
+              <div>
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <Upload className="w-5 h-5 text-amber-500" />
+                  <span>JSON Batch Import / Export</span>
+                </h3>
+                <p className="text-xs text-slate-400 mt-0.5">
+                  Target Topic: <strong className="text-white">{selectedTopic?.topic_title}</strong> (Level {selectedTopic?.level})
+                </p>
+              </div>
               <button
                 type="button"
-                onClick={() => setShowJsonModal(false)}
+                onClick={() => {
+                  setShowJsonModal(false);
+                  handleClearSelectedFile();
+                }}
                 className="text-slate-400 hover:text-white"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
+            {/* Warning if replacing existing questions */}
+            {selectedTopic?.questions?.length > 0 && (
+              <div className="p-3 bg-amber-500/10 border border-amber-500/25 rounded-xl flex items-start gap-2.5 text-xs text-amber-300">
+                <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                <div>
+                  <strong className="text-amber-200">Warning:</strong> Applying new JSON will replace the{' '}
+                  <strong className="text-white">{selectedTopic.questions.length}</strong> existing question(s) in this topic. The current questions are pre-loaded in the box below as a backup.
+                </div>
+              </div>
+            )}
+
             <p className="text-xs text-slate-400">
-              Paste an array of question objects to replace or bulk-populate questions for{' '}
-              <strong className="text-white">{selectedTopic?.topic_title}</strong>.
+              Upload a <code className="bg-slate-950 px-1 py-0.5 rounded text-amber-400 font-mono">.json</code> file or manually paste question objects below. Questions will only be saved when you click <strong className="text-white">Apply JSON to Topic</strong>.
             </p>
 
-            <textarea
-              rows="12"
-              value={jsonInput}
-              onChange={(e) => setJsonInput(e.target.value)}
-              className="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-white font-mono text-xs focus:outline-none focus:border-amber-500"
-              placeholder='[ { "id": "gt-a1-t01-001", "difficulty": "Easy", "english_sentence": "...", "target_german": "...", "accepted_answers": [], "hints": { "verbs": [], "nouns": [] }, "explanation": "..." } ]'
-            />
+            {/* File Upload Control */}
+            <div className="p-3.5 bg-slate-950/90 border border-slate-800 rounded-xl space-y-2.5">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".json,application/json"
+                onChange={handleFileChange}
+                className="hidden"
+                id="json-file-input"
+              />
+
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-lg text-xs border border-slate-700 flex items-center gap-2 transition cursor-pointer active:scale-95 shadow-sm"
+                  >
+                    <Upload className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Choose JSON File</span>
+                  </button>
+
+                  {selectedFileName ? (
+                    <div className="flex items-center gap-1.5 px-2.5 py-1.5 bg-emerald-500/10 border border-emerald-500/30 rounded-lg text-xs text-emerald-300 font-mono">
+                      <FileText className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      <span className="truncate max-w-[220px]" title={selectedFileName}>
+                        {selectedFileName}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={handleClearSelectedFile}
+                        className="text-slate-400 hover:text-white ml-1 p-0.5 rounded hover:bg-slate-800"
+                        title="Clear chosen file"
+                      >
+                        <X className="w-3 h-3" />
+                      </button>
+                    </div>
+                  ) : (
+                    <span className="text-[11px] text-slate-400">
+                      Accepts valid .json question arrays
+                    </span>
+                  )}
+                </div>
+
+                {jsonInput && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (typeof navigator !== 'undefined' && navigator.clipboard) {
+                        navigator.clipboard.writeText(jsonInput);
+                        alert('JSON copied to clipboard!');
+                      }
+                    }}
+                    className="text-[11px] text-slate-400 hover:text-amber-400 transition underline underline-offset-2 self-start sm:self-auto"
+                  >
+                    Copy Existing JSON Backup
+                  </button>
+                )}
+              </div>
+
+              {/* File validation error banner */}
+              {fileError && (
+                <div className="p-2.5 bg-rose-500/10 border border-rose-500/30 rounded-lg flex items-start gap-2 text-xs text-rose-300">
+                  <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                  <p className="flex-1 leading-relaxed">{fileError}</p>
+                </div>
+              )}
+
+              {/* File validation success message */}
+              {fileSuccess && (
+                <div className="p-2.5 bg-emerald-500/10 border border-emerald-500/20 rounded-lg flex items-center gap-2 text-xs text-emerald-300">
+                  <CheckCircle className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <p className="flex-1 leading-relaxed">{fileSuccess}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Textarea for JSON Inspection & Manual Edit */}
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                  JSON Data Preview / Manual Paste
+                </label>
+                <span className="text-[10px] text-slate-400">Editable before applying</span>
+              </div>
+              <textarea
+                rows="11"
+                value={jsonInput}
+                onChange={(e) => {
+                  setJsonInput(e.target.value);
+                  if (fileSuccess) setFileSuccess('');
+                }}
+                className="w-full bg-slate-950 border border-slate-700 rounded-lg p-3 text-white font-mono text-xs focus:outline-none focus:border-amber-500 transition leading-relaxed"
+                placeholder='[ { "id": "gt-a1-t01-001", "difficulty": "Easy", "english_sentence": "...", "target_german": "...", "accepted_answers": [], "hints": { "verbs": [], "nouns": [] }, "explanation": "..." } ]'
+              />
+            </div>
 
             <div className="flex justify-end gap-2 pt-2 border-t border-slate-800">
               <button
                 type="button"
-                onClick={() => setShowJsonModal(false)}
+                onClick={() => {
+                  setShowJsonModal(false);
+                  handleClearSelectedFile();
+                }}
                 className="px-4 py-2 bg-slate-800 text-slate-300 font-bold rounded-lg hover:bg-slate-700 text-xs"
               >
                 Cancel
@@ -1079,9 +1310,16 @@ export default function GrammarTranslationManager({ initialTab = 'topics' }) {
                 type="button"
                 onClick={handleImportJson}
                 disabled={loading || !jsonInput.trim()}
-                className="px-4 py-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-bold rounded-lg transition text-xs shadow-md"
+                className="px-4 py-2 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-slate-950 font-bold rounded-lg transition text-xs shadow-md flex items-center gap-1.5"
               >
-                {loading ? 'Processing...' : 'Apply JSON to Topic'}
+                {loading ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <span>Processing...</span>
+                  </>
+                ) : (
+                  <span>Apply JSON to Topic</span>
+                )}
               </button>
             </div>
           </div>
