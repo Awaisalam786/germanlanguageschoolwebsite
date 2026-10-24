@@ -206,6 +206,8 @@ export default function GrammarTranslationManager({ initialTab = 'topics' }) {
   const openEditQuestionModal = (q) => {
     setEditingQuestion({
       ...q,
+      english_sentence: (q.english_sentence || q.english_prompt || q.prompt || q.english || q.sentence || '').trim(),
+      target_german: (q.target_german || q.german_sentence || q.german || q.correct_german || q.target || '').trim(),
       accepted_answers: Array.isArray(q.accepted_answers) ? q.accepted_answers : [],
       hints: {
         verbs: Array.isArray(q.hints?.verbs) ? q.hints.verbs : [],
@@ -307,23 +309,65 @@ export default function GrammarTranslationManager({ initialTab = 'topics' }) {
         return;
       }
 
-      // Basic validation
-      const sanitized = parsed.map((item, idx) => ({
-        id: item.id || `gt-${selectedTopic.level.toLowerCase()}-t${String(selectedTopic.topic_number).padStart(2, '0')}-${String(idx + 1).padStart(3, '0')}`,
-        level: selectedTopic.level,
-        topic: selectedTopic.topic_title,
-        difficulty: DIFFICULTIES.includes(item.difficulty) ? item.difficulty : 'Easy',
-        english_sentence: String(item.english_sentence || '').trim(),
-        target_german: String(item.target_german || '').trim(),
-        accepted_answers: Array.isArray(item.accepted_answers) ? item.accepted_answers : [],
-        hints: {
-          verbs: Array.isArray(item.hints?.verbs) ? item.hints.verbs : [],
-          nouns: Array.isArray(item.hints?.nouns) ? item.hints.nouns : [],
-          adjectives: Array.isArray(item.hints?.adjectives) ? item.hints.adjectives : [],
-          notes: item.hints?.notes || '',
-        },
-        explanation: item.explanation || '',
-      }));
+      if (parsed.length === 0) {
+        alert('JSON array is empty. Please provide at least one question.');
+        return;
+      }
+
+      // Basic validation and field normalization
+      const sanitized = parsed.map((item, idx) => {
+        const english = String(
+          item.english_sentence ||
+          item.english_prompt ||
+          item.prompt ||
+          item.english ||
+          item.sentence ||
+          ''
+        ).trim();
+
+        const german = String(
+          item.target_german ||
+          item.german_sentence ||
+          item.german ||
+          item.correct_german ||
+          item.target ||
+          ''
+        ).trim();
+
+        return {
+          id: item.id || `gt-${selectedTopic.level.toLowerCase()}-t${String(selectedTopic.topic_number).padStart(2, '0')}-${String(idx + 1).padStart(3, '0')}`,
+          level: selectedTopic.level,
+          topic: selectedTopic.topic_title,
+          difficulty: DIFFICULTIES.includes(item.difficulty) ? item.difficulty : 'Easy',
+          english_sentence: english,
+          target_german: german,
+          accepted_answers: Array.isArray(item.accepted_answers) ? item.accepted_answers : [],
+          hints: {
+            verbs: Array.isArray(item.hints?.verbs) ? item.hints.verbs : [],
+            nouns: Array.isArray(item.hints?.nouns) ? item.hints.nouns : [],
+            adjectives: Array.isArray(item.hints?.adjectives) ? item.hints.adjectives : [],
+            notes: item.hints?.notes || '',
+          },
+          explanation: item.explanation || '',
+        };
+      });
+
+      // Strict validation: verify that all questions have non-blank English and German sentences
+      const missingEnglishIdx = sanitized.findIndex((q) => !q.english_sentence);
+      if (missingEnglishIdx !== -1) {
+        alert(
+          `Import rejected: Question #${missingEnglishIdx + 1} (${sanitized[missingEnglishIdx].id}) is missing an English prompt ("english_sentence" or "prompt"). Every question must have an English sentence.`
+        );
+        return;
+      }
+
+      const missingGermanIdx = sanitized.findIndex((q) => !q.target_german);
+      if (missingGermanIdx !== -1) {
+        alert(
+          `Import rejected: Question #${missingGermanIdx + 1} (${sanitized[missingGermanIdx].id}) is missing a primary German translation ("target_german" or "german"). Every question must have an official German answer.`
+        );
+        return;
+      }
 
       await persistTopicQuestions(sanitized);
       setShowJsonModal(false);
@@ -646,8 +690,26 @@ export default function GrammarTranslationManager({ initialTab = 'topics' }) {
                             </span>
                           </div>
 
-                          <p className="text-sm font-bold text-white leading-snug">{q.english_sentence}</p>
-                          <p className="text-sm text-emerald-300 font-semibold leading-snug">{q.target_german}</p>
+                          <p className="text-sm font-bold text-white leading-snug">
+                            {q.english_sentence ? (
+                              q.english_sentence
+                            ) : (
+                              <span className="text-rose-400 font-semibold flex items-center gap-1">
+                                <AlertCircle className="w-3.5 h-3.5" />
+                                Missing English Prompt
+                              </span>
+                            )}
+                          </p>
+                          <p className="text-sm text-emerald-300 font-semibold leading-snug">
+                            {q.target_german ? (
+                              q.target_german
+                            ) : (
+                              <span className="text-rose-400 font-semibold flex items-center gap-1">
+                                <AlertCircle className="w-3.5 h-3.5" />
+                                Missing German Answer
+                              </span>
+                            )}
+                          </p>
 
                           {q.accepted_answers && q.accepted_answers.length > 0 && (
                             <div className="text-[11px] text-slate-400 flex items-center gap-1.5 flex-wrap pt-0.5">
